@@ -27,6 +27,7 @@
     <div class="menu-item" onclick="app.switchView('withdrawView')">🏧 Withdraw Funds</div>
     <div class="menu-item" onclick="app.switchView('investmentsView')">💼 Available Investments</div>
     <div class="menu-item" onclick="app.switchView('myInvestmentsView')">⭐ My Investments</div>
+    <div class="menu-item" onclick="app.switchView('earningsView')">💰 My Earnings</div>
     <div class="menu-item" onclick="app.switchView('transactionsView')">📜 Transaction History</div>
     <div class="menu-item" style="margin-top: auto; background: #c0392b;" onclick="app.signOut()">🚪 Sign Out</div>
   </div>
@@ -195,7 +196,28 @@
       </div>
     </div>
 
-    <!-- 7. TRANSACTION HISTORY VIEW -->
+    <!-- 7. MY EARNINGS VIEW -->
+    <div id="earningsView" class="app-view hidden">
+      <div class="dashboard-grid" style="margin-bottom: 20px;">
+        <div class="stat-card">
+          <div class="stat-title">Today's Profit Potential</div>
+          <div class="stat-value" id="todayEarningsDisplay" style="color:#27ae60;">KES 0.00</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Total Claimed Earnings</div>
+          <div class="stat-value" id="totalEarningsDisplay" style="color:#f39c12;">KES 0.00</div>
+        </div>
+      </div>
+
+      <div class="dash-section">
+        <div class="dash-section-title">⚡ Rental Machine Daily Claims</div>
+        <div id="earningsPackageList" style="margin-top: 15px;">
+          <p style="color:#64748b; font-size:14px;">Loading rental packages...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. TRANSACTION HISTORY VIEW -->
     <div id="transactionsView" class="app-view hidden">
       <div class="dash-section">
         <div class="dash-section-title">📜 My Transaction History</div>
@@ -275,6 +297,8 @@
 
         if (viewId === 'myInvestmentsView') {
           app.loadMyInvestments();
+        } else if (viewId === 'earningsView' && typeof app.loadEarnings === 'function') {
+          app.loadEarnings();
         } else if (viewId === 'transactionsView' && typeof app.loadTransactions === 'function') {
           app.loadTransactions();
         }
@@ -303,6 +327,7 @@
             email: email,
             balance: 0,
             investments: 0,
+            totalEarnings: 0,
             createdAt: new Date()
           });
 
@@ -418,6 +443,7 @@
             userId: app.currentUser.uid,
             packageName: name,
             cost: cost,
+            lastClaimedDate: "",
             purchasedAt: new Date()
           });
 
@@ -465,28 +491,4 @@
     auth.onAuthStateChanged(async (user) => {
       if (user) {
         app.currentUser = user;
-        const doc = await db.collection("users").doc(user.uid).get();
-        if (doc.exists) {
-          app.userData = doc.data();
-          document.getElementById('authView').classList.add('hidden');
-          document.getElementById('menuBtn').classList.remove('hidden');
-          app.switchView('dashboardView');
-          app.updateUI();
-        }
-      } else {
-        app.currentUser = null;
-        app.userData = null;
-        document.getElementById('authView').classList.remove('hidden');
-        document.getElementById('menuBtn').classList.add('hidden');
-        const views = document.querySelectorAll('.app-view');
-        views.forEach(v => v.classList.add('hidden'));
-        app.showTab('register');
-      }
-    });
-  </script>
-
-  <!-- External JavaScript Files -->
-  <script src="transactions.js"></script>
-</body>
-  </html>
-  
+        cons
