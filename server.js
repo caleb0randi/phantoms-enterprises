@@ -6,12 +6,15 @@ const https = require('https');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
+// Body Parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
 
-// Super Admin Credentials (Environment variables with hardcoded fallbacks)
+// Serve static assets from public & root
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(__dirname));
+
+// Super Admin Credentials
 const SUPER_ADMIN_CREDENTIALS = {
   username: process.env.SUPER_ADMIN_USERNAME || 'phantomsenterprises@gmail.com',
   password: process.env.SUPER_ADMIN_PASSWORD || '@18922caleb',
@@ -24,7 +27,7 @@ const verificationCodes = {};
 const passwordResetCodes = {};
 const pendingWithdrawals = [];
 
-// Helper: Generate referral code from email
+// Helper: Generate referral code
 function generateReferralCode(email) {
   const prefix = email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
   const random = Math.floor(1000 + Math.random() * 9000);
@@ -74,21 +77,21 @@ function sendBrevoEmail(toEmail, subject, textContent, htmlContent) {
   });
 }
 
-// ROUTE: Dedicated Login Page
+// Dedicated Login Page Route
 app.get('/login', (req, res) => {
   const rootLoginPath = path.join(__dirname, 'login.html');
   const publicLoginPath = path.join(__dirname, 'public', 'login.html');
 
   if (fs.existsSync(rootLoginPath)) {
-    res.sendFile(rootLoginPath);
+    return res.sendFile(rootLoginPath);
   } else if (fs.existsSync(publicLoginPath)) {
-    res.sendFile(publicLoginPath);
+    return res.sendFile(publicLoginPath);
   } else {
-    res.status(404).send('login.html not found. Place login.html in root folder.');
+    return res.status(404).send('login.html not found. Please place login.html in your project folder.');
   }
 });
 
-// ROUTE 1: Login (Super Admin & Users)
+// ROUTE 1: Login (Super Admin & Regular Users)
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
 
@@ -100,7 +103,7 @@ app.post('/api/login', (req, res) => {
   const superAdminUser = SUPER_ADMIN_CREDENTIALS.username.trim().toLowerCase();
   const superAdminEmail = SUPER_ADMIN_CREDENTIALS.email.trim().toLowerCase();
 
-  // Super Admin Credentials Check
+  // Super Admin Check
   if ((cleanInput === superAdminUser || cleanInput === superAdminEmail) && password === SUPER_ADMIN_CREDENTIALS.password) {
     return res.json({
       success: true,
@@ -113,7 +116,7 @@ app.post('/api/login', (req, res) => {
     });
   }
 
-  // Regular User Login Check
+  // Regular User Check
   const user = registeredUsers.find(u => u.email.toLowerCase() === cleanInput && u.password === password);
   if (user) {
     return res.json({
@@ -298,12 +301,21 @@ app.post('/api/admin/reset-user-password', (req, res) => {
   return res.status(404).json({ success: false, message: 'Registered user email not found.' });
 });
 
-// Catch-all route to serve main dashboard
+// Main Dashboard Fallback Route
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  const publicIndexPath = path.join(__dirname, 'public', 'index.html');
+  const rootIndexPath = path.join(__dirname, 'index.html');
+
+  if (fs.existsSync(publicIndexPath)) {
+    res.sendFile(publicIndexPath);
+  } else if (fs.existsSync(rootIndexPath)) {
+    res.sendFile(rootIndexPath);
+  } else {
+    res.status(404).send('index.html not found. Place index.html inside a public folder or root folder.');
+  }
 });
 
 app.listen(PORT, () => {
   console.log(`Phantoms Enterprises Server running on port ${PORT}`);
 });
-         
+      
