@@ -27,7 +27,7 @@
     <div class="menu-item" onclick="app.switchView('withdrawView')">🏧 Withdraw Funds</div>
     <div class="menu-item" onclick="app.switchView('investmentsView')">💼 Available Investments</div>
     <div class="menu-item" onclick="app.switchView('myInvestmentsView')">⭐ My Investments</div>
-    <div class="menu-item" onclick="app.switchView('earningsView')">💰 My Earnings</div>
+    <div class="menu-item" onclick="app.switchView('transactionsView')">📜 Transaction History</div>
     <div class="menu-item" style="margin-top: auto; background: #c0392b;" onclick="app.signOut()">🚪 Sign Out</div>
   </div>
 
@@ -195,16 +195,12 @@
       </div>
     </div>
 
-    <!-- 7. DAILY EARNINGS VIEW -->
-    <div id="earningsView" class="app-view hidden">
+    <!-- 7. TRANSACTION HISTORY VIEW -->
+    <div id="transactionsView" class="app-view hidden">
       <div class="dash-section">
-        <div class="dash-section-title">💰 My Daily Earnings</div>
-        <div style="background:#1e293b; color:#fff; padding:15px; border-radius:8px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:14px; color:#94a3b8;">Total Earnings Claimed:</span>
-          <strong id="totalEarningsDisplay" style="font-size:18px; color:#27ae60;">KES 0.00</strong>
-        </div>
-        <div id="earningsPackageList">
-          <p style="color:#64748b; font-size:14px;">Loading active packages...</p>
+        <div class="dash-section-title">📜 My Transaction History</div>
+        <div id="transactionList" style="margin-top: 15px;">
+          <p style="color:#64748b; font-size:14px;">Loading history...</p>
         </div>
       </div>
     </div>
@@ -279,8 +275,8 @@
 
         if (viewId === 'myInvestmentsView') {
           app.loadMyInvestments();
-        } else if (viewId === 'earningsView') {
-          app.loadEarnings();
+        } else if (viewId === 'transactionsView' && typeof app.loadTransactions === 'function') {
+          app.loadTransactions();
         }
       },
 
@@ -347,11 +343,6 @@
         document.getElementById('userInvestments').innerText = "KES " + (app.userData.investments || 0).toLocaleString();
         document.getElementById('profileEmail').innerText = app.userData.email;
         document.getElementById('profilePhone').innerText = app.userData.phone;
-        
-        const totalDisplay = document.getElementById('totalEarningsDisplay');
-        if (totalDisplay) {
-          totalDisplay.innerText = "KES " + (app.userData.totalEarnings || 0).toLocaleString();
-        }
       },
 
       submitDepositRequest: async function() {
@@ -428,6 +419,7 @@
             userId: app.currentUser.uid,
             packageName: name,
             cost: cost,
+            lastClaimedDate: "",
             purchasedAt: new Date()
           });
 
@@ -469,21 +461,33 @@
         } catch (err) {
           container.innerHTML = "<p style='color:red;'>Failed to load investments.</p>";
         }
-      },
+      }
+    };
 
-      // -----------------------------------------------------------
-      // LOAD EARNINGS & CLAIM LOGIC
-      // -----------------------------------------------------------
-      loadEarnings: async function() {
-        const listContainer = document.getElementById("earningsPackageList");
-        if (!listContainer || !app.currentUser) return;
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        app.currentUser = user;
+        const doc = await db.collection("users").doc(user.uid).get();
+        if (doc.exists) {
+          app.userData = doc.data();
+          document.getElementById('authView').classList.add('hidden');
+          document.getElementById('menuBtn').classList.remove('hidden');
+          app.switchView('dashboardView');
+          app.updateUI();
+        }
+      } else {
+        app.currentUser = null;
+        app.userData = null;
+        document.getElementById('authView').classList.remove('hidden');
+        document.getElementById('menuBtn').classList.add('hidden');
+        const views = document.querySelectorAll('.app-view');
+        views.forEach(v => v.classList.add('hidden'));
+        app.showTab('register');
+      }
+    });
+  </script>
 
-        listContainer.innerHTML = "<p style='color:#64748b; font-size:14px;'>Loading active packages...</p>";
-
-        try {
-          const snapshot = await db.collection("userInvestments")
-            .where("userId", "==", app.currentUser.uid)
-            .get();
-
-          if (snapshot.empty) {
-            listContainer.innerHTML = "<p style='color:#64748b; font-size:14px;'>No 
+  <!-- External JavaScript Files -->
+  <script src="transactions.js"></script>
+</body>
+</html>
