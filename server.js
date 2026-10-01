@@ -1,3 +1,4 @@
+
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
@@ -41,7 +42,7 @@ function saveUsers(users) {
     fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
 }
 
-// Auto-seed Admin Account on Startup
+// Auto-seed Admin Account on Startup using Render Environment Variables
 function seedAdmin() {
     const users = getUsers();
     const adminUsername = process.env.ADMIN_USERNAME || 'admin';
@@ -84,7 +85,7 @@ app.get('/', (req, res) => {
     }
 });
 
-// Dashboard Route - LOCKED down with requireAuth middleware
+// Dashboard Route - Locked with authentication middleware
 app.get('/dashboard', requireAuth, (req, res) => {
     const publicIndexPath = path.join(__dirname, 'public', 'index.html');
     const rootIndexPath = path.join(__dirname, 'index.html');
@@ -143,7 +144,7 @@ app.post('/api/signup', (req, res) => {
     return res.json({ success: true, message: 'Account created successfully!' });
 });
 
-// Login Endpoint - Creates Session
+// Login Endpoint - Sets active session
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     const users = getUsers();
@@ -170,4 +171,4 @@ app.get('/api/logout', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-            
+    
