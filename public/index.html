@@ -27,7 +27,6 @@
     <div class="menu-item" onclick="app.switchView('withdrawView')">🏧 Withdraw Funds</div>
     <div class="menu-item" onclick="app.switchView('investmentsView')">💼 Available Investments</div>
     <div class="menu-item" onclick="app.switchView('myInvestmentsView')">⭐ My Investments</div>
-    <div class="menu-item" onclick="app.switchView('earningsView')">💰 My Earnings</div>
     <div class="menu-item" onclick="app.switchView('transactionsView')">📜 Transaction History</div>
     <div class="menu-item" style="margin-top: auto; background: #c0392b;" onclick="app.signOut()">🚪 Sign Out</div>
   </div>
@@ -45,7 +44,7 @@
       <button id="menuBtn" class="menu-trigger hidden" onclick="app.toggleMenu()">☰</button>
     </div>
 
-    <div id="statusAlert" class="status-alert" style="display: none;"></div>
+    <div id="statusAlert" class="status-alert"></div>
 
     <!-- AUTHENTICATION VIEW -->
     <div id="authView">
@@ -76,7 +75,7 @@
       </div>
 
       <!-- Sign In Box -->
-      <div id="loginBox" style="display: none;">
+      <div id="loginBox" class="hidden" style="display: none;">
         <div class="field-group">
           <label>Email Address</label>
           <input type="email" id="loginEmail" class="input-box" placeholder="Enter email address">
@@ -196,20 +195,7 @@
       </div>
     </div>
 
-    <!-- 7. MY EARNINGS VIEW -->
-    <div id="earningsView" class="app-view hidden">
-      <div class="dash-section">
-        <div class="dash-section-title">💰 My Daily Earnings</div>
-        <div style="margin-bottom:15px; color:#94a3b8;">
-          Total Earnings Claimed: <strong id="totalEarningsDisplay" style="color:#f39c12;">KES 0.00</strong>
-        </div>
-        <div id="earningsPackageList">
-          <p style="color:#64748b; font-size:14px;">Loading rental packages...</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- 8. TRANSACTION HISTORY VIEW -->
+    <!-- 7. TRANSACTION HISTORY VIEW -->
     <div id="transactionsView" class="app-view hidden">
       <div class="dash-section">
         <div class="dash-section-title">📜 My Transaction History</div>
@@ -260,12 +246,16 @@
 
         if (tabName === 'register') {
           regBox.style.display = "block";
+          regBox.classList.remove('hidden');
           loginBox.style.display = "none";
+          loginBox.classList.add('hidden');
           regBtn.classList.add('active');
           loginBtn.classList.remove('active');
         } else {
           regBox.style.display = "none";
+          regBox.classList.add('hidden');
           loginBox.style.display = "block";
+          loginBox.classList.remove('hidden');
           loginBtn.classList.add('active');
           regBtn.classList.remove('active');
         }
@@ -285,8 +275,6 @@
 
         if (viewId === 'myInvestmentsView') {
           app.loadMyInvestments();
-        } else if (viewId === 'earningsView' && typeof app.loadEarnings === 'function') {
-          app.loadEarnings();
         } else if (viewId === 'transactionsView' && typeof app.loadTransactions === 'function') {
           app.loadTransactions();
         }
@@ -482,7 +470,7 @@
         const doc = await db.collection("users").doc(user.uid).get();
         if (doc.exists) {
           app.userData = doc.data();
-          document.getElementById('authView').style.display = "none";
+          document.getElementById('authView').classList.add('hidden');
           document.getElementById('menuBtn').classList.remove('hidden');
           app.switchView('dashboardView');
           app.updateUI();
@@ -490,5 +478,16 @@
       } else {
         app.currentUser = null;
         app.userData = null;
-        document.getElementById('authView').style.display = "block";
-        document.getElementById(
+        document.getElementById('authView').classList.remove('hidden');
+        document.getElementById('menuBtn').classList.add('hidden');
+        const views = document.querySelectorAll('.app-view');
+        views.forEach(v => v.classList.add('hidden'));
+        app.showTab('register');
+      }
+    });
+  </script>
+
+  <!-- External JavaScript Files -->
+  <script src="transactions.js"></script>
+</body>
+</html>
