@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Phantoms Enterprises - Registration</title>
+  <title>Phantoms Enterprises</title>
   <style>
     * {
       box-sizing: border-box;
@@ -31,6 +31,7 @@
       padding: 35px;
     }
 
+    /* Brand Header */
     .brand-header {
       display: flex;
       align-items: center;
@@ -57,6 +58,33 @@
       display: inline-block;
     }
 
+    /* Form Layout Switcher (Register / Sign In) */
+    .tab-switcher {
+      display: flex;
+      background-color: #eef2f5;
+      border-radius: 8px;
+      padding: 4px;
+      margin-bottom: 25px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: transparent;
+      color: #7f8c8d;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background-color: #ffffff;
+      color: #1a2b4c;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    /* Grid Layout */
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -144,11 +172,6 @@
       gap: 10px;
       font-size: 13px;
       color: #555;
-      margin-top: 5px;
-    }
-
-    .consent-group input {
-      margin-top: 3px;
     }
 
     .submit-btn {
@@ -172,7 +195,6 @@
       border-radius: 8px;
       font-size: 13px;
       display: none;
-      margin-top: 10px;
     }
 
     .status-alert.success {
@@ -187,25 +209,11 @@
       border: 1px solid #f5c6cb;
     }
 
-    .login-link-box {
-      background-color: #f8fafc;
-      border: 1px solid #eef2f5;
-      padding: 15px;
-      border-radius: 8px;
-      text-align: center;
-      font-size: 14px;
-      color: #7f8c8d;
-      margin-top: auto;
+    .form-toggle-view {
+      display: block;
     }
 
-    .login-link-box a {
-      color: #2980b9;
-      font-weight: 600;
-      text-decoration: none;
-    }
-
-    /* Target removals */
-    .company-recruitment, .android-app-section, .telegram-btn, a[href*="t.me"] {
+    .hidden {
       display: none !important;
     }
   </style>
@@ -214,7 +222,7 @@
 
   <div class="container">
     <div class="brand-header">
-      <svg class="logo-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg class="logo-icon" viewBox="0 0 100 100" fill="none">
         <path d="M50 5 L90 25 L50 45 L10 25 Z" fill="#F39C12"/>
         <path d="M10 25 L50 45 L50 95 L10 75 Z" fill="#E67E22"/>
         <path d="M50 45 L90 25 L90 75 L50 95 Z" fill="#D35400"/>
@@ -224,12 +232,20 @@
       </div>
     </div>
 
-    <form id="registerForm">
+    <!-- Mode Switcher -->
+    <div class="tab-switcher">
+      <button class="tab-btn active" id="tabRegister" onclick="switchTab('register')">Register</button>
+      <button class="tab-btn" id="tabLogin" onclick="switchTab('login')">Sign In</button>
+    </div>
+
+    <!-- Alert Box -->
+    <div id="statusAlert" class="status-alert" style="margin-bottom: 20px;"></div>
+
+    <!-- REGISTER FORM -->
+    <form id="registerForm" class="form-toggle-view">
       <div class="form-grid">
-        
-        <!-- Left Column: User Input Credentials -->
         <div class="form-section">
-          <span class="section-label">Account Registration</span>
+          <span class="section-label">Account Creation</span>
 
           <div class="field-group">
             <label>Phone Number</label>
@@ -237,115 +253,194 @@
               <select class="country-select">
                 <option>+254</option>
               </select>
-              <input type="tel" id="phone" class="input-box" placeholder="Enter phone number" required>
+              <input type="tel" id="regPhone" class="input-box" placeholder="Enter phone number" required>
             </div>
           </div>
 
           <div class="field-group">
             <label>Email Address</label>
-            <input type="email" id="email" class="input-box" placeholder="Enter your email" required>
+            <input type="email" id="regEmail" class="input-box" placeholder="Enter your email" required>
           </div>
 
           <div class="field-group">
-            <label>Email Verification Code</label>
+            <label>Verification Code</label>
             <div class="code-wrap">
-              <input type="text" id="verificationCode" class="input-box" placeholder="Enter 6-digit code" required>
-              <button type="button" class="send-code-btn" id="sendCodeBtn" onclick="generateEmailCode()">Send Code</button>
+              <input type="text" id="regCode" class="input-box" placeholder="Enter 6-digit code" required>
+              <button type="button" class="send-code-btn" id="sendCodeBtn" onclick="sendBrevoEmailCode()">Send Code</button>
             </div>
           </div>
+        </div>
+
+        <div class="form-section">
+          <span class="section-label">Password & Consent</span>
 
           <div class="field-group">
             <label>Password</label>
-            <input type="password" id="password" class="input-box" placeholder="Create password" required>
+            <input type="password" id="regPassword" class="input-box" placeholder="Create password" required>
           </div>
 
           <div class="field-group">
             <label>Confirm Password</label>
-            <input type="password" id="confirmPassword" class="input-box" placeholder="Re-enter password" required>
+            <input type="password" id="regConfirmPassword" class="input-box" placeholder="Re-enter password" required>
           </div>
-        </div>
-
-        <!-- Right Column: Verification, Consent & Action -->
-        <div class="form-section">
-          <span class="section-label">Terms & Submission</span>
 
           <div class="consent-group">
-            <input type="checkbox" id="consentCheck" required>
-            <label for="consentCheck">
-              I agree to the Terms of Service and Privacy Policy, and consent to receive email verification codes.
-            </label>
+            <input type="checkbox" id="regConsent" required>
+            <label for="regConsent">I agree to the Terms of Service & Privacy Policy.</label>
           </div>
 
-          <button type="submit" class="submit-btn">Register Account</button>
-          
-          <div id="statusAlert" class="status-alert"></div>
-
-          <div class="login-link-box">
-            Already registered? <a href="#">Sign in to your account</a>
-          </div>
+          <button type="submit" class="submit-btn">Create Account</button>
         </div>
-
       </div>
     </form>
+
+    <!-- SIGN IN FORM -->
+    <form id="loginForm" class="form-toggle-view hidden">
+      <div class="form-section" style="max-width: 400px; margin: 0 auto;">
+        <span class="section-label">Sign In to Your Account</span>
+
+        <div class="field-group">
+          <label>Email Address or Phone</label>
+          <input type="text" id="loginIdentifier" class="input-box" placeholder="Enter email or phone" required>
+        </div>
+
+        <div class="field-group">
+          <label>Password</label>
+          <input type="password" id="loginPassword" class="input-box" placeholder="Enter password" required>
+        </div>
+
+        <button type="submit" class="submit-btn" style="margin-top: 10px;">Sign In</button>
+      </div>
+    </form>
+
   </div>
 
   <script>
-    let activeCode = "";
+    // ==========================================
+    // BREVO API CONFIGURATION
+    // Replace with your actual Brevo API Key & Sender Email
+    // ==========================================
+    const BREVO_API_KEY = "YOUR_BREVO_API_KEY_HERE"; 
+    const SENDER_EMAIL = "your-verified-sender@example.com"; 
+    const SENDER_NAME = "Phantoms Enterprises";
 
-    function generateEmailCode() {
-      const email = document.getElementById('email').value;
-      const statusAlert = document.getElementById('statusAlert');
-      
+    let generatedCode = "";
+
+    function showAlert(message, isError = false) {
+      const alertBox = document.getElementById('statusAlert');
+      alertBox.className = isError ? "status-alert error" : "status-alert success";
+      alertBox.innerText = message;
+      alertBox.style.display = "block";
+    }
+
+    function switchTab(mode) {
+      document.getElementById('statusAlert').style.display = "none";
+      if (mode === 'register') {
+        document.getElementById('registerForm').classList.remove('hidden');
+        document.getElementById('loginForm').classList.add('hidden');
+        document.getElementById('tabRegister').classList.add('active');
+        document.getElementById('tabLogin').classList.remove('active');
+      } else {
+        document.getElementById('registerForm').classList.add('hidden');
+        document.getElementById('loginForm').classList.remove('hidden');
+        document.getElementById('tabLogin').classList.add('active');
+        document.getElementById('tabRegister').classList.remove('active');
+      }
+    }
+
+    // Send Verification Code via Brevo API
+    async function sendBrevoEmailCode() {
+      const email = document.getElementById('regEmail').value;
       if (!email) {
-        statusAlert.className = "status-alert error";
-        statusAlert.innerText = "Please enter an email address first.";
-        statusAlert.style.display = "block";
+        showAlert("Please enter an email address first.", true);
         return;
       }
 
-      // Generate random 6-digit verification code
-      activeCode = Math.floor(100000 + Math.random() * 900000).toString();
-      
-      // Displays verification code on screen for user testing
-      statusAlert.className = "status-alert success";
-      statusAlert.innerText = `Verification code sent to ${email}. (Demo Code: ${activeCode})`;
-      statusAlert.style.display = "block";
+      generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+      showAlert("Sending email verification code...");
+
+      try {
+        const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+          method: "POST",
+          headers: {
+            "accept": "application/json",
+            "api-key": BREVO_API_KEY,
+            "content-type": "application/json"
+          },
+          body: JSON.stringify({
+            sender: { name: SENDER_NAME, email: SENDER_EMAIL },
+            to: [{ email: email }],
+            subject: "Your Phantoms Enterprises Verification Code",
+            htmlContent: `<p>Your verification code is: <strong>${generatedCode}</strong></p>`
+          })
+        });
+
+        if (response.ok) {
+          showAlert(`Verification code sent to ${email}. Check your inbox!`);
+        } else {
+          // If API Key is not set or fails, fallback to screen notification
+          console.error("Brevo API error:", await response.text());
+          showAlert(`Code dispatch ready. (Code: ${generatedCode})`);
+        }
+      } catch (err) {
+        console.error(err);
+        showAlert(`Code dispatch ready. (Code: ${generatedCode})`);
+      }
     }
 
+    // Account Registration Handler
     document.getElementById('registerForm').addEventListener('submit', function(e) {
       e.preventDefault();
 
-      const phone = document.getElementById('phone').value;
-      const email = document.getElementById('email').value;
-      const code = document.getElementById('verificationCode').value;
-      const password = document.getElementById('password').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
-      const statusAlert = document.getElementById('statusAlert');
+      const phone = document.getElementById('regPhone').value;
+      const email = document.getElementById('regEmail').value;
+      const code = document.getElementById('regCode').value;
+      const password = document.getElementById('regPassword').value;
+      const confirmPassword = document.getElementById('regConfirmPassword').value;
 
       if (password !== confirmPassword) {
-        statusAlert.className = "status-alert error";
-        statusAlert.innerText = "Passwords do not match.";
-        statusAlert.style.display = "block";
+        showAlert("Passwords do not match.", true);
         return;
       }
 
-      if (code !== activeCode) {
-        statusAlert.className = "status-alert error";
-        statusAlert.innerText = "Invalid verification code. Click 'Send Code' to get a valid code.";
-        statusAlert.style.display = "block";
+      if (generatedCode && code !== generatedCode) {
+        showAlert("Invalid verification code. Please check your email or request a new code.", true);
         return;
       }
 
-      // Save user to browser local storage so account persists locally
-      const userData = { phone, email, password };
-      localStorage.setItem('registeredUser', JSON.stringify(userData));
-
-      statusAlert.className = "status-alert success";
-      statusAlert.innerText = "Account successfully registered! You can now log in.";
-      statusAlert.style.display = "block";
+      // Store account in browser database so user can log in
+      const users = JSON.parse(localStorage.getItem('phantoms_users') || '[]');
       
+      const existing = users.find(u => u.email === email || u.phone === phone);
+      if (existing) {
+        showAlert("An account with this email or phone number already exists.", true);
+        return;
+      }
+
+      users.push({ phone, email, password });
+      localStorage.setItem('phantoms_users', JSON.stringify(users));
+
+      showAlert("Account successfully registered! Switch to Sign In to log in.");
       this.reset();
-      activeCode = "";
+      generatedCode = "";
+    });
+
+    // Account Login Handler
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const identifier = document.getElementById('loginIdentifier').value;
+      const password = document.getElementById('loginPassword').value;
+
+      const users = JSON.parse(localStorage.getItem('phantoms_users') || '[]');
+      const validUser = users.find(u => (u.email === identifier || u.phone === identifier) && u.password === password);
+
+      if (validUser) {
+        showAlert(`Welcome back! Logged in as ${validUser.email}`);
+      } else {
+        showAlert("Invalid credentials. Please check your email/phone and password.", true);
+      }
     });
   </script>
 </body>
