@@ -24,7 +24,7 @@
 
     .container {
       width: 100%;
-      max-width: 900px;
+      max-width: 850px;
       background: #ffffff;
       border-radius: 12px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
@@ -32,7 +32,7 @@
       margin-top: 10px;
     }
 
-    /* Brand Header with Logo */
+    /* Brand Header */
     .brand-header {
       display: flex;
       align-items: center;
@@ -81,13 +81,14 @@
       font-weight: 700;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 15px;
+      transition: all 0.2s ease;
     }
 
     .tab-btn.active {
       background-color: #ffffff;
       color: #1a2b4c;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
     }
 
     /* Form Fields */
@@ -113,19 +114,24 @@
       outline: none;
     }
 
+    .input-box:focus {
+      border-color: #2980b9;
+    }
+
     .submit-btn {
       width: 100%;
       padding: 14px;
-      background-color: #2980b9;
+      background-color: #3498db;
       color: #ffffff;
       border: none;
       border-radius: 8px;
       font-weight: 700;
       font-size: 15px;
       cursor: pointer;
+      margin-top: 10px;
     }
 
-    .submit-btn:hover { background-color: #2471a3; }
+    .submit-btn:hover { background-color: #2980b9; }
 
     .status-alert {
       padding: 12px;
@@ -194,7 +200,7 @@
     /* RENTAL STORE */
     .rental-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 15px;
     }
 
@@ -282,7 +288,7 @@
 
   <div class="container">
     
-    <!-- Top Header with Restored Logo Icon -->
+    <!-- Top Header -->
     <div class="brand-header">
       <div class="brand-logo-wrap">
         <svg class="logo-icon" viewBox="0 0 100 100" fill="none">
@@ -292,21 +298,21 @@
         </svg>
         <h1 class="brand-title">PHANTOMS <span>ENTERPRISES</span></h1>
       </div>
-      <button id="logoutBtn" class="logout-btn hidden" onclick="logout()">Sign Out</button>
+      <button id="logoutBtn" class="logout-btn hidden">Sign Out</button>
     </div>
 
     <!-- Alert Banner -->
     <div id="statusAlert" class="status-alert"></div>
 
-    <!-- AUTHENTICATION FORM -->
+    <!-- AUTHENTICATION CONTAINER -->
     <div id="authView">
       <div class="tab-switcher">
-        <button class="tab-btn active" id="tabRegister" onclick="switchTab('register')">Register</button>
-        <button class="tab-btn" id="tabLogin" onclick="switchTab('login')">Sign In</button>
+        <button type="button" class="tab-btn active" id="tabRegisterBtn">Register</button>
+        <button type="button" class="tab-btn" id="tabLoginBtn">Sign In</button>
       </div>
 
       <!-- Register Form -->
-      <form id="registerForm" onsubmit="handleRegister(event)">
+      <form id="registerForm">
         <div class="field-group">
           <label>Phone Number (e.g. 0712345678)</label>
           <input type="text" id="regPhone" class="input-box" placeholder="Enter phone number" required>
@@ -327,10 +333,10 @@
       </form>
 
       <!-- Login Form -->
-      <form id="loginForm" class="hidden" onsubmit="handleLogin(event)">
+      <form id="loginForm" class="hidden">
         <div class="field-group">
-          <label>Phone Number or Email</label>
-          <input type="text" id="loginIdentifier" class="input-box" placeholder="Enter phone or email" required>
+          <label>Email Address or Phone Number</label>
+          <input type="text" id="loginIdentifier" class="input-box" placeholder="Enter email address or phone" required>
         </div>
         <div class="field-group">
           <label>Password</label>
@@ -361,11 +367,11 @@
 
       <!-- Quick Actions -->
       <div class="action-row">
-        <button class="btn-action btn-deposit" onclick="openDepositModal()">Deposit Funds</button>
-        <button class="btn-action btn-withdraw" onclick="openWithdrawModal()">Withdraw Funds</button>
+        <button type="button" class="btn-action btn-deposit" id="openDepositBtn">Deposit Funds</button>
+        <button type="button" class="btn-action btn-withdraw" id="openWithdrawBtn">Withdraw Funds</button>
       </div>
 
-      <!-- Available Rental Investment Plans -->
+      <!-- Rental Plans -->
       <div class="dash-section">
         <div class="dash-section-title">Available Rental Investment Plans</div>
         <div class="rental-grid">
@@ -374,29 +380,29 @@
             <div class="rental-price">KES 1,000</div>
             <div class="rental-detail">Daily Income: <strong>KES 150 / day</strong></div>
             <div class="rental-detail">Duration: <strong>10 Days</strong></div>
-            <button class="rent-btn" onclick="rentPlan('Phantom Rig Alpha', 1000)">Rent Plan</button>
+            <button type="button" class="rent-btn" onclick="rentPlan('Phantom Rig Alpha', 1000)">Rent Plan</button>
           </div>
           <div class="rental-card">
             <h4>Phantom Rig Pro</h4>
             <div class="rental-price">KES 3,000</div>
             <div class="rental-detail">Daily Income: <strong>KES 500 / day</strong></div>
             <div class="rental-detail">Duration: <strong>15 Days</strong></div>
-            <button class="rent-btn" onclick="rentPlan('Phantom Rig Pro', 3000)">Rent Plan</button>
+            <button type="button" class="rent-btn" onclick="rentPlan('Phantom Rig Pro', 3000)">Rent Plan</button>
           </div>
           <div class="rental-card">
             <h4>Phantom Enterprise Stack</h4>
             <div class="rental-price">KES 10,000</div>
             <div class="rental-detail">Daily Income: <strong>KES 1,800 / day</strong></div>
             <div class="rental-detail">Duration: <strong>20 Days</strong></div>
-            <button class="rent-btn" onclick="rentPlan('Phantom Enterprise Stack', 10000)">Rent Plan</button>
+            <button type="button" class="rent-btn" onclick="rentPlan('Phantom Enterprise Stack', 10000)">Rent Plan</button>
           </div>
         </div>
       </div>
 
-      <!-- Financial Personal Profile -->
+      <!-- Financial Profile -->
       <div class="dash-section">
         <div class="dash-section-title">Financial Personal Profile</div>
-        <form onsubmit="saveFinancialProfile(event)">
+        <form id="profileForm">
           <div class="field-group">
             <label>Full Legal Name</label>
             <input type="text" id="profFullName" class="input-box" placeholder="Full name as on ID">
@@ -417,7 +423,7 @@
 
   </div>
 
-  <!-- DEPOSIT MODAL POPUP -->
+  <!-- DEPOSIT MODAL -->
   <div id="depositModal" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-title">Deposit Funds</div>
@@ -438,13 +444,13 @@
         <input type="number" id="depAmount" class="input-box" placeholder="Enter amount">
       </div>
       <div class="modal-actions">
-        <button type="button" class="btn-cancel" onclick="closeDepositModal()">Cancel</button>
-        <button type="button" class="submit-btn" style="background:#27ae60; flex:1;" onclick="processDeposit()">Confirm & Send STK Push</button>
+        <button type="button" class="btn-cancel" id="closeDepositBtn">Cancel</button>
+        <button type="button" class="submit-btn" style="background:#27ae60; flex:1;" id="confirmDepositBtn">Confirm & Send STK Push</button>
       </div>
     </div>
   </div>
 
-  <!-- WITHDRAWAL MODAL POPUP -->
+  <!-- WITHDRAWAL MODAL -->
   <div id="withdrawModal" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-title">Withdraw Funds</div>
@@ -464,168 +470,146 @@
         <input type="number" id="wdAmount" class="input-box" placeholder="Enter amount">
       </div>
       <div class="modal-actions">
-        <button type="button" class="btn-cancel" onclick="closeWithdrawModal()">Cancel</button>
-        <button type="button" class="submit-btn" style="background:#e74c3c; flex:1;" onclick="processWithdrawal()">Confirm Withdrawal</button>
+        <button type="button" class="btn-cancel" id="closeWithdrawBtn">Cancel</button>
+        <button type="button" class="submit-btn" style="background:#e74c3c; flex:1;" id="confirmWithdrawBtn">Confirm Withdrawal</button>
       </div>
     </div>
   </div>
 
   <script>
-    const SYSTEM_MERCHANT = "0111414027";
-    let currentUser = null;
+    document.addEventListener("DOMContentLoaded", function() {
+      const SYSTEM_MERCHANT = "0111414027";
+      let currentUser = null;
+      let userDatabase = [];
 
-    function showAlert(msg, isError = false) {
-      const box = document.getElementById('statusAlert');
-      box.className = isError ? "status-alert error" : "status-alert success";
-      box.innerText = msg;
-      box.style.display = "block";
-    }
+      // Alert helper
+      function showAlert(msg, isError = false) {
+        const box = document.getElementById('statusAlert');
+        box.className = isError ? "status-alert error" : "status-alert success";
+        box.innerText = msg;
+        box.style.display = "block";
+      }
 
-    function switchTab(mode) {
-      document.getElementById('statusAlert').style.display = "none";
-      if (mode === 'register') {
+      // Tab switching: Register vs Sign In
+      document.getElementById('tabRegisterBtn').addEventListener('click', function() {
+        document.getElementById('statusAlert').style.display = "none";
         document.getElementById('registerForm').classList.remove('hidden');
         document.getElementById('loginForm').classList.add('hidden');
-        document.getElementById('tabRegister').classList.add('active');
-        document.getElementById('tabLogin').classList.remove('active');
-      } else {
+        document.getElementById('tabRegisterBtn').classList.add('active');
+        document.getElementById('tabLoginBtn').classList.remove('active');
+      });
+
+      document.getElementById('tabLoginBtn').addEventListener('click', function() {
+        document.getElementById('statusAlert').style.display = "none";
         document.getElementById('registerForm').classList.add('hidden');
         document.getElementById('loginForm').classList.remove('hidden');
-        document.getElementById('tabLogin').classList.add('active');
-        document.getElementById('tabRegister').classList.remove('active');
-      }
-    }
+        document.getElementById('tabLoginBtn').classList.add('active');
+        document.getElementById('tabRegisterBtn').classList.remove('active');
+      });
 
-    function getUsers() {
-      return JSON.parse(localStorage.getItem('phantoms_users_v3') || '[]');
-    }
-
-    function saveUsers(users) {
-      localStorage.setItem('phantoms_users_v3', JSON.stringify(users));
-    }
-
-    function saveCurrentUser() {
-      const users = getUsers();
-      const idx = users.findIndex(u => u.phone === currentUser.phone || u.email === currentUser.email);
-      if (idx !== -1) {
-        users[idx] = currentUser;
-      } else {
-        users.push(currentUser);
-      }
-      saveUsers(users);
-      updateUI();
-    }
-
-    function updateUI() {
-      if (!currentUser) return;
-      document.getElementById('userBalance').innerText = `KES ${(currentUser.balance || 0).toLocaleString('.2f')}`;
-      document.getElementById('userInvestments').innerText = `KES ${(currentUser.investments || 0).toLocaleString('.2f')}`;
-      document.getElementById('userReferrals').innerText = `${currentUser.referrals || 0} Users`;
-    }
-
-    function launchDashboard(user) {
-      currentUser = user;
-      document.getElementById('authView').classList.add('hidden');
-      document.getElementById('dashboardView').classList.remove('hidden');
-      document.getElementById('logoutBtn').classList.remove('hidden');
-      
-      document.getElementById('profFullName').value = user.fullName || '';
-      document.getElementById('profNationalId').value = user.nationalId || '';
-      document.getElementById('profPayoutPhone').value = user.payoutPhone || user.phone;
-
-      updateUI();
-    }
-
-    // REGISTRATION LOGIC WITH PASSWORD CONFIRMATION
-    function handleRegister(e) {
-      e.preventDefault();
-
-      const phone = document.getElementById('regPhone').value.trim();
-      const email = document.getElementById('regEmail').value.trim().toLowerCase();
-      const password = document.getElementById('regPassword').value;
-      const confirmPassword = document.getElementById('regConfirmPassword').value;
-
-      if (!phone || !email || !password || !confirmPassword) {
-        showAlert("Please fill in all registration fields.", true);
-        return;
+      // UI Update logic
+      function updateUI() {
+        if (!currentUser) return;
+        document.getElementById('userBalance').innerText = `KES ${(currentUser.balance || 0).toLocaleString('.2f')}`;
+        document.getElementById('userInvestments').innerText = `KES ${(currentUser.investments || 0).toLocaleString('.2f')}`;
+        document.getElementById('userReferrals').innerText = `${currentUser.referrals || 0} Users`;
       }
 
-      if (password !== confirmPassword) {
-        showAlert("Passwords do not match! Please check again.", true);
-        return;
+      function launchDashboard(user) {
+        currentUser = user;
+        document.getElementById('authView').classList.add('hidden');
+        document.getElementById('dashboardView').classList.remove('hidden');
+        document.getElementById('logoutBtn').classList.remove('hidden');
+        
+        document.getElementById('profFullName').value = user.fullName || '';
+        document.getElementById('profNationalId').value = user.nationalId || '';
+        document.getElementById('profPayoutPhone').value = user.payoutPhone || user.phone;
+
+        updateUI();
       }
 
-      const users = getUsers();
-      const exists = users.some(u => u.phone === phone || u.email === email);
-      
-      if (exists) {
-        showAlert("An account with this phone or email already exists. Please Sign In.", true);
-        return;
+      function saveUserRecord() {
+        const idx = userDatabase.findIndex(u => u.phone === currentUser.phone || u.email === currentUser.email);
+        if (idx !== -1) {
+          userDatabase[idx] = currentUser;
+        } else {
+          userDatabase.push(currentUser);
+        }
+        updateUI();
       }
 
-      const newUser = {
-        phone: phone,
-        email: email,
-        password: password,
-        balance: 0,
-        investments: 0,
-        referrals: 0,
-        fullName: '',
-        nationalId: '',
-        payoutPhone: phone
-      };
+      // Handle Registration Submit
+      document.getElementById('registerForm').addEventListener('submit', function(e) {
+        e.preventDefault();
 
-      users.push(newUser);
-      saveUsers(users);
-      showAlert("Registration successful! Welcome to Phantoms Enterprises.");
-      launchDashboard(newUser);
-    }
+        const phone = document.getElementById('regPhone').value.trim();
+        const email = document.getElementById('regEmail').value.trim().toLowerCase();
+        const password = document.getElementById('regPassword').value;
+        const confirmPassword = document.getElementById('regConfirmPassword').value;
 
-    // LOGIN LOGIC
-    function handleLogin(e) {
-      e.preventDefault();
+        if (password !== confirmPassword) {
+          showAlert("Passwords do not match. Please re-enter passwords.", true);
+          return;
+        }
 
-      const id = document.getElementById('loginIdentifier').value.trim().toLowerCase();
-      const pass = document.getElementById('loginPassword').value;
+        const exists = userDatabase.some(u => u.phone === phone || u.email === email);
+        if (exists) {
+          showAlert("An account with this phone or email already exists. Click 'Sign In' to log in.", true);
+          return;
+        }
 
-      if (!id || !pass) {
-        showAlert("Please enter your login details.", true);
-        return;
-      }
+        const newUser = {
+          phone: phone,
+          email: email,
+          password: password,
+          balance: 0,
+          investments: 0,
+          referrals: 0,
+          fullName: '',
+          nationalId: '',
+          payoutPhone: phone
+        };
 
-      const users = getUsers();
-      const user = users.find(u => (u.phone.toLowerCase() === id || u.email.toLowerCase() === id) && u.password === pass);
+        userDatabase.push(newUser);
+        showAlert("Account created successfully!");
+        launchDashboard(newUser);
+      });
 
-      if (user) {
-        showAlert("Login successful!");
-        launchDashboard(user);
-      } else {
-        showAlert("Invalid credentials! Please check your details and try again.", true);
-      }
-    }
+      // Handle Login Submit
+      document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
 
-    function logout() {
-      currentUser = null;
-      document.getElementById('dashboardView').classList.add('hidden');
-      document.getElementById('logoutBtn').classList.add('hidden');
-      document.getElementById('authView').classList.remove('hidden');
-      switchTab('login');
-      showAlert("You have signed out.");
-    }
+        const id = document.getElementById('loginIdentifier').value.trim().toLowerCase();
+        const pass = document.getElementById('loginPassword').value;
 
-    // DEPOSIT MODAL LOGIC
-    function openDepositModal() {
-      document.getElementById('depPhone').value = currentUser.payoutPhone || currentUser.phone;
-      document.getElementById('depositModal').classList.remove('hidden');
-    }
+        const foundUser = userDatabase.find(u => (u.phone.toLowerCase() === id || u.email.toLowerCase() === id) && u.password === pass);
 
-    function closeDepositModal() {
-      document.getElementById('depositModal').classList.add('hidden');
-    }
+        if (foundUser) {
+          showAlert("Login successful!");
+          launchDashboard(foundUser);
+        } else {
+          showAlert("Invalid credentials! Please check your email/phone and password.", true);
+        }
+      });
 
-    function processDeposit() {
-      const net = document.getElementById('depNetwork').value;
-      const phone = document.getElementById('depPhone').value.trim();
-      const amt = parseFloat(document.getElementById('depAmount').value);
+      // Sign Out
+      document.getElementById('logoutBtn').addEventListener('click', function() {
+        currentUser = null;
+        document.getElementById('dashboardView').classList.add('hidden');
+        document.getElementById('logoutBtn').classList.add('hidden');
+        document.getElementById('authView').classList.remove('hidden');
+        document.getElementById('tabLoginBtn').click();
+        showAlert("You have signed out.");
+      });
 
-   
+      // Deposit Modal logic
+      document.getElementById('openDepositBtn').addEventListener('click', function() {
+        document.getElementById('depPhone').value = currentUser.payoutPhone || currentUser.phone;
+        document.getElementById('depositModal').classList.remove('hidden');
+      });
+
+      document.getElementById('closeDepositBtn').addEventListener('click', function() {
+        document.getElementById('depositModal').classList.add('hidden');
+      });
+
+      document.ge
