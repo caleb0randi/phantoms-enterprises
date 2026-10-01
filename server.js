@@ -1,4 +1,5 @@
 const express = require('express');
+const session = require('express-session');
 const path = require('path');
 const fs = require('fs');
 const { sendVerificationEmail } = require('./mailer');
@@ -10,7 +11,15 @@ const USERS_FILE = path.join(__dirname, 'users.json');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files, but DISABLE automatically serving index.html on /
+// Configure session management
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'phantoms_secret_key_2026',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 3600000 } // 1 hour session
+}));
+
+// Serve static assets without auto-serving index.html
 app.use(express.static(__dirname, { index: false }));
 app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 
@@ -53,7 +62,15 @@ function seedAdmin() {
 }
 seedAdmin();
 
-// Force the main URL to always show login.html
+// Authentication Middleware to lock protected routes
+function requireAuth(req, res, next) {
+    if (req.session && req.session.user) {
+        return next();
+    }
+    return res.redirect('/');
+}
+
+// Root Route - Always serve Login Page
 app.get('/', (req, res) => {
     const rootLogin = path.join(__dirname, 'login.html');
     const publicLogin = path.join(__dirname, 'public', 'login.html');
@@ -63,12 +80,12 @@ app.get('/', (req, res) => {
     } else if (fs.existsSync(publicLogin)) {
         res.sendFile(publicLogin);
     } else {
-        res.status(404).send('login.html file not found in root or public folder.');
+        res.status(404).send('login.html not found');
     }
 });
 
-// Serve dashboard explicitly on /dashboard route
-app.get('/dashboard', (req, res) => {
+// Dashboard Route - LOCKED down with requireAuth middleware
+app.get('/dashboard', requireAuth, (req, res) => {
     const publicIndexPath = path.join(__dirname, 'public', 'index.html');
     const rootIndexPath = path.join(__dirname, 'index.html');
 
@@ -126,7 +143,7 @@ app.post('/api/signup', (req, res) => {
     return res.json({ success: true, message: 'Account created successfully!' });
 });
 
-// Login Endpoint
+// Login Endpoint - Creates Session
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     const users = getUsers();
@@ -136,12 +153,21 @@ app.post('/api/login', (req, res) => {
         return res.status(401).json({ success: false, message: 'Invalid username or password.' });
     }
 
+    req.session.user = { id: user.id, username: user.username, role: user.role || 'user' };
+
     return res.json({ 
         success: true, 
-        user: { id: user.id, username: user.username, role: user.role || 'user' } 
+        user: req.session.user 
     });
+});
+
+// Logout Endpoint
+app.get('/api/logout', (req, res) => {
+    req.session.destroy();
+    res.redirect('/');
 });
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
+            
