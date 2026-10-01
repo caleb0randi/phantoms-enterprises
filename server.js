@@ -17,7 +17,7 @@ const SUPER_ADMIN_CREDENTIALS = {
   email: 'phantomenterprises@gmail.com'
 };
 
-// In-Memory Users & Verification Storage
+// In-Memory Storage for Users & Verification Codes
 const registeredUsers = [];
 const verificationCodes = {};
 
@@ -27,34 +27,48 @@ let assetPrototypes = [
   { id: '2', name: 'Industrial Washing Machine', category: 'Laundry', leaseCost: 220.00, dailyYield: 5.35, durationDays: 45, icon: '🧺' }
 ];
 
-// Helper: Send Brevo Verification Email
+// Helper: Send Brevo Verification Email with Detailed Response Handling
 async function sendBrevoEmail(toEmail, code) {
   const apiKey = process.env.BREVO_API_KEY;
   if (!apiKey) {
-    console.warn("BREVO_API_KEY environment variable not set. Code:", code);
-    return false;
+    console.warn("BREVO_API_KEY environment variable not set. Code generated:", code);
+    return { success: false, reason: "API key missing" };
   }
 
-  const response = await fetch('https://api.brevo.com/v3/smtp/email', {
-    method: 'POST',
-    headers: {
-      'accept': 'application/json',
-      'api-key': apiKey,
-      'content-type': 'application/json'
-    },
-    body: JSON.stringify({
-      sender: { name: 'Phantoms Enterprises', email: 'phantomenterprises@gmail.com' },
-      to: [{ email: toEmail }],
-      subject: 'Your Verification Code - Phantoms Enterprises',
-      htmlContent: `<div style="font-family:sans-serif;padding:20px;">
-        <h2>Welcome to Phantoms Enterprises</h2>
-        <p>Your 6-digit registration verification code is:</p>
-        <h1 style="color:#d97706;letter-spacing:4px;">${code}</h1>
-      </div>`
-    })
-  });
+  try {
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'api-key': apiKey,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        sender: { name: 'Phantoms Enterprises', email: 'phantomenterprises@gmail.com' },
+        to: [{ email: toEmail }],
+        subject: 'Your Verification Code - Phantoms Enterprises',
+        htmlContent: `<div style="font-family:sans-serif;padding:20px;background:#0f172a;color:#f8fafc;border-radius:12px;">
+          <h2 style="color:#ffffff;">Welcome to Phantoms Enterprises</h2>
+          <p style="color:#cbd5e1;">Your 6-digit registration verification code is:</p>
+          <h1 style="color:#f59e0b;letter-spacing:6px;font-size:36px;">${code}</h1>
+          <p style="color:#94a3b8;font-size:12px;">If you did not request this code, please ignore this email.</p>
+        </div>`
+      })
+    });
 
-  return response.ok;
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      console.error("Brevo API error response:", responseData);
+      return { success: false, data: responseData };
+    }
+
+    console.log("Brevo email dispatched successfully:", responseData);
+    return { success: true, data: responseData };
+  } catch (error) {
+    console.error("Brevo connection error:", error);
+    return { success: false, error: error.message };
+  }
 }
 
 // Dedicated /login route (Checks both root and public/ directory for login.html)
@@ -113,24 +127,33 @@ app.post('/api/login', (req, res) => {
 // ROUTE 2: Register & Request Brevo Verification Code
 app.post('/api/register/send-code', async (req, res) => {
   const { email } = req.body;
-  if (!email) return res.status(400).json({ success: false, message: 'Email required' });
+  if (!email) return res.status(400).json({ success: false, message: 'Email address is required' });
 
   const code = Math.floor(100000 + Math.random() * 900000).toString();
   verificationCodes[email.toLowerCase()] = code;
 
-  const sent = await sendBrevoEmail(email, code);
-  return res.json({ success: true, message: 'Verification code sent via Brevo.' });
+  const result = await sendBrevoEmail(email, code);
+
+  if (result.success) {
+    return res.json({ success: true, message: 'Verification code sent! Please check your inbox and spam folder.' });
+  } else {
+    return res.json({ 
+      success: true, 
+      message: 'Code generated. If email delivery is delayed, check spam or Brevo sender status.',
+      debugCode: process.env.NODE_ENV !== 'production' ? code : undefined 
+    });
+  }
 });
 
 // ROUTE 3: Verify Code & Create Account
 app.post('/api/register/verify', (req, res) => {
   const { email, password, code } = req.body;
-  const cleanEmail = email.toLowerCase();
+  const cleanEmail = email ? email.toLowerCase() : '';
 
   if (verificationCodes[cleanEmail] && verificationCodes[cleanEmail] === code) {
     delete verificationCodes[cleanEmail];
     registeredUsers.push({ email: cleanEmail, password });
-    return res.json({ success: true, message: 'Account verified successfully!' });
+    return res.json({ success: true, message: 'Account verified and created successfully!' });
   }
 
   return res.status(400).json({ success: false, message: 'Invalid or expired verification code' });
@@ -149,4 +172,3 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-                               
