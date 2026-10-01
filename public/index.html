@@ -32,7 +32,7 @@
       margin-top: 10px;
     }
 
-    /* Brand Header */
+    /* Brand Header with Logo */
     .brand-header {
       display: flex;
       align-items: center;
@@ -40,6 +40,17 @@
       margin-bottom: 20px;
       padding-bottom: 15px;
       border-bottom: 2px solid #f0f3f6;
+    }
+
+    .brand-logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
     }
 
     .brand-title {
@@ -52,7 +63,7 @@
       color: #e67e22;
     }
 
-    /* Tabs */
+    /* Tab Controls */
     .tab-switcher {
       display: flex;
       background-color: #eef2f5;
@@ -127,7 +138,7 @@
     .status-alert.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
     .status-alert.error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
-    /* DASHBOARD */
+    /* DASHBOARD STYLES */
     .dashboard-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -243,7 +254,6 @@
     }
 
     .modal-title { font-size: 18px; font-weight: 700; color: #0f172a; }
-
     .modal-actions { display: flex; gap: 10px; margin-top: 10px; }
 
     .btn-cancel {
@@ -272,16 +282,23 @@
 
   <div class="container">
     
-    <!-- Top Header -->
+    <!-- Top Header with Restored Logo Icon -->
     <div class="brand-header">
-      <h1 class="brand-title">PHANTOMS <span>ENTERPRISES</span></h1>
+      <div class="brand-logo-wrap">
+        <svg class="logo-icon" viewBox="0 0 100 100" fill="none">
+          <path d="M50 5 L90 25 L50 45 L10 25 Z" fill="#F39C12"/>
+          <path d="M10 25 L50 45 L50 95 L10 75 Z" fill="#E67E22"/>
+          <path d="M50 45 L90 25 L90 75 L50 95 Z" fill="#D35400"/>
+        </svg>
+        <h1 class="brand-title">PHANTOMS <span>ENTERPRISES</span></h1>
+      </div>
       <button id="logoutBtn" class="logout-btn hidden" onclick="logout()">Sign Out</button>
     </div>
 
     <!-- Alert Banner -->
     <div id="statusAlert" class="status-alert"></div>
 
-    <!-- AUTHENTICATION FORM (Register & Login) -->
+    <!-- AUTHENTICATION FORM -->
     <div id="authView">
       <div class="tab-switcher">
         <button class="tab-btn active" id="tabRegister" onclick="switchTab('register')">Register</button>
@@ -289,34 +306,38 @@
       </div>
 
       <!-- Register Form -->
-      <div id="registerForm">
+      <form id="registerForm" onsubmit="handleRegister(event)">
         <div class="field-group">
           <label>Phone Number (e.g. 0712345678)</label>
-          <input type="text" id="regPhone" class="input-box" placeholder="Enter phone number">
+          <input type="text" id="regPhone" class="input-box" placeholder="Enter phone number" required>
         </div>
         <div class="field-group">
           <label>Email Address</label>
-          <input type="email" id="regEmail" class="input-box" placeholder="Enter email address">
+          <input type="email" id="regEmail" class="input-box" placeholder="Enter email address" required>
         </div>
         <div class="field-group">
           <label>Password</label>
-          <input type="password" id="regPassword" class="input-box" placeholder="Create password">
+          <input type="password" id="regPassword" class="input-box" placeholder="Create password" required>
         </div>
-        <button class="submit-btn" onclick="handleRegister()">Register Account</button>
-      </div>
+        <div class="field-group">
+          <label>Confirm Password</label>
+          <input type="password" id="regConfirmPassword" class="input-box" placeholder="Re-enter password" required>
+        </div>
+        <button type="submit" class="submit-btn">Register Account</button>
+      </form>
 
       <!-- Login Form -->
-      <div id="loginForm" class="hidden">
+      <form id="loginForm" class="hidden" onsubmit="handleLogin(event)">
         <div class="field-group">
           <label>Phone Number or Email</label>
-          <input type="text" id="loginIdentifier" class="input-box" placeholder="Enter phone or email">
+          <input type="text" id="loginIdentifier" class="input-box" placeholder="Enter phone or email" required>
         </div>
         <div class="field-group">
           <label>Password</label>
-          <input type="password" id="loginPassword" class="input-box" placeholder="Enter password">
+          <input type="password" id="loginPassword" class="input-box" placeholder="Enter password" required>
         </div>
-        <button class="submit-btn" onclick="handleLogin()">Sign In</button>
-      </div>
+        <button type="submit" class="submit-btn">Sign In</button>
+      </form>
     </div>
 
     <!-- USER DASHBOARD VIEW -->
@@ -333,7 +354,7 @@
           <div class="stat-value" id="userInvestments">KES 0.00</div>
         </div>
         <div class="stat-card">
-          <div class="stat-title">Total Referral</div>
+          <div class="stat-title">Total Referrals</div>
           <div class="stat-value" id="userReferrals">0 Users</div>
         </div>
       </div>
@@ -375,19 +396,21 @@
       <!-- Financial Personal Profile -->
       <div class="dash-section">
         <div class="dash-section-title">Financial Personal Profile</div>
-        <div class="field-group">
-          <label>Full Legal Name</label>
-          <input type="text" id="profFullName" class="input-box" placeholder="Full name as on ID">
-        </div>
-        <div class="field-group">
-          <label>National ID / Account ID</label>
-          <input type="text" id="profNationalId" class="input-box" placeholder="Enter ID number">
-        </div>
-        <div class="field-group">
-          <label>Financial Payout Phone Number</label>
-          <input type="text" id="profPayoutPhone" class="input-box" placeholder="07XXXXXXXX">
-        </div>
-        <button class="submit-btn" style="width:200px;" onclick="saveFinancialProfile()">Save Profile</button>
+        <form onsubmit="saveFinancialProfile(event)">
+          <div class="field-group">
+            <label>Full Legal Name</label>
+            <input type="text" id="profFullName" class="input-box" placeholder="Full name as on ID">
+          </div>
+          <div class="field-group">
+            <label>National ID / Account ID</label>
+            <input type="text" id="profNationalId" class="input-box" placeholder="Enter ID number">
+          </div>
+          <div class="field-group">
+            <label>Financial Payout Phone Number</label>
+            <input type="text" id="profPayoutPhone" class="input-box" placeholder="07XXXXXXXX">
+          </div>
+          <button type="submit" class="submit-btn" style="width:200px;">Save Profile</button>
+        </form>
       </div>
 
     </div>
@@ -400,14 +423,14 @@
       <div class="modal-title">Deposit Funds</div>
       <div class="routing-info">Routing deposits to Merchant Number: <strong>0111414027</strong></div>
       <div class="field-group">
-        <label>Where do you want to deposit from?</label>
+        <label>Payment Method</label>
         <select id="depNetwork">
           <option value="Safaricom M-Pesa">Safaricom M-Pesa</option>
           <option value="Airtel Money">Airtel Money</option>
         </select>
       </div>
       <div class="field-group">
-        <label>Which Phone Number?</label>
+        <label>Phone Number</label>
         <input type="text" id="depPhone" class="input-box" placeholder="07XXXXXXXX">
       </div>
       <div class="field-group">
@@ -415,8 +438,8 @@
         <input type="number" id="depAmount" class="input-box" placeholder="Enter amount">
       </div>
       <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeDepositModal()">Cancel</button>
-        <button class="submit-btn" style="background:#27ae60; flex:1;" onclick="processDeposit()">Confirm & Prompt PIN</button>
+        <button type="button" class="btn-cancel" onclick="closeDepositModal()">Cancel</button>
+        <button type="button" class="submit-btn" style="background:#27ae60; flex:1;" onclick="processDeposit()">Confirm & Send STK Push</button>
       </div>
     </div>
   </div>
@@ -426,14 +449,14 @@
     <div class="modal-card">
       <div class="modal-title">Withdraw Funds</div>
       <div class="field-group">
-        <label>Where do you want to withdraw to?</label>
+        <label>Destination Network</label>
         <select id="wdNetwork">
           <option value="Safaricom M-Pesa">Safaricom M-Pesa</option>
           <option value="Airtel Money">Airtel Money</option>
         </select>
       </div>
       <div class="field-group">
-        <label>Which Phone Number?</label>
+        <label>Payout Phone Number</label>
         <input type="text" id="wdPhone" class="input-box" placeholder="07XXXXXXXX">
       </div>
       <div class="field-group">
@@ -441,8 +464,8 @@
         <input type="number" id="wdAmount" class="input-box" placeholder="Enter amount">
       </div>
       <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeWithdrawModal()">Cancel</button>
-        <button class="submit-btn" style="background:#e74c3c; flex:1;" onclick="processWithdrawal()">Confirm Withdrawal</button>
+        <button type="button" class="btn-cancel" onclick="closeWithdrawModal()">Cancel</button>
+        <button type="button" class="submit-btn" style="background:#e74c3c; flex:1;" onclick="processWithdrawal()">Confirm Withdrawal</button>
       </div>
     </div>
   </div>
@@ -474,11 +497,11 @@
     }
 
     function getUsers() {
-      return JSON.parse(localStorage.getItem('phantoms_users_v2') || '[]');
+      return JSON.parse(localStorage.getItem('phantoms_users_v3') || '[]');
     }
 
     function saveUsers(users) {
-      localStorage.setItem('phantoms_users_v2', JSON.stringify(users));
+      localStorage.setItem('phantoms_users_v3', JSON.stringify(users));
     }
 
     function saveCurrentUser() {
@@ -513,14 +536,22 @@
       updateUI();
     }
 
-    // REGISTRATION LOGIC
-    function handleRegister() {
+    // REGISTRATION LOGIC WITH PASSWORD CONFIRMATION
+    function handleRegister(e) {
+      e.preventDefault();
+
       const phone = document.getElementById('regPhone').value.trim();
       const email = document.getElementById('regEmail').value.trim().toLowerCase();
-      const password = document.getElementById('regPassword').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const confirmPassword = document.getElementById('regConfirmPassword').value;
 
-      if (!phone || !email || !password) {
+      if (!phone || !email || !password || !confirmPassword) {
         showAlert("Please fill in all registration fields.", true);
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showAlert("Passwords do not match! Please check again.", true);
         return;
       }
 
@@ -551,9 +582,11 @@
     }
 
     // LOGIN LOGIC
-    function handleLogin() {
+    function handleLogin(e) {
+      e.preventDefault();
+
       const id = document.getElementById('loginIdentifier').value.trim().toLowerCase();
-      const pass = document.getElementById('loginPassword').value.trim();
+      const pass = document.getElementById('loginPassword').value;
 
       if (!id || !pass) {
         showAlert("Please enter your login details.", true);
@@ -595,35 +628,4 @@
       const phone = document.getElementById('depPhone').value.trim();
       const amt = parseFloat(document.getElementById('depAmount').value);
 
-      if (!phone || !amt || amt <= 0) {
-        alert("Please enter a valid phone number and deposit amount.");
-        return;
-      }
-
-      closeDepositModal();
-      alert(`STK Push message dispatched to ${phone} via ${net}.\nRouting funds to Merchant: ${SYSTEM_MERCHANT}.\n\nPlease enter your PIN on your phone to confirm KES ${amt}.`);
-
-      currentUser.balance += amt;
-      saveCurrentUser();
-      showAlert(`Deposit of KES ${amt.toLocaleString()} processed successfully!`);
-    }
-
-    // WITHDRAWAL MODAL LOGIC
-    function openWithdrawModal() {
-      document.getElementById('wdPhone').value = currentUser.payoutPhone || currentUser.phone;
-      document.getElementById('withdrawModal').classList.remove('hidden');
-    }
-
-    function closeWithdrawModal() {
-      document.getElementById('withdrawModal').classList.add('hidden');
-    }
-
-    function processWithdrawal() {
-      const net = document.getElementById('wdNetwork').value;
-      const phone = document.getElementById('wdPhone').value.trim();
-      const amt = parseFloat(document.getElementById('wdAmount').value);
-
-      if (!phone || !amt || amt <= 0) {
-        alert("Please enter a valid phone number and withdrawal amount.");
-        return;
-      
+   
