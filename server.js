@@ -6,11 +6,10 @@ const https = require('https');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Body Parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static assets from public & root
+// Serve static assets
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(__dirname));
 
@@ -27,19 +26,18 @@ const verificationCodes = {};
 const passwordResetCodes = {};
 const pendingWithdrawals = [];
 
-// Helper: Generate referral code
-function generateReferralCode(email) {
-  const prefix = email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+function generateReferralCode(emailOrPhone) {
+  const prefix = emailOrPhone.replace(/[^a-zA-Z0-9]/g, '').slice(0, 5).toUpperCase();
   const random = Math.floor(1000 + Math.random() * 9000);
   return `${prefix}${random}`;
 }
 
-// Brevo Email Dispatch Helper using Node built-in https
+// Brevo Email Dispatch Helper
 function sendBrevoEmail(toEmail, subject, textContent, htmlContent) {
   return new Promise((resolve) => {
     const apiKey = process.env.BREVO_API_KEY;
     if (!apiKey) {
-      console.warn("BREVO_API_KEY missing from environment variables.");
+      console.warn("BREVO_API_KEY missing.");
       return resolve({ success: false, reason: "API key missing" });
     }
 
@@ -77,33 +75,50 @@ function sendBrevoEmail(toEmail, subject, textContent, htmlContent) {
   });
 }
 
-// Dedicated Login Page Route
-app.get('/login', (req, res) => {
-  const rootLoginPath = path.join(__dirname, 'login.html');
-  const publicLoginPath = path.join(__dirname, 'public', 'login.html');
+// ROOT ROUTE: Direct landing page is Registration/Login
+app.get('/', (req, res) => {
+  const loginPath = path.join(__dirname, 'login.html');
+  if (fs.existsSync(loginPath)) {
+    return res.sendFile(loginPath);
+  }
+  return res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
 
-  if (fs.existsSync(rootLoginPath)) {
-    return res.sendFile(rootLoginPath);
-  } else if (fs.existsSync(publicLoginPath)) {
-    return res.sendFile(publicLoginPath);
+// LOGIN PAGE ROUTE
+app.get('/login', (req, res) => {
+  const loginPath = path.join(__dirname, 'login.html');
+  if (fs.existsSync(loginPath)) {
+    return res.sendFile(loginPath);
+  }
+  return res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+// DASHBOARD ROUTE (Protected view target)
+app.get('/dashboard', (req, res) => {
+  const dashboardPath = path.join(__dirname, 'public', 'dashboard.html');
+  const rootDashPath = path.join(__dirname, 'dashboard.html');
+
+  if (fs.existsSync(dashboardPath)) {
+    return res.sendFile(dashboardPath);
+  } else if (fs.existsSync(rootDashPath)) {
+    return res.sendFile(rootDashPath);
   } else {
-    return res.status(404).send('login.html not found. Please place login.html in your project folder.');
+    return res.status(404).send('dashboard.html not found.');
   }
 });
 
-// ROUTE 1: Login (Super Admin & Regular Users)
+// API: Login
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    return res.status(400).json({ success: false, message: 'Username/Email and password are required' });
+    return res.status(400).json({ success: false, message: 'Username/Phone and password are required' });
   }
 
   const cleanInput = username.trim().toLowerCase();
   const superAdminUser = SUPER_ADMIN_CREDENTIALS.username.trim().toLowerCase();
   const superAdminEmail = SUPER_ADMIN_CREDENTIALS.email.trim().toLowerCase();
 
-  // Super Admin Check
   if ((cleanInput === superAdminUser || cleanInput === superAdminEmail) && password === SUPER_ADMIN_CREDENTIALS.password) {
     return res.json({
       success: true,
@@ -116,13 +131,12 @@ app.post('/api/login', (req, res) => {
     });
   }
 
-  // Regular User Check
-  const user = registeredUsers.find(u => u.email.toLowerCase() === cleanInput && u.password === password);
+  const user = registeredUsers.find(u => (u.email.toLowerCase() === cleanInput || u.phone === cleanInput) && u.password === password);
   if (user) {
     return res.json({
       success: true,
       user: {
-        username: user.email,
+        username: user.phone || user.email,
         email: user.email,
         role: 'user',
         referralCode: user.referralCode,
@@ -131,10 +145,10 @@ app.post('/api/login', (req, res) => {
     });
   }
 
-  return res.status(401).json({ success: false, message: 'Invalid credentials. Please verify email and password.' });
+  return res.status(401).json({ success: false, message: 'Invalid credentials.' });
 });
 
-// ROUTE 2: Send Registration Verification Code
+// API: Registration Code
 app.post('/api/register/send-code', async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ success: false, message: 'Email address is required' });
@@ -144,7 +158,7 @@ app.post('/api/register/send-code', async (req, res) => {
 
   const html = `<div style="font-family:sans-serif;padding:20px;background:#0f172a;color:#f8fafc;border-radius:12px;">
     <h2 style="color:#ffffff;">Welcome to Phantoms Enterprises</h2>
-    <p style="color:#cbd5e1;">Your 6-digit registration verification code is:</p>
+    <p style="color:#cbd5e1;">Your 6-digit registration code is:</p>
     <h1 style="color:#f59e0b;letter-spacing:6px;font-size:36px;">${code}</h1>
   </div>`;
 
@@ -152,44 +166,50 @@ app.post('/api/register/send-code', async (req, res) => {
   return res.json({ success: true, message: 'Verification code sent to your email.' });
 });
 
-// ROUTE 3: Verify Registration & Create Account
+// API: Register Verify
 app.post('/api/register/verify', (req, res) => {
-  const { email, password, code, referredBy } = req.body;
-  const cleanEmail = email ? email.toLowerCase() : '';
+  const { phone, password, confirmPassword, inviteCode, captcha, email, code } = req.body;
 
-  if (verificationCodes[cleanEmail] && verificationCodes[cleanEmail] === code) {
-    delete verificationCodes[cleanEmail];
-
-    const userRefCode = generateReferralCode(cleanEmail);
-
-    if (referredBy) {
-      const referrer = registeredUsers.find(u => u.referralCode === referredBy || u.email.toLowerCase() === referredBy.toLowerCase());
-      if (referrer) {
-        referrer.referredCount = (referrer.referredCount || 0) + 1;
-      }
-    }
-
-    const newUser = {
-      email: cleanEmail,
-      password,
-      referralCode: userRefCode,
-      referredBy: referredBy || null,
-      referredCount: 0
-    };
-
-    registeredUsers.push(newUser);
-
-    return res.json({
-      success: true,
-      message: 'Account created successfully!',
-      user: { email: newUser.email, referralCode: newUser.referralCode }
-    });
+  if (password !== confirmPassword) {
+    return res.status(400).json({ success: false, message: 'Passwords do not match.' });
   }
 
-  return res.status(400).json({ success: false, message: 'Invalid or expired verification code.' });
+  const cleanEmail = email ? email.toLowerCase() : `${phone}@phantoms.app`;
+
+  if (email && verificationCodes[cleanEmail] && verificationCodes[cleanEmail] !== code) {
+    return res.status(400).json({ success: false, message: 'Invalid email verification code.' });
+  }
+
+  if (email) delete verificationCodes[cleanEmail];
+
+  const userRefCode = generateReferralCode(phone || cleanEmail);
+
+  if (inviteCode) {
+    const referrer = registeredUsers.find(u => u.referralCode === inviteCode);
+    if (referrer) {
+      referrer.referredCount = (referrer.referredCount || 0) + 1;
+    }
+  }
+
+  const newUser = {
+    phone: phone || '',
+    email: cleanEmail,
+    password,
+    referralCode: userRefCode,
+    referredBy: inviteCode || null,
+    referredCount: 0
+  };
+
+  registeredUsers.push(newUser);
+
+  return res.json({
+    success: true,
+    message: 'Account created successfully!',
+    user: { email: newUser.email, phone: newUser.phone, referralCode: newUser.referralCode }
+  });
 });
 
-// ROUTE 4: Forgot Password Code Dispatch
+// API: Password Reset Code
 app.post('/api/forgot-password/send-code', async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ success: false, message: 'Email is required' });
@@ -206,7 +226,7 @@ app.post('/api/forgot-password/send-code', async (req, res) => {
 
   const html = `<div style="font-family:sans-serif;padding:20px;background:#0f172a;color:#f8fafc;border-radius:12px;">
     <h2 style="color:#ffffff;">Password Reset Request</h2>
-    <p style="color:#cbd5e1;">Your 6-digit password reset code is:</p>
+    <p style="color:#cbd5e1;">Your password reset code is:</p>
     <h1 style="color:#f59e0b;letter-spacing:6px;font-size:36px;">${code}</h1>
   </div>`;
 
@@ -214,7 +234,7 @@ app.post('/api/forgot-password/send-code', async (req, res) => {
   return res.json({ success: true, message: 'Password reset code sent to your inbox.' });
 });
 
-// ROUTE 5: Reset Password
+// API: Reset Password
 app.post('/api/forgot-password/reset', (req, res) => {
   const { email, code, newPassword } = req.body;
   const cleanEmail = email ? email.toLowerCase() : '';
@@ -224,14 +244,14 @@ app.post('/api/forgot-password/reset', (req, res) => {
     const user = registeredUsers.find(u => u.email.toLowerCase() === cleanEmail);
     if (user) {
       user.password = newPassword;
-      return res.json({ success: true, message: 'Password reset successfully! You can now log in.' });
+      return res.json({ success: true, message: 'Password reset successfully!' });
     }
   }
 
-  return res.status(400).json({ success: false, message: 'Invalid or expired password reset code.' });
+  return res.status(400).json({ success: false, message: 'Invalid or expired reset code.' });
 });
 
-// ROUTE 6: Get Referral Stats
+// API: Referrals
 app.get('/api/user/referrals', (req, res) => {
   const email = req.query.email;
   if (!email) return res.status(400).json({ success: false, message: 'Email is required' });
@@ -248,7 +268,7 @@ app.get('/api/user/referrals', (req, res) => {
   return res.json({ success: true, referralCode: generateReferralCode(email), referredCount: 0 });
 });
 
-// ROUTE 7: Submit Withdrawal Request
+// API: Withdrawals
 app.post('/api/withdraw/request', (req, res) => {
   const { userEmail, amount, provider, phone } = req.body;
   if (!userEmail || !amount || !provider || !phone) {
@@ -269,12 +289,12 @@ app.post('/api/withdraw/request', (req, res) => {
   return res.json({ success: true, message: 'Withdrawal submitted for Super Admin approval.', data: requestObj });
 });
 
-// ROUTE 8: Super Admin - View Pending Withdrawals
+// API: Admin Withdrawals
 app.get('/api/admin/withdrawals', (req, res) => {
   res.json({ success: true, withdrawals: pendingWithdrawals });
 });
 
-// ROUTE 9: Super Admin - Approve/Reject Withdrawal
+// API: Admin Approve
 app.post('/api/admin/approve-withdrawal', (req, res) => {
   const { withdrawalId, action } = req.body;
   const index = pendingWithdrawals.findIndex(w => w.id === withdrawalId);
@@ -287,7 +307,7 @@ app.post('/api/admin/approve-withdrawal', (req, res) => {
   return res.status(404).json({ success: false, message: 'Withdrawal request not found.' });
 });
 
-// ROUTE 10: Super Admin - Reset User Password Override
+// API: Admin Password Reset
 app.post('/api/admin/reset-user-password', (req, res) => {
   const { targetEmail, newPassword } = req.body;
   const cleanEmail = targetEmail ? targetEmail.toLowerCase() : '';
@@ -298,21 +318,7 @@ app.post('/api/admin/reset-user-password', (req, res) => {
     return res.json({ success: true, message: `Password for ${targetEmail} updated successfully!` });
   }
 
-  return res.status(404).json({ success: false, message: 'Registered user email not found.' });
-});
-
-// Main Dashboard Fallback Route
-app.get('*', (req, res) => {
-  const publicIndexPath = path.join(__dirname, 'public', 'index.html');
-  const rootIndexPath = path.join(__dirname, 'index.html');
-
-  if (fs.existsSync(publicIndexPath)) {
-    res.sendFile(publicIndexPath);
-  } else if (fs.existsSync(rootIndexPath)) {
-    res.sendFile(rootIndexPath);
-  } else {
-    res.status(404).send('index.html not found. Place index.html inside a public folder or root folder.');
-  }
+  return res.status(404).json({ success: false, message: 'User email not found.' });
 });
 
 app.listen(PORT, () => {
