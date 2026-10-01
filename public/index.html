@@ -45,7 +45,7 @@
       <button id="menuBtn" class="menu-trigger hidden" onclick="app.toggleMenu()">☰</button>
     </div>
 
-    <div id="statusAlert" class="status-alert"></div>
+    <div id="statusAlert" class="status-alert" style="display: none;"></div>
 
     <!-- AUTHENTICATION VIEW -->
     <div id="authView">
@@ -76,7 +76,7 @@
       </div>
 
       <!-- Sign In Box -->
-      <div id="loginBox" class="hidden" style="display: none;">
+      <div id="loginBox" style="display: none;">
         <div class="field-group">
           <label>Email Address</label>
           <input type="email" id="loginEmail" class="input-box" placeholder="Enter email address">
@@ -260,16 +260,12 @@
 
         if (tabName === 'register') {
           regBox.style.display = "block";
-          regBox.classList.remove('hidden');
           loginBox.style.display = "none";
-          loginBox.classList.add('hidden');
           regBtn.classList.add('active');
           loginBtn.classList.remove('active');
         } else {
           regBox.style.display = "none";
-          regBox.classList.add('hidden');
           loginBox.style.display = "block";
-          loginBox.classList.remove('hidden');
           loginBtn.classList.add('active');
           regBtn.classList.remove('active');
         }
@@ -486,9 +482,13 @@
         const doc = await db.collection("users").doc(user.uid).get();
         if (doc.exists) {
           app.userData = doc.data();
-          document.getElementById('authView').classList.add('hidden');
+          document.getElementById('authView').style.display = "none";
           document.getElementById('menuBtn').classList.remove('hidden');
           app.switchView('dashboardView');
           app.updateUI();
         }
-      
+      } else {
+        app.currentUser = null;
+        app.userData = null;
+        document.getElementById('authView').style.display = "block";
+        document.getElementById(
