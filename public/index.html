@@ -3,342 +3,266 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Phantoms Enterprises | Dashboard</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Phantoms Enterprises</title>
   <style>
-    .glass { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); }
-    .gold-gradient { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
-    .card-bg { background: rgba(30, 41, 59, 0.7); }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f4f6f9;
+      color: #2c3e50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+      padding: 35px;
+    }
+
+    /* Brand Header with Isometric Cube Logo */
+    .brand-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #eef2f5;
+    }
+
+    .logo-icon {
+      width: 50px;
+      height: 50px;
+    }
+
+    .brand-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: #1a2b4c;
+      letter-spacing: 0.5px;
+      line-height: 1.1;
+    }
+
+    .brand-title span {
+      color: #e67e22;
+      display: inline-block;
+    }
+
+    /* Horizontal Form Grid Layout */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-section {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #7f8c8d;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    /* Field Inputs */
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field-group label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #34495e;
+    }
+
+    .input-box {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #dcdfe6;
+      border-radius: 8px;
+      font-size: 14px;
+      background-color: #fcfdfe;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-box:focus {
+      border-color: #2980b9;
+      background-color: #ffffff;
+    }
+
+    .phone-wrap {
+      display: flex;
+      gap: 8px;
+    }
+
+    .country-select {
+      padding: 12px;
+      border: 1px solid #dcdfe6;
+      border-radius: 8px;
+      background: #f8fafc;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    /* Buttons & Actions */
+    .action-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background-color: #2980b9;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .submit-btn:hover {
+      background-color: #1b6aaa;
+    }
+
+    .login-link-box {
+      background-color: #f8fafc;
+      border: 1px solid #eef2f5;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 14px;
+      color: #7f8c8d;
+    }
+
+    .login-link-box a {
+      color: #2980b9;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .login-link-box a:hover {
+      text-decoration: underline;
+    }
+
+    /* Footer */
+    .footer-text {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 12px;
+      color: #95a5a6;
+    }
+
+    /* Target Removal CSS (Verification Code, Invite Code, Red Dots, Recruitment, Apps, Telegram) */
+    .verification-group,
+    .invite-code-group,
+    .red-dot,
+    .company-recruitment,
+    .android-app-section,
+    .telegram-btn,
+    a[href*="t.me"] {
+      display: none !important;
+    }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen font-sans flex flex-col">
+<body>
 
-  <!-- Protection Script: Redirects immediately if no account session exists -->
-  <script>
-    if (!localStorage.getItem('userEmail') && !localStorage.getItem('userRole')) {
-      window.location.href = '/login';
-    }
-  </script>
-
-  <!-- Navigation -->
-  <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-16">
-        
-        <div class="flex items-center gap-3">
-          <span class="text-2xl">⚡</span>
-          <span class="font-black text-xl tracking-wider text-white">PHANTOMS</span>
-        </div>
-
-        <div class="flex items-center gap-4">
-          <span id="userGreeting" class="text-xs text-amber-400 font-bold"></span>
-          <button onclick="logout()" class="px-5 py-2 rounded-xl gold-gradient text-slate-950 font-bold text-xs hover:opacity-90 transition shadow-lg">
-            Log Out
-          </button>
-        </div>
-
-      </div>
-    </div>
-  </nav>
-
-  <!-- Main Content -->
-  <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full space-y-10">
-
-    <!-- SUPER ADMIN CONTROLS -->
-    <div id="superAdminSection" class="hidden space-y-6 bg-slate-900 border-2 border-amber-500/50 rounded-3xl p-6 glass shadow-2xl">
-      <div class="flex justify-between items-center border-b border-slate-800 pb-4">
-        <div>
-          <span class="px-3 py-1 bg-amber-500/20 text-amber-400 text-xs font-bold rounded-full uppercase tracking-wider">Super Admin Controls</span>
-          <h2 class="text-xl font-bold text-white mt-1">Platform Control Dashboard</h2>
-        </div>
-      </div>
-
-      <!-- Pending Withdrawals Table -->
-      <div class="space-y-3">
-        <h3 class="text-sm font-bold text-amber-400 uppercase tracking-wide">Pending Withdrawal Approval Queue</h3>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr class="bg-slate-950 text-slate-400 border-b border-slate-800">
-                <th class="p-3">User Email</th>
-                <th class="p-3">Amount (KES)</th>
-                <th class="p-3">Provider</th>
-                <th class="p-3">Phone</th>
-                <th class="p-3">Status</th>
-                <th class="p-3 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="withdrawalTableBody">
-              <tr><td colspan="6" class="p-3 text-slate-500 text-center">No pending withdrawal requests.</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Password Reset Override -->
-      <div class="border-t border-slate-800 pt-4 space-y-3">
-        <h3 class="text-sm font-bold text-amber-400 uppercase tracking-wide">Assist User: Change / Reset Password</h3>
-        <form onsubmit="handleAdminPasswordReset(event)" class="flex flex-col sm:flex-row gap-3">
-          <input type="email" id="adminTargetEmail" required placeholder="User email address" class="flex-1 px-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
-          <input type="password" id="adminNewPassword" required placeholder="New password" class="flex-1 px-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
-          <button type="submit" class="px-5 py-2 bg-amber-500 text-slate-950 font-bold text-xs rounded-xl hover:bg-amber-400 whitespace-nowrap">Update Password</button>
-        </form>
-        <p id="adminPassStatus" class="text-xs text-emerald-400 hidden"></p>
-      </div>
-    </div>
-
-    <!-- REFERRAL LINK GENERATOR -->
-    <section id="referralSection" class="card-bg border border-amber-500/30 rounded-3xl p-6 space-y-4">
-      <div class="flex items-center justify-between">
-        <div>
-          <h3 class="text-lg font-black text-white flex items-center gap-2">🔗 YOUR REFERRAL PROGRAM</h3>
-          <p class="text-slate-400 text-xs mt-1">Share your referral link. Friends who register through your link earn you bonuses!</p>
-        </div>
-        <div class="text-right">
-          <span class="text-xs text-slate-400 font-semibold block">Total Referred</span>
-          <span id="refCountBadge" class="text-2xl font-black text-amber-400">0</span>
-        </div>
-      </div>
-
-      <div class="flex flex-col sm:flex-row gap-3 pt-2">
-        <input type="text" id="refUrlInput" readonly class="flex-1 px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-amber-400 font-mono">
-        <button onclick="copyReferralLink()" class="px-6 py-3 gold-gradient text-slate-950 font-bold text-xs rounded-xl hover:opacity-90 transition whitespace-nowrap">Copy Referral Link</button>
-      </div>
-      <p id="copyStatus" class="text-xs text-emerald-400 hidden"></p>
-    </section>
-
-    <!-- ASSET STORE -->
-    <section class="space-y-4">
+  <div class="container">
+    
+    <!-- Brand Header with Logo -->
+    <div class="brand-header">
+      <svg class="logo-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50 5 L90 25 L50 45 L10 25 Z" fill="#F39C12"/>
+        <path d="M10 25 L50 45 L50 95 L10 75 Z" fill="#E67E22"/>
+        <path d="M50 45 L90 25 L90 75 L50 95 Z" fill="#D35400"/>
+      </svg>
       <div>
-        <h2 class="text-2xl font-black text-white tracking-wide">AVAILABLE ASSETS TO LEASE</h2>
-        <p class="text-slate-400 text-xs mt-1">Select an asset to lease and generate daily yields</p>
+        <h1 class="brand-title">PHANTOMS<br><span>ENTERPRISES</span></h1>
       </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="card-bg border border-slate-800 rounded-2xl p-5 hover:border-amber-500/50 transition shadow-xl space-y-4">
-          <div class="text-4xl">❄️</div>
-          <div>
-            <h3 class="text-lg font-bold text-white">Commercial Refrigerator X1</h3>
-            <p class="text-slate-400 text-xs">Category: Commercial Appliances</p>
-          </div>
-          <div class="flex justify-between text-xs py-2 border-y border-slate-800/60">
-            <span class="text-slate-400">Lease Cost: <strong class="text-amber-400">KES 15,000</strong></span>
-            <span class="text-slate-400">Yield: <strong class="text-emerald-400">KES 450/day</strong></span>
-          </div>
-          <button onclick="alert('Please make a deposit first to fund your asset lease.')" class="w-full py-2.5 bg-slate-800 hover:bg-amber-500 hover:text-slate-950 font-bold text-xs rounded-xl transition">
-            Lease Asset
-          </button>
-        </div>
-
-        <div class="card-bg border border-slate-800 rounded-2xl p-5 hover:border-amber-500/50 transition shadow-xl space-y-4">
-          <div class="text-4xl">🧺</div>
-          <div>
-            <h3 class="text-lg font-bold text-white">Industrial Washing Machine</h3>
-            <p class="text-slate-400 text-xs">Category: Laundry</p>
-          </div>
-          <div class="flex justify-between text-xs py-2 border-y border-slate-800/60">
-            <span class="text-slate-400">Lease Cost: <strong class="text-amber-400">KES 22,000</strong></span>
-            <span class="text-slate-400">Yield: <strong class="text-emerald-400">KES 680/day</strong></span>
-          </div>
-          <button onclick="alert('Please make a deposit first to fund your asset lease.')" class="w-full py-2.5 bg-slate-800 hover:bg-amber-500 hover:text-slate-950 font-bold text-xs rounded-xl transition">
-            Lease Asset
-          </button>
-        </div>
-
-        <div class="card-bg border border-slate-800 rounded-2xl p-5 hover:border-amber-500/50 transition shadow-xl space-y-4">
-          <div class="text-4xl">🍳</div>
-          <div>
-            <h3 class="text-lg font-bold text-white">Commercial Deep Fryer & Cooker</h3>
-            <p class="text-slate-400 text-xs">Category: Kitchen Equipment</p>
-          </div>
-          <div class="flex justify-between text-xs py-2 border-y border-slate-800/60">
-            <span class="text-slate-400">Lease Cost: <strong class="text-amber-400">KES 18,500</strong></span>
-            <span class="text-slate-400">Yield: <strong class="text-emerald-400">KES 550/day</strong></span>
-          </div>
-          <button onclick="alert('Please make a deposit first to fund your asset lease.')" class="w-full py-2.5 bg-slate-800 hover:bg-amber-500 hover:text-slate-950 font-bold text-xs rounded-xl transition">
-            Lease Asset
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- FINANCIALS, DEPOSIT, WITHDRAWAL -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <section class="card-bg border border-slate-800 rounded-2xl p-6 space-y-4">
-        <h3 class="text-base font-bold text-white flex items-center gap-2">💳 Financials & Withdrawal PIN</h3>
-        <form onsubmit="saveFinancials(event)" class="space-y-4">
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-1">Mobile Money Provider</label>
-            <select id="finProvider" required class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
-              <option value="Safaricom (M-Pesa)">Safaricom (M-Pesa)</option>
-              <option value="Airtel Money">Airtel Money</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-1">Withdrawal Phone Number</label>
-            <input type="tel" id="finPhone" required placeholder="e.g. 0712345678" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-1">4-Digit Withdrawal PIN</label>
-            <input type="password" id="finPin" maxlength="4" required placeholder="••••" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
-          </div>
-          <button type="submit" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-xs rounded-xl transition">Save Financials</button>
-        </form>
-        <p id="finStatus" class="text-xs text-emerald-400 hidden"></p>
-      </section>
-
-      <section class="card-bg border border-slate-800 rounded-2xl p-6 space-y-4">
-        <h3 class="text-base font-bold text-white flex items-center gap-2">📤 Request Withdrawal</h3>
-        <form onsubmit="requestWithdrawal(event)" class="space-y-4">
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-1">Withdrawal Amount (KES)</label>
-            <input type="number" id="witAmount" min="100" required placeholder="Enter amount" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-1">4-Digit Withdrawal PIN</label>
-            <input type="password" id="witPin" maxlength="4" required placeholder="••••" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
-          </div>
-          <button type="submit" class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition text-xs shadow-lg">Submit Withdrawal Request</button>
-        </form>
-        <p id="witStatus" class="text-xs text-amber-400 hidden"></p>
-      </section>
     </div>
 
-  </main>
+    <!-- Registration Form Horizontal Grid Layout -->
+    <form id="registerForm">
+      <div class="form-grid">
+        
+        <!-- Left Column: Account Credentials -->
+        <div class="form-section">
+          <span class="section-label">Account Details</span>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const role = localStorage.getItem('userRole');
-      const email = localStorage.getItem('userEmail') || localStorage.getItem('username');
-      const greeting = document.getElementById('userGreeting');
+          <div class="field-group">
+            <label>Phone Number</label>
+            <div class="phone-wrap">
+              <select class="country-select">
+                <option>+254</option>
+              </select>
+              <input type="tel" class="input-box" placeholder="Enter phone number" required>
+            </div>
+          </div>
 
-      if (role === 'superadmin') {
-        document.getElementById('superAdminSection').classList.remove('hidden');
-        greeting.innerText = `👑 Super Admin: ${email}`;
-        loadAdminWithdrawals();
-      } else {
-        greeting.innerText = `User: ${email}`;
-        loadUserReferrals(email);
-      }
-    });
+          <div class="field-group">
+            <label>Password</label>
+            <input type="password" class="input-box" placeholder="Create password" required>
+          </div>
 
-    function logout() {
-      localStorage.clear();
-      window.location.href = '/login';
-    }
+          <div class="field-group">
+            <label>Confirm Password</label>
+            <input type="password" class="input-box" placeholder="Re-enter password" required>
+          </div>
+        </div>
 
-    async function loadUserReferrals(email) {
-      const res = await fetch(`/api/user/referrals?email=${encodeURIComponent(email)}`);
-      const data = await res.json();
-      if (data.success) {
-        document.getElementById('refUrlInput').value = `${window.location.origin}/?ref=${data.referralCode}`;
-        document.getElementById('refCountBadge').innerText = data.referredCount || 0;
-      }
-    }
+        <!-- Right Column: Submission & Navigation -->
+        <div class="form-section action-panel">
+          <div>
+            <span class="section-label">Complete Registration</span>
+            <p style="font-size: 13px; color: #7f8c8d; margin-top: 8px; margin-bottom: 20px;">
+              Please ensure your details are correct before submitting your account creation request.
+            </p>
+            <button type="submit" class="submit-btn">Register Account</button>
+          </div>
 
-    function copyReferralLink() {
-      const input = document.getElementById('refUrlInput');
-      input.select();
-      navigator.clipboard.writeText(input.value);
-      const s = document.getElementById('copyStatus');
-      s.innerText = "Referral link copied!";
-      s.classList.remove('hidden');
-      setTimeout(() => s.classList.add('hidden'), 2500);
-    }
+          <div class="login-link-box">
+            Already registered? <a href="#">Sign in to your account</a>
+          </div>
+        </div>
 
-    function saveFinancials(e) {
-      e.preventDefault();
-      localStorage.setItem('finProvider', document.getElementById('finProvider').value);
-      localStorage.setItem('finPhone', document.getElementById('finPhone').value);
-      localStorage.setItem('finPin', document.getElementById('finPin').value);
-      const s = document.getElementById('finStatus');
-      s.innerText = "Financial details saved!";
-      s.classList.remove('hidden');
-    }
+      </div>
+    </form>
 
-    async function requestWithdrawal(e) {
-      e.preventDefault();
-      const amount = document.getElementById('witAmount').value;
-      const enteredPin = document.getElementById('witPin').value;
-      const savedPin = localStorage.getItem('finPin');
-      const phone = localStorage.getItem('finPhone');
-      const provider = localStorage.getItem('finProvider') || 'Safaricom (M-Pesa)';
-      const email = localStorage.getItem('userEmail');
-      const s = document.getElementById('witStatus');
+    <div class="footer-text">
+      &copy; Phantoms Enterprises. All rights reserved.
+    </div>
 
-      if (!savedPin) return alert('Please setup your Withdrawal PIN first!');
-      if (enteredPin !== savedPin) {
-        s.className = "text-xs text-red-400";
-        s.innerText = "Incorrect Withdrawal PIN.";
-        s.classList.remove('hidden');
-        return;
-      }
-
-      const res = await fetch('/api/withdraw/request', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userEmail: email, amount, provider, phone })
-      });
-      const data = await res.json();
-      if (data.success) {
-        s.className = "text-xs text-emerald-400";
-        s.innerText = "Withdrawal request submitted for approval!";
-        s.classList.remove('hidden');
-      }
-    }
-
-    async function loadAdminWithdrawals() {
-      const res = await fetch('/api/admin/withdrawals');
-      const data = await res.json();
-      const tbody = document.getElementById('withdrawalTableBody');
-
-      if (data.withdrawals && data.withdrawals.length > 0) {
-        tbody.innerHTML = data.withdrawals.map(w => `
-          <tr class="border-b border-slate-800/50">
-            <td class="p-3 font-semibold text-white">${w.userEmail}</td>
-            <td class="p-3 text-amber-400 font-bold">KES ${w.amount}</td>
-            <td class="p-3">${w.provider}</td>
-            <td class="p-3">${w.phone}</td>
-            <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${w.status === 'Approved' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}">${w.status}</span></td>
-            <td class="p-3 text-right space-x-2">
-              ${w.status === 'Pending' ? `
-                <button onclick="approveWithdrawal('${w.id}', 'Approve')" class="px-2.5 py-1 bg-emerald-600 text-white font-bold rounded text-[10px]">Approve</button>
-                <button onclick="approveWithdrawal('${w.id}', 'Reject')" class="px-2.5 py-1 bg-red-600 text-white font-bold rounded text-[10px]">Reject</button>
-              ` : '<span class="text-slate-500 text-[10px]">Processed</span>'}
-            </td>
-          </tr>
-        `).join('');
-      }
-    }
-
-    async function approveWithdrawal(withdrawalId, action) {
-      const res = await fetch('/api/admin/approve-withdrawal', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ withdrawalId, action })
-      });
-      const data = await res.json();
-      alert(data.message);
-      loadAdminWithdrawals();
-    }
-
-    async function handleAdminPasswordReset(e) {
-      e.preventDefault();
-      const targetEmail = document.getElementById('adminTargetEmail').value;
-      const newPassword = document.getElementById('adminNewPassword').value;
-      const status = document.getElementById('adminPassStatus');
-
-      const res = await fetch('/api/admin/reset-user-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ targetEmail, newPassword })
-      });
-      const data = await res.json();
-      status.innerText = data.message;
-      status.classList.remove('hidden');
-    }
-  </script>
+  </div>
 
 </body>
-            </html>
-        
+</html>
