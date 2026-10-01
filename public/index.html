@@ -37,7 +37,7 @@
   <!-- Main Container -->
   <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full space-y-10">
 
-    <!-- SUPER ADMIN POWERS SECTION (Hidden unless logged in as Super Admin) -->
+    <!-- SUPER ADMIN DASHBOARD -->
     <div id="superAdminSection" class="hidden space-y-6 bg-slate-900 border-2 border-amber-500/50 rounded-3xl p-6 glass shadow-2xl">
       <div class="flex justify-between items-center border-b border-slate-800 pb-4">
         <div>
@@ -46,7 +46,7 @@
         </div>
       </div>
 
-      <!-- Super Admin Power 1: Withdrawal Approvals Table -->
+      <!-- Pending Withdrawals Table -->
       <div class="space-y-3">
         <h3 class="text-sm font-bold text-amber-400 uppercase tracking-wide">Pending Withdrawal Requests Approval Queue</h3>
         <div class="overflow-x-auto">
@@ -68,27 +68,46 @@
         </div>
       </div>
 
-      <!-- Super Admin Power 2: User Password Reset Override -->
+      <!-- Super Admin Password Reset Override -->
       <div class="border-t border-slate-800 pt-4 space-y-3">
-        <h3 class="text-sm font-bold text-amber-400 uppercase tracking-wide">Assist User: Change / Reset User Password</h3>
+        <h3 class="text-sm font-bold text-amber-400 uppercase tracking-wide">Assist User: Change / Reset Password</h3>
         <form onsubmit="handleAdminPasswordReset(event)" class="flex flex-col sm:flex-row gap-3">
           <input type="email" id="adminTargetEmail" required placeholder="User email address" class="flex-1 px-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
           <input type="password" id="adminNewPassword" required placeholder="New password" class="flex-1 px-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
-          <button type="submit" class="px-5 py-2 bg-amber-500 text-slate-950 font-bold text-xs rounded-xl hover:bg-amber-400 whitespace-nowrap">Update User Password</button>
+          <button type="submit" class="px-5 py-2 bg-amber-500 text-slate-950 font-bold text-xs rounded-xl hover:bg-amber-400 whitespace-nowrap">Update Password</button>
         </form>
         <p id="adminPassStatus" class="text-xs text-emerald-400 hidden"></p>
       </div>
     </div>
 
-    <!-- CLIENT SECTION 1: Asset Store -->
+    <!-- REFERRAL LINK GENERATOR & TRACKER -->
+    <section id="referralSection" class="card-bg border border-amber-500/30 rounded-3xl p-6 space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-black text-white flex items-center gap-2">🔗 YOUR REFERRAL PROGRAM</h3>
+          <p class="text-slate-400 text-xs mt-1">Share your link below. Friends who register through your link earn you referral rewards!</p>
+        </div>
+        <div class="text-right">
+          <span class="text-xs text-slate-400 font-semibold block">Total Referred</span>
+          <span id="refCountBadge" class="text-2xl font-black text-amber-400">0</span>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 pt-2">
+        <input type="text" id="refUrlInput" readonly value="Log in to view your referral URL" class="flex-1 px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-amber-400 font-mono">
+        <button onclick="copyReferralLink()" class="px-6 py-3 gold-gradient text-slate-950 font-bold text-xs rounded-xl hover:opacity-90 transition whitespace-nowrap">Copy Referral Link</button>
+      </div>
+      <p id="copyStatus" class="text-xs text-emerald-400 hidden"></p>
+    </section>
+
+    <!-- ASSET STORE -->
     <section class="space-y-4">
       <div>
         <h2 class="text-2xl font-black text-white tracking-wide">AVAILABLE ASSETS TO LEASE</h2>
-        <p class="text-slate-400 text-xs mt-1">Select an item to lease and generate daily yields</p>
+        <p class="text-slate-400 text-xs mt-1">Select an asset to lease and generate daily yields</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Refrigerator -->
         <div class="card-bg border border-slate-800 rounded-2xl p-5 hover:border-amber-500/50 transition shadow-xl space-y-4">
           <div class="text-4xl">❄️</div>
           <div>
@@ -104,7 +123,6 @@
           </button>
         </div>
 
-        <!-- Washing Machine -->
         <div class="card-bg border border-slate-800 rounded-2xl p-5 hover:border-amber-500/50 transition shadow-xl space-y-4">
           <div class="text-4xl">🧺</div>
           <div>
@@ -120,7 +138,6 @@
           </button>
         </div>
 
-        <!-- Cooking Machine -->
         <div class="card-bg border border-slate-800 rounded-2xl p-5 hover:border-amber-500/50 transition shadow-xl space-y-4">
           <div class="text-4xl">🍳</div>
           <div>
@@ -138,7 +155,7 @@
       </div>
     </section>
 
-    <!-- CLIENT SECTION 2: Profile, Financials, Deposit, Withdrawal -->
+    <!-- PROFILE, FINANCIALS, DEPOSIT, WITHDRAWAL -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
       <!-- Profile Section -->
@@ -147,7 +164,7 @@
         <form onsubmit="saveProfile(event)" class="space-y-4">
           <div>
             <label class="block text-xs font-semibold text-slate-400 mb-1">Full Name</label>
-            <input type="text" id="profName" required placeholder="Enter your full name" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
+            <input type="text" id="profName" required placeholder="Enter full name" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-400 mb-1">Phone Number</label>
@@ -160,7 +177,7 @@
 
       <!-- Financials Section -->
       <section class="card-bg border border-slate-800 rounded-2xl p-6 space-y-4">
-        <h3 class="text-base font-bold text-white flex items-center gap-2">💳 Financials & Withdrawal Account</h3>
+        <h3 class="text-base font-bold text-white flex items-center gap-2">💳 Financials & Withdrawal PIN</h3>
         <form onsubmit="saveFinancials(event)" class="space-y-4">
           <div>
             <label class="block text-xs font-semibold text-slate-400 mb-1">Mobile Money Provider</label>
@@ -170,27 +187,27 @@
             </select>
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-1">Withdrawal Mobile Phone Number</label>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Withdrawal Phone Number</label>
             <input type="tel" id="finPhone" required placeholder="e.g. 0712345678" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-1">Create 4-Digit Withdrawal PIN</label>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">4-Digit Withdrawal PIN</label>
             <input type="password" id="finPin" maxlength="4" required placeholder="••••" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
           </div>
-          <button type="submit" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-xs rounded-xl transition">Save Financials & PIN</button>
+          <button type="submit" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-xs rounded-xl transition">Save Financials</button>
         </form>
         <p id="finStatus" class="text-xs text-emerald-400 hidden"></p>
       </section>
 
       <!-- Deposit Section -->
       <section class="card-bg border border-slate-800 rounded-2xl p-6 space-y-4">
-        <h3 class="text-base font-bold text-white flex items-center gap-2">📥 Deposit Funds (STK Push Prompt)</h3>
+        <h3 class="text-base font-bold text-white flex items-center gap-2">📥 Deposit Funds (STK Push)</h3>
         <form onsubmit="triggerDeposit(event)" class="space-y-4">
           <div>
             <label class="block text-xs font-semibold text-slate-400 mb-1">Amount to Deposit (KES)</label>
             <input type="number" id="depAmount" min="10" required placeholder="Enter amount" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
           </div>
-          <button type="submit" class="w-full gold-gradient text-slate-950 font-bold py-3 rounded-xl hover:opacity-90 transition text-xs shadow-lg">Send Payment Prompt</button>
+          <button type="submit" class="w-full gold-gradient text-slate-950 font-bold py-3 rounded-xl hover:opacity-90 transition text-xs shadow-lg">Send STK Push Prompt</button>
         </form>
         <p id="depStatus" class="text-xs text-blue-400 hidden"></p>
       </section>
@@ -234,12 +251,33 @@
         authBtn.innerText = 'Log Out';
         userGreeting.innerText = `Logged in: ${email}`;
         userGreeting.classList.remove('hidden');
+        loadUserReferrals(email);
       }
 
       if (localStorage.getItem('profName')) document.getElementById('profName').value = localStorage.getItem('profName');
       if (localStorage.getItem('profPhone')) document.getElementById('profPhone').value = localStorage.getItem('profPhone');
       if (localStorage.getItem('finPhone')) document.getElementById('finPhone').value = localStorage.getItem('finPhone');
     });
+
+    async function loadUserReferrals(email) {
+      const res = await fetch(`/api/user/referrals?email=${encodeURIComponent(email)}`);
+      const data = await res.json();
+      if (data.success) {
+        const refLink = `${window.location.origin}/login?ref=${data.referralCode}`;
+        document.getElementById('refUrlInput').value = refLink;
+        document.getElementById('refCountBadge').innerText = data.referredCount || 0;
+      }
+    }
+
+    function copyReferralLink() {
+      const input = document.getElementById('refUrlInput');
+      input.select();
+      navigator.clipboard.writeText(input.value);
+      const s = document.getElementById('copyStatus');
+      s.innerText = "Referral link copied to clipboard!";
+      s.classList.remove('hidden');
+      setTimeout(() => s.classList.add('hidden'), 2500);
+    }
 
     function handleAuthAction() {
       if (localStorage.getItem('userRole') || localStorage.getItem('userEmail')) {
@@ -265,7 +303,7 @@
       localStorage.setItem('finPhone', document.getElementById('finPhone').value);
       localStorage.setItem('finPin', document.getElementById('finPin').value);
       const s = document.getElementById('finStatus');
-      s.innerText = "Financial details & Withdrawal PIN saved!";
+      s.innerText = "Financial details & PIN saved!";
       s.classList.remove('hidden');
     }
 
@@ -277,7 +315,7 @@
       const s = document.getElementById('depStatus');
 
       if (!phone) {
-        alert('Please save your financial or profile phone number first!');
+        alert('Please save your phone number in Financials or Profile first!');
         return;
       }
 
@@ -287,7 +325,7 @@
 
       setTimeout(() => {
         s.className = "text-xs text-emerald-400";
-        s.innerText = `STK Prompt sent to ${phone}. Enter your ${provider} PIN to complete deposit of KES ${amount}.`;
+        s.innerText = `STK Prompt sent to ${phone}. Enter your ${provider} PIN to complete KES ${amount} deposit.`;
       }, 1500);
     }
 
@@ -302,7 +340,7 @@
       const s = document.getElementById('witStatus');
 
       if (!savedPin) {
-        alert('Please setup your Withdrawal PIN in Financials section first!');
+        alert('Please setup your Withdrawal PIN in Financials first!');
         return;
       }
 
@@ -342,45 +380,4 @@
             <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${w.status === 'Approved' ? 'bg-emerald-500/20 text-emerald-400' : w.status === 'Rejected' ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400'}">${w.status}</span></td>
             <td class="p-3 text-right space-x-2">
               ${w.status === 'Pending' ? `
-                <button onclick="approveWithdrawal('${w.id}', 'Approve')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded text-[10px]">Approve</button>
-                <button onclick="approveWithdrawal('${w.id}', 'Reject')" class="px-2.5 py-1 bg-red-600 hover:bg-red-500 text-white font-bold rounded text-[10px]">Reject</button>
-              ` : '<span class="text-slate-500 text-[10px]">Processed</span>'}
-            </td>
-          </tr>
-        `).join('');
-      }
-    }
-
-    async function approveWithdrawal(withdrawalId, action) {
-      const res = await fetch('/api/admin/approve-withdrawal', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ withdrawalId, action })
-      });
-      const data = await res.json();
-      alert(data.message);
-      loadAdminWithdrawals();
-    }
-
-    async function handleAdminPasswordReset(e) {
-      e.preventDefault();
-      const targetEmail = document.getElementById('adminTargetEmail').value;
-      const newPassword = document.getElementById('adminNewPassword').value;
-      const status = document.getElementById('adminPassStatus');
-
-      const res = await fetch('/api/admin/reset-user-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ targetEmail, newPassword })
-      });
-      const data = await res.json();
-
-      status.innerText = data.message;
-      status.className = data.success ? "text-xs text-emerald-400" : "text-xs text-red-400";
-      status.classList.remove('hidden');
-    }
-  </script>
-
-</body>
-            </html>
-  
+                <button onclick="approveWithdrawal('${w.id}', 'Approve')" class="px-2.5 py
