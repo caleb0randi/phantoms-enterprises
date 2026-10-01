@@ -40,7 +40,8 @@
       <nav class="hidden md:flex space-x-8 text-sm font-medium">
         <button onclick="switchTab('marketplace')" class="hover:text-blue-400 transition">Asset Lease Market</button>
         <button onclick="switchTab('dashboard')" class="hover:text-blue-400 transition">Investor Dashboard</button>
-        <button onclick="switchTab('admin')" class="text-amber-400 hover:text-amber-300 font-bold transition">Admin Control Panel</button>
+        <!-- Admin button hidden by default using class "hidden" -->
+        <button id="admin-nav-link" onclick="switchTab('admin')" class="hidden text-amber-400 hover:text-amber-300 font-bold transition">Admin Control Panel</button>
       </nav>
 
       <!-- User Profile / Wallet Status -->
@@ -212,8 +213,18 @@
       document.getElementById(`tab-${tabName}`).classList.remove('hidden');
     }
 
+    // Check if logged in user is admin before showing control panel button
+    function checkAdminAccess() {
+      const userRole = localStorage.getItem('userRole'); 
+      if (userRole === 'admin' || userRole === 'superadmin') {
+        const adminBtn = document.getElementById('admin-nav-link');
+        if (adminBtn) adminBtn.classList.remove('hidden');
+      }
+    }
+
     // Initial Load
     fetchAssets();
+    checkAdminAccess();
   </script>
 </body>
 </html>
