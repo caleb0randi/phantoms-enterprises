@@ -12,9 +12,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Super Admin Credentials
 const SUPER_ADMIN_CREDENTIALS = {
-  username: 'phantomenterprises@gmail.com',
+  username: 'phantomsenterprises@gmail.com',
   password: '@18922caleb',
-  email: 'phantomenterprises@gmail.com'
+  email: 'phantomsenterprises@gmail.com'
 };
 
 // In-Memory Storage for Users & Verification Codes
@@ -27,7 +27,7 @@ let assetPrototypes = [
   { id: '2', name: 'Industrial Washing Machine', category: 'Laundry', leaseCost: 220.00, dailyYield: 5.35, durationDays: 45, icon: '🧺' }
 ];
 
-// Helper: Send Brevo Verification Email with Detailed Response Handling
+// Helper: Send Brevo Verification Email
 async function sendBrevoEmail(toEmail, code) {
   const apiKey = process.env.BREVO_API_KEY;
   if (!apiKey) {
@@ -44,7 +44,7 @@ async function sendBrevoEmail(toEmail, code) {
         'content-type': 'application/json'
       },
       body: JSON.stringify({
-        sender: { name: 'Phantoms Enterprises', email: 'phantomenterprises@gmail.com' },
+        sender: { name: 'Phantoms Enterprises', email: 'phantomsenterprises@gmail.com' },
         to: [{ email: toEmail }],
         subject: 'Your Verification Code - Phantoms Enterprises',
         htmlContent: `<div style="font-family:sans-serif;padding:20px;background:#0f172a;color:#f8fafc;border-radius:12px;">
@@ -172,3 +172,4 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
