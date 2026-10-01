@@ -10,28 +10,31 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Super Admin Credentials
+// Super Admin Credentials (Prioritizes Environment Variables with Hardcoded Fallbacks)
 const SUPER_ADMIN_CREDENTIALS = {
-  username: 'phantomsenterprises@gmail.com',
-  password: '@18922caleb',
-  email: 'phantomsenterprises@gmail.com'
+  username: process.env.SUPER_ADMIN_USERNAME || 'phantomsenterprises@gmail.com',
+  password: process.env.SUPER_ADMIN_PASSWORD || '@18922caleb',
+  email: process.env.SUPER_ADMIN_EMAIL || 'phantomsenterprises@gmail.com'
 };
 
-// In-Memory Storage for Users & Verification Codes
-const registeredUsers = [];
-const verificationCodes = {};
+// In-Memory Data Storage
+const registeredUsers = []; // Stores { email, password, phone, name }
+const verificationCodes = {}; // Registration codes
+const passwordResetCodes = {}; // Forgot password codes
+const pendingWithdrawals = []; // Stores pending withdrawal requests for Super Admin approval
 
-// Mock In-Memory Asset Storage
+// Mock Assets
 let assetPrototypes = [
-  { id: '1', name: 'Commercial Refrigerator X1', category: 'Appliances', leaseCost: 150.00, dailyYield: 4.50, durationDays: 30, icon: '❄️' },
-  { id: '2', name: 'Industrial Washing Machine', category: 'Laundry', leaseCost: 220.00, dailyYield: 5.35, durationDays: 45, icon: '🧺' }
+  { id: '1', name: 'Commercial Refrigerator X1', category: 'Appliances', leaseCost: 15000, dailyYield: 450, durationDays: 30, icon: '❄️' },
+  { id: '2', name: 'Industrial Washing Machine', category: 'Laundry', leaseCost: 22000, dailyYield: 680, durationDays: 45, icon: '🧺' },
+  { id: '3', name: 'Commercial Deep Fryer & Cooker', category: 'Kitchen Equipment', leaseCost: 18500, dailyYield: 550, durationDays: 30, icon: '🍳' }
 ];
 
-// Helper: Send Brevo Verification Email
-async function sendBrevoEmail(toEmail, code) {
+// Brevo Email Sender Helper
+async function sendBrevoEmail(toEmail, subject, textContent, htmlContent) {
   const apiKey = process.env.BREVO_API_KEY;
   if (!apiKey) {
-    console.warn("BREVO_API_KEY environment variable not set. Code generated:", code);
+    console.warn("BREVO_API_KEY environment variable not set.");
     return { success: false, reason: "API key missing" };
   }
 
@@ -46,32 +49,24 @@ async function sendBrevoEmail(toEmail, code) {
       body: JSON.stringify({
         sender: { name: 'Phantoms Enterprises', email: 'phantomsenterprises@gmail.com' },
         to: [{ email: toEmail }],
-        subject: 'Your Verification Code - Phantoms Enterprises',
-        htmlContent: `<div style="font-family:sans-serif;padding:20px;background:#0f172a;color:#f8fafc;border-radius:12px;">
-          <h2 style="color:#ffffff;">Welcome to Phantoms Enterprises</h2>
-          <p style="color:#cbd5e1;">Your 6-digit registration verification code is:</p>
-          <h1 style="color:#f59e0b;letter-spacing:6px;font-size:36px;">${code}</h1>
-          <p style="color:#94a3b8;font-size:12px;">If you did not request this code, please ignore this email.</p>
-        </div>`
+        subject: subject,
+        htmlContent: htmlContent
       })
     });
 
     const responseData = await response.json();
-
     if (!response.ok) {
-      console.error("Brevo API error response:", responseData);
+      console.error("Brevo API error:", responseData);
       return { success: false, data: responseData };
     }
-
-    console.log("Brevo email dispatched successfully:", responseData);
     return { success: true, data: responseData };
   } catch (error) {
-    console.error("Brevo connection error:", error);
+    console.error("Brevo dispatch error:", error);
     return { success: false, error: error.message };
   }
 }
 
-// Dedicated /login route (Checks both root and public/ directory for login.html)
+// ROUTE: Dedicated /login route
 app.get('/login', (req, res) => {
   const rootLoginPath = path.join(__dirname, 'login.html');
   const publicLoginPath = path.join(__dirname, 'public', 'login.html');
@@ -81,7 +76,7 @@ app.get('/login', (req, res) => {
   } else if (fs.existsSync(publicLoginPath)) {
     res.sendFile(publicLoginPath);
   } else {
-    res.status(404).send('login.html not found. Please ensure login.html exists in your root or public folder.');
+    res.status(404).send('login.html not found. Please ensure login.html exists in your root or public directory.');
   }
 });
 
@@ -90,14 +85,15 @@ app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    return res.status(400).json({ success: false, message: 'Username and password are required' });
+    return res.status(400).json({ success: false, message: 'Username/Email and password are required' });
   }
 
-  const cleanUsername = username.trim().toLowerCase();
-  const superAdminUser = SUPER_ADMIN_CREDENTIALS.username.toLowerCase();
+  const cleanInput = username.trim().toLowerCase();
+  const superAdminUser = SUPER_ADMIN_CREDENTIALS.username.trim().toLowerCase();
+  const superAdminEmail = SUPER_ADMIN_CREDENTIALS.email.trim().toLowerCase();
 
-  // Check Super Admin Credentials
-  if (cleanUsername === superAdminUser && password === SUPER_ADMIN_CREDENTIALS.password) {
+  // Check Super Admin Credentials (matches either username or email)
+  if ((cleanInput === superAdminUser || cleanInput === superAdminEmail) && password === SUPER_ADMIN_CREDENTIALS.password) {
     return res.json({
       success: true,
       user: {
@@ -109,7 +105,7 @@ app.post('/api/login', (req, res) => {
   }
 
   // Check Registered Users
-  const user = registeredUsers.find(u => u.email.toLowerCase() === cleanUsername && u.password === password);
+  const user = registeredUsers.find(u => u.email.toLowerCase() === cleanInput && u.password === password);
   if (user) {
     return res.json({
       success: true,
@@ -121,10 +117,10 @@ app.post('/api/login', (req, res) => {
     });
   }
 
-  return res.status(401).json({ success: false, message: 'Invalid credentials' });
+  return res.status(401).json({ success: false, message: 'Invalid credentials. Please verify email and password.' });
 });
 
-// ROUTE 2: Register & Request Brevo Verification Code
+// ROUTE 2: Registration - Send Brevo Code
 app.post('/api/register/send-code', async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ success: false, message: 'Email address is required' });
@@ -132,20 +128,22 @@ app.post('/api/register/send-code', async (req, res) => {
   const code = Math.floor(100000 + Math.random() * 900000).toString();
   verificationCodes[email.toLowerCase()] = code;
 
-  const result = await sendBrevoEmail(email, code);
+  const html = `<div style="font-family:sans-serif;padding:20px;background:#0f172a;color:#f8fafc;border-radius:12px;">
+    <h2 style="color:#ffffff;">Welcome to Phantoms Enterprises</h2>
+    <p style="color:#cbd5e1;">Your 6-digit registration verification code is:</p>
+    <h1 style="color:#f59e0b;letter-spacing:6px;font-size:36px;">${code}</h1>
+  </div>`;
+
+  const result = await sendBrevoEmail(email, 'Your Verification Code - Phantoms Enterprises', `Your code is ${code}`, html);
 
   if (result.success) {
-    return res.json({ success: true, message: 'Verification code sent! Please check your inbox and spam folder.' });
+    return res.json({ success: true, message: 'Verification code sent to your email address.' });
   } else {
-    return res.json({ 
-      success: true, 
-      message: 'Code generated. If email delivery is delayed, check spam or Brevo sender status.',
-      debugCode: process.env.NODE_ENV !== 'production' ? code : undefined 
-    });
+    return res.json({ success: true, message: 'Code generated. Check inbox or spam folder.' });
   }
 });
 
-// ROUTE 3: Verify Code & Create Account
+// ROUTE 3: Registration - Verify Code & Create Account
 app.post('/api/register/verify', (req, res) => {
   const { email, password, code } = req.body;
   const cleanEmail = email ? email.toLowerCase() : '';
@@ -159,17 +157,108 @@ app.post('/api/register/verify', (req, res) => {
   return res.status(400).json({ success: false, message: 'Invalid or expired verification code' });
 });
 
-// ROUTE 4: Assets Endpoint
-app.get('/api/assets', (req, res) => {
-  res.json({ success: true, assets: assetPrototypes });
+// ROUTE 4: Forgot Password - Send Reset Code
+app.post('/api/forgot-password/send-code', async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ success: false, message: 'Email is required' });
+
+  const cleanEmail = email.toLowerCase();
+  const userExists = registeredUsers.find(u => u.email.toLowerCase() === cleanEmail);
+
+  if (!userExists) {
+    return res.status(404).json({ success: false, message: 'No account registered with this email address' });
+  }
+
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  passwordResetCodes[cleanEmail] = code;
+
+  const html = `<div style="font-family:sans-serif;padding:20px;background:#0f172a;color:#f8fafc;border-radius:12px;">
+    <h2 style="color:#ffffff;">Password Reset Request</h2>
+    <p style="color:#cbd5e1;">Your 6-digit password reset code is:</p>
+    <h1 style="color:#f59e0b;letter-spacing:6px;font-size:36px;">${code}</h1>
+  </div>`;
+
+  await sendBrevoEmail(cleanEmail, 'Password Reset Code - Phantoms Enterprises', `Your reset code is ${code}`, html);
+  return res.json({ success: true, message: 'Password reset code sent to your email inbox.' });
 });
 
-// Fallback Route (Only serves main dashboard for unknown routes)
+// ROUTE 5: Forgot Password - Reset Password with Code
+app.post('/api/forgot-password/reset', (req, res) => {
+  const { email, code, newPassword } = req.body;
+  const cleanEmail = email ? email.toLowerCase() : '';
+
+  if (passwordResetCodes[cleanEmail] && passwordResetCodes[cleanEmail] === code) {
+    delete passwordResetCodes[cleanEmail];
+    const user = registeredUsers.find(u => u.email.toLowerCase() === cleanEmail);
+    if (user) {
+      user.password = newPassword;
+      return res.json({ success: true, message: 'Password reset successfully! You can now log in.' });
+    }
+  }
+
+  return res.status(400).json({ success: false, message: 'Invalid or expired password reset code.' });
+});
+
+// ROUTE 6: Submit Withdrawal Request (Client Side)
+app.post('/api/withdraw/request', (req, res) => {
+  const { userEmail, amount, provider, phone } = req.body;
+  if (!userEmail || !amount || !provider || !phone) {
+    return res.status(400).json({ success: false, message: 'All withdrawal details are required' });
+  }
+
+  const requestObj = {
+    id: Date.now().toString(),
+    userEmail,
+    amount: parseFloat(amount),
+    provider,
+    phone,
+    status: 'Pending',
+    requestedAt: new Date().toLocaleString()
+  };
+
+  pendingWithdrawals.push(requestObj);
+  return res.json({ success: true, message: 'Withdrawal request submitted! Awaiting Super Admin approval.', data: requestObj });
+});
+
+// ROUTE 7: Get Pending Withdrawals (Super Admin Only)
+app.get('/api/admin/withdrawals', (req, res) => {
+  res.json({ success: true, withdrawals: pendingWithdrawals });
+});
+
+// ROUTE 8: Approve/Reject Withdrawal (Super Admin Power)
+app.post('/api/admin/approve-withdrawal', (req, res) => {
+  const { withdrawalId, action } = req.body; // action: 'Approve' or 'Reject'
+  const index = pendingWithdrawals.findIndex(w => w.id === withdrawalId);
+
+  if (index !== -1) {
+    pendingWithdrawals[index].status = action === 'Approve' ? 'Approved' : 'Rejected';
+    return res.json({ success: true, message: `Withdrawal request ${action.toLowerCase()}d successfully!` });
+  }
+
+  return res.status(404).json({ success: false, message: 'Withdrawal request not found' });
+});
+
+// ROUTE 9: Super Admin Force Change User Password
+app.post('/api/admin/reset-user-password', (req, res) => {
+  const { targetEmail, newPassword } = req.body;
+  const cleanEmail = targetEmail ? targetEmail.toLowerCase() : '';
+
+  const user = registeredUsers.find(u => u.email.toLowerCase() === cleanEmail);
+  if (user) {
+    user.password = newPassword;
+    return res.json({ success: true, message: `Password for ${targetEmail} updated successfully by Super Admin!` });
+  }
+
+  return res.status(404).json({ success: false, message: 'Registered user email not found' });
+});
+
+// Fallback Route
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Phantoms Enterprises Server running on port ${PORT}`);
 });
+      
 
