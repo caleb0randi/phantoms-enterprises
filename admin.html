@@ -3,22 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Phantoms Enterprises - Admin Dashboard</title>
+  <title>Phantoms Enterprises - Master Admin Control Panel</title>
   
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { background-color: #0f172a; color: #f8fafc; padding: 20px; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid #334155; padding-bottom: 15px; }
     .admin-card { background: #1e293b; border-radius: 10px; padding: 20px; margin-bottom: 25px; border: 1px solid #334155; }
-    h2 { color: #f39c12; margin-bottom: 15px; font-size: 1.2rem; border-bottom: 1px solid #334155; padding-bottom: 8px; }
+    h2 { color: #f39c12; margin-bottom: 15px; font-size: 1.2rem; border-bottom: 1px solid #334155; padding-bottom: 8px; display: flex; align-items: center; gap: 8px; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { text-align: left; padding: 12px; border-bottom: 1px solid #334155; font-size: 0.9rem; }
+    th, td { text-align: left; padding: 12px; border-bottom: 1px solid #334155; font-size: 0.9rem; vertical-align: middle; }
     th { color: #94a3b8; font-weight: 600; background: #0f172a; }
     .btn { padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.8rem; margin-right: 5px; }
     .btn-approve { background: #27ae60; color: white; }
     .btn-reject { background: #e74c3c; color: white; }
+    .btn-warn { background: #f39c12; color: white; }
+    .btn-add { background: #3498db; color: white; padding: 10px 18px; font-size: 0.9rem; margin-top: 10px; }
     .badge-pending { color: #f39c12; font-weight: bold; }
     .badge-approved { color: #27ae60; font-weight: bold; }
     .badge-rejected { color: #e74c3c; font-weight: bold; }
+    .badge-active { color: #27ae60; font-weight: bold; }
+    .badge-suspended { color: #e74c3c; font-weight: bold; }
+    
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 10px; }
+    .input-box { width: 100%; padding: 10px; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 5px; font-size: 0.9rem; }
+    .pkg-img { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid #334155; }
   </style>
 
   <!-- Firebase Web Libraries -->
@@ -28,41 +37,94 @@
 </head>
 <body>
 
-  <h1 style="margin-bottom: 20px; color: #ffffff;">Admin Control Panel</h1>
+  <div class="header">
+    <h1 style="color: #ffffff;">⚙️ Master Admin Control Panel</h1>
+  </div>
 
-  <!-- DEPOSIT REQUESTS SECTION -->
+  <!-- SECTION 1: DEPOSIT REQUESTS -->
   <div class="admin-card">
-    <h2>💵 Pending Deposit Requests</h2>
+    <h2>💵 1. Deposit Approvals & Rejections</h2>
     <table>
       <thead>
         <tr>
           <th>User Email / Phone</th>
           <th>M-Pesa Code</th>
-          <th>Amount (KES)</th>
+          <th>Amount</th>
           <th>Status</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody id="depositTableBody">
-        <tr><td colspan="5">Loading deposit requests...</td></tr>
+        <tr><td colspan="5">Loading deposits...</td></tr>
       </tbody>
     </table>
   </div>
 
-  <!-- WITHDRAWAL REQUESTS SECTION -->
+  <!-- SECTION 2: WITHDRAWAL REQUESTS -->
   <div class="admin-card">
-    <h2>🏧 Pending Withdrawal Requests</h2>
+    <h2>🏧 2. Withdrawal Approvals & Rejections</h2>
     <table>
       <thead>
         <tr>
           <th>User Phone</th>
-          <th>Amount (KES)</th>
+          <th>Amount</th>
           <th>Status</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody id="withdrawTableBody">
-        <tr><td colspan="4">Loading withdrawal requests...</td></tr>
+        <tr><td colspan="4">Loading withdrawals...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SECTION 3: MANAGE INVESTMENT PACKAGES -->
+  <div class="admin-card">
+    <h2>💼 3. Manage Investment Packages (Add / Remove)</h2>
+    
+    <!-- Add New Package Form -->
+    <div style="background: #0f172a; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+      <h3 style="color:#ffffff; font-size: 0.95rem; margin-bottom: 10px;">Add New Investment Plan</h3>
+      <div class="form-grid">
+        <input type="text" id="pkgName" class="input-box" placeholder="Package Title (e.g. Rig V1)">
+        <input type="number" id="pkgPrice" class="input-box" placeholder="Rental Price (KES)">
+        <input type="number" id="pkgProfit" class="input-box" placeholder="Daily Profit (KES)">
+        <input type="text" id="pkgImgUrl" class="input-box" placeholder="Image URL (e.g. https://...)">
+      </div>
+      <button class="btn btn-add" onclick="addNewPackage()">+ Add Investment Package</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Image</th>
+          <th>Package Name</th>
+          <th>Price (KES)</th>
+          <th>Daily Profit</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="packagesTableBody">
+        <tr><td colspan="5">Loading investment plans...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SECTION 4: USER MANAGEMENT & BANNING -->
+  <div class="admin-card">
+    <h2>👤 4. User Accounts & Terms Enforcement</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Balance</th>
+          <th>Account Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="usersTableBody">
+        <tr><td colspan="5">Loading registered members...</td></tr>
       </tbody>
     </table>
   </div>
@@ -80,14 +142,11 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // Load Deposits
+    // --- 1. DEPOSITS ---
     function loadDeposits() {
       db.collection("depositRequests").onSnapshot(snapshot => {
         const tbody = document.getElementById('depositTableBody');
-        if (snapshot.empty) {
-          tbody.innerHTML = "<tr><td colspan='5'>No deposit requests found.</td></tr>";
-          return;
-        }
+        if (snapshot.empty) { tbody.innerHTML = "<tr><td colspan='5'>No deposit requests.</td></tr>"; return; }
 
         let html = "";
         snapshot.forEach(doc => {
@@ -114,38 +173,31 @@
       });
     }
 
-    // Approve Deposit
     async function approveDeposit(reqId, userId, amount) {
-      if (!confirm("Approve this deposit and add KES " + amount + " to user balance?")) return;
+      if (!confirm("Approve deposit and add KES " + amount + " to user?")) return;
       try {
         const userRef = db.collection("users").doc(userId);
         await db.runTransaction(async (transaction) => {
           const userDoc = await transaction.get(userRef);
-          if (!userDoc.exists) throw "User does not exist!";
+          if (!userDoc.exists) throw "User missing";
           const currentBal = userDoc.data().balance || 0;
           transaction.update(userRef, { balance: currentBal + amount });
           transaction.update(db.collection("depositRequests").doc(reqId), { status: "approved" });
         });
-        alert("Deposit approved successfully!");
-      } catch (err) {
-        alert("Error: " + err.message);
-      }
+        alert("Deposit credited!");
+      } catch (err) { alert(err.message); }
     }
 
-    // Reject Deposit
     async function rejectDeposit(reqId) {
-      if (!confirm("Reject this deposit request?")) return;
+      if (!confirm("Reject this payment?")) return;
       await db.collection("depositRequests").doc(reqId).update({ status: "rejected" });
     }
 
-    // Load Withdrawals
+    // --- 2. WITHDRAWALS ---
     function loadWithdrawals() {
       db.collection("withdrawalRequests").onSnapshot(snapshot => {
         const tbody = document.getElementById('withdrawTableBody');
-        if (snapshot.empty) {
-          tbody.innerHTML = "<tr><td colspan='4'>No withdrawal requests found.</td></tr>";
-          return;
-        }
+        if (snapshot.empty) { tbody.innerHTML = "<tr><td colspan='4'>No withdrawal requests.</td></tr>"; return; }
 
         let html = "";
         snapshot.forEach(doc => {
@@ -160,7 +212,7 @@
               <td class="badge-${data.status}">${data.status.toUpperCase()}</td>
               <td>
                 ${isPending ? `
-                  <button class="btn btn-approve" onclick="approveWithdrawal('${id}')">Approve Sent</button>
+                  <button class="btn btn-approve" onclick="approveWithdrawal('${id}')">Confirm Sent</button>
                   <button class="btn btn-reject" onclick="rejectWithdrawal('${id}', '${data.userId}',${data.amount})">Refund & Reject</button>
                 ` : 'Done'}
               </td>
@@ -171,15 +223,13 @@
       });
     }
 
-    // Approve Withdrawal
     async function approveWithdrawal(reqId) {
-      if (!confirm("Confirm that you have sent money to the user via M-Pesa?")) return;
+      if (!confirm("Confirm payment sent via M-Pesa?")) return;
       await db.collection("withdrawalRequests").doc(reqId).update({ status: "approved" });
     }
 
-    // Reject Withdrawal & Refund User
     async function rejectWithdrawal(reqId, userId, amount) {
-      if (!confirm("Reject withdrawal and refund KES " + amount + " back to user balance?")) return;
+      if (!confirm("Reject and refund KES " + amount + " to user balance?")) return;
       try {
         const userRef = db.collection("users").doc(userId);
         await db.runTransaction(async (transaction) => {
@@ -190,16 +240,113 @@
           }
           transaction.update(db.collection("withdrawalRequests").doc(reqId), { status: "rejected" });
         });
-        alert("Withdrawal rejected and funds returned to user.");
-      } catch (err) {
-        alert("Error: " + err.message);
+        alert("Withdrawal rejected & refunded.");
+      } catch (err) { alert(err.message); }
+    }
+
+    // --- 3. INVESTMENT PACKAGES MANAGEMENT ---
+    function loadPackages() {
+      db.collection("investmentPackages").onSnapshot(snapshot => {
+        const tbody = document.getElementById('packagesTableBody');
+        if (snapshot.empty) { tbody.innerHTML = "<tr><td colspan='5'>No packages found. Add one above.</td></tr>"; return; }
+
+        let html = "";
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const imgUrl = data.imgUrl || 'https://via.placeholder.com/50';
+
+          html += `
+            <tr>
+              <td><img src="${imgUrl}" class="pkg-img" alt="Package"></td>
+              <td><strong>${data.name}</strong></td>
+              <td>KES ${data.price.toLocaleString()}</td>
+              <td>KES ${data.dailyProfit.toLocaleString()} / day</td>
+              <td>
+                <button class="btn btn-reject" onclick="deletePackage('${doc.id}')">Delete Plan</button>
+              </td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+      });
+    }
+
+    async function addNewPackage() {
+      const name = document.getElementById('pkgName').value.trim();
+      const price = parseFloat(document.getElementById('pkgPrice').value);
+      const profit = parseFloat(document.getElementById('pkgProfit').value);
+      const imgUrl = document.getElementById('pkgImgUrl').value.trim();
+
+      if (!name || !price || !profit) {
+        alert("Please enter title, price, and daily profit.");
+        return;
+      }
+
+      await db.collection("investmentPackages").add({
+        name: name,
+        price: price,
+        dailyProfit: profit,
+        imgUrl: imgUrl,
+        createdAt: new Date()
+      });
+
+      document.getElementById('pkgName').value = "";
+      document.getElementById('pkgPrice').value = "";
+      document.getElementById('pkgProfit').value = "";
+      document.getElementById('pkgImgUrl').value = "";
+      alert("Package created successfully!");
+    }
+
+    async function deletePackage(id) {
+      if (confirm("Delete this investment plan?")) {
+        await db.collection("investmentPackages").doc(id).delete();
       }
     }
 
-    // Initialize Panel
+    // --- 4. USER SUSPENSION / BANNING ---
+    function loadUsers() {
+      db.collection("users").onSnapshot(snapshot => {
+        const tbody = document.getElementById('usersTableBody');
+        if (snapshot.empty) { tbody.innerHTML = "<tr><td colspan='5'>No members registered yet.</td></tr>"; return; }
+
+        let html = "";
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const id = doc.id;
+          const status = data.status || "active";
+          const isSuspended = status === "suspended";
+
+          html += `
+            <tr>
+              <td>${data.email}</td>
+              <td>${data.phone}</td>
+              <td>KES ${(data.balance || 0).toLocaleString()}</td>
+              <td class="badge-${status}">${status.toUpperCase()}</td>
+              <td>
+                ${isSuspended ? `
+                  <button class="btn btn-approve" onclick="updateUserStatus('${id}', 'active')">Re-activate Member</button>
+                ` : `
+                  <button class="btn btn-reject" onclick="updateUserStatus('${id}', 'suspended')">Suspend / Reject Member</button>
+                `}
+              </td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+      });
+    }
+
+    async function updateUserStatus(userId, newStatus) {
+      if (!confirm(`Change user account status to ${newStatus}?`)) return;
+      await db.collection("users").doc(userId).update({ status: newStatus });
+      alert("User status updated to " + newStatus);
+    }
+
+    // Initialize all sections
     loadDeposits();
     loadWithdrawals();
+    loadPackages();
+    loadUsers();
   </script>
 </body>
-  </html>
-  
+</html>
