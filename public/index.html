@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Phantoms Enterprises</title>
+  <title>Phantoms Enterprises - Registration</title>
   <style>
     * {
       box-sizing: border-box;
@@ -16,9 +16,8 @@
       background-color: #f4f6f9;
       color: #2c3e50;
       display: flex;
-      flex-direction: column;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       min-height: 100vh;
       padding: 20px;
     }
@@ -32,12 +31,11 @@
       padding: 35px;
     }
 
-    /* Brand Header with Isometric Cube Logo */
     .brand-header {
       display: flex;
       align-items: center;
       gap: 15px;
-      margin-bottom: 30px;
+      margin-bottom: 25px;
       padding-bottom: 20px;
       border-bottom: 1px solid #eef2f5;
     }
@@ -51,7 +49,6 @@
       font-size: 26px;
       font-weight: 800;
       color: #1a2b4c;
-      letter-spacing: 0.5px;
       line-height: 1.1;
     }
 
@@ -60,7 +57,6 @@
       display: inline-block;
     }
 
-    /* Horizontal Form Grid Layout */
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -76,7 +72,7 @@
     .form-section {
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 16px;
     }
 
     .section-label {
@@ -87,7 +83,6 @@
       letter-spacing: 0.8px;
     }
 
-    /* Field Inputs */
     .field-group {
       display: flex;
       flex-direction: column;
@@ -108,7 +103,6 @@
       font-size: 14px;
       background-color: #fcfdfe;
       outline: none;
-      transition: border-color 0.2s;
     }
 
     .input-box:focus {
@@ -116,7 +110,7 @@
       background-color: #ffffff;
     }
 
-    .phone-wrap {
+    .phone-wrap, .code-wrap {
       display: flex;
       gap: 8px;
     }
@@ -127,15 +121,34 @@
       border-radius: 8px;
       background: #f8fafc;
       font-weight: 600;
-      color: #2c3e50;
     }
 
-    /* Buttons & Actions */
-    .action-panel {
+    .send-code-btn {
+      padding: 0 16px;
+      background-color: #e67e22;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .send-code-btn:hover {
+      background-color: #d35400;
+    }
+
+    .consent-group {
       display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 20px;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13px;
+      color: #555;
+      margin-top: 5px;
+    }
+
+    .consent-group input {
+      margin-top: 3px;
     }
 
     .submit-btn {
@@ -148,11 +161,30 @@
       font-weight: 700;
       font-size: 15px;
       cursor: pointer;
-      transition: background 0.2s;
     }
 
     .submit-btn:hover {
       background-color: #1b6aaa;
+    }
+
+    .status-alert {
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      display: none;
+      margin-top: 10px;
+    }
+
+    .status-alert.success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .status-alert.error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
     }
 
     .login-link-box {
@@ -163,6 +195,7 @@
       text-align: center;
       font-size: 14px;
       color: #7f8c8d;
+      margin-top: auto;
     }
 
     .login-link-box a {
@@ -171,26 +204,8 @@
       text-decoration: none;
     }
 
-    .login-link-box a:hover {
-      text-decoration: underline;
-    }
-
-    /* Footer */
-    .footer-text {
-      margin-top: 30px;
-      text-align: center;
-      font-size: 12px;
-      color: #95a5a6;
-    }
-
-    /* Target Removal CSS (Verification Code, Invite Code, Red Dots, Recruitment, Apps, Telegram) */
-    .verification-group,
-    .invite-code-group,
-    .red-dot,
-    .company-recruitment,
-    .android-app-section,
-    .telegram-btn,
-    a[href*="t.me"] {
+    /* Target removals */
+    .company-recruitment, .android-app-section, .telegram-btn, a[href*="t.me"] {
       display: none !important;
     }
   </style>
@@ -198,8 +213,6 @@
 <body>
 
   <div class="container">
-    
-    <!-- Brand Header with Logo -->
     <div class="brand-header">
       <svg class="logo-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M50 5 L90 25 L50 45 L10 25 Z" fill="#F39C12"/>
@@ -211,13 +224,12 @@
       </div>
     </div>
 
-    <!-- Registration Form Horizontal Grid Layout -->
     <form id="registerForm">
       <div class="form-grid">
         
-        <!-- Left Column: Account Credentials -->
+        <!-- Left Column: User Input Credentials -->
         <div class="form-section">
-          <span class="section-label">Account Details</span>
+          <span class="section-label">Account Registration</span>
 
           <div class="field-group">
             <label>Phone Number</label>
@@ -225,30 +237,48 @@
               <select class="country-select">
                 <option>+254</option>
               </select>
-              <input type="tel" class="input-box" placeholder="Enter phone number" required>
+              <input type="tel" id="phone" class="input-box" placeholder="Enter phone number" required>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label>Email Address</label>
+            <input type="email" id="email" class="input-box" placeholder="Enter your email" required>
+          </div>
+
+          <div class="field-group">
+            <label>Email Verification Code</label>
+            <div class="code-wrap">
+              <input type="text" id="verificationCode" class="input-box" placeholder="Enter 6-digit code" required>
+              <button type="button" class="send-code-btn" id="sendCodeBtn" onclick="generateEmailCode()">Send Code</button>
             </div>
           </div>
 
           <div class="field-group">
             <label>Password</label>
-            <input type="password" class="input-box" placeholder="Create password" required>
+            <input type="password" id="password" class="input-box" placeholder="Create password" required>
           </div>
 
           <div class="field-group">
             <label>Confirm Password</label>
-            <input type="password" class="input-box" placeholder="Re-enter password" required>
+            <input type="password" id="confirmPassword" class="input-box" placeholder="Re-enter password" required>
           </div>
         </div>
 
-        <!-- Right Column: Submission & Navigation -->
-        <div class="form-section action-panel">
-          <div>
-            <span class="section-label">Complete Registration</span>
-            <p style="font-size: 13px; color: #7f8c8d; margin-top: 8px; margin-bottom: 20px;">
-              Please ensure your details are correct before submitting your account creation request.
-            </p>
-            <button type="submit" class="submit-btn">Register Account</button>
+        <!-- Right Column: Verification, Consent & Action -->
+        <div class="form-section">
+          <span class="section-label">Terms & Submission</span>
+
+          <div class="consent-group">
+            <input type="checkbox" id="consentCheck" required>
+            <label for="consentCheck">
+              I agree to the Terms of Service and Privacy Policy, and consent to receive email verification codes.
+            </label>
           </div>
+
+          <button type="submit" class="submit-btn">Register Account</button>
+          
+          <div id="statusAlert" class="status-alert"></div>
 
           <div class="login-link-box">
             Already registered? <a href="#">Sign in to your account</a>
@@ -257,12 +287,66 @@
 
       </div>
     </form>
-
-    <div class="footer-text">
-      &copy; Phantoms Enterprises. All rights reserved.
-    </div>
-
   </div>
 
+  <script>
+    let activeCode = "";
+
+    function generateEmailCode() {
+      const email = document.getElementById('email').value;
+      const statusAlert = document.getElementById('statusAlert');
+      
+      if (!email) {
+        statusAlert.className = "status-alert error";
+        statusAlert.innerText = "Please enter an email address first.";
+        statusAlert.style.display = "block";
+        return;
+      }
+
+      // Generate random 6-digit verification code
+      activeCode = Math.floor(100000 + Math.random() * 900000).toString();
+      
+      // Displays verification code on screen for user testing
+      statusAlert.className = "status-alert success";
+      statusAlert.innerText = `Verification code sent to ${email}. (Demo Code: ${activeCode})`;
+      statusAlert.style.display = "block";
+    }
+
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const phone = document.getElementById('phone').value;
+      const email = document.getElementById('email').value;
+      const code = document.getElementById('verificationCode').value;
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const statusAlert = document.getElementById('statusAlert');
+
+      if (password !== confirmPassword) {
+        statusAlert.className = "status-alert error";
+        statusAlert.innerText = "Passwords do not match.";
+        statusAlert.style.display = "block";
+        return;
+      }
+
+      if (code !== activeCode) {
+        statusAlert.className = "status-alert error";
+        statusAlert.innerText = "Invalid verification code. Click 'Send Code' to get a valid code.";
+        statusAlert.style.display = "block";
+        return;
+      }
+
+      // Save user to browser local storage so account persists locally
+      const userData = { phone, email, password };
+      localStorage.setItem('registeredUser', JSON.stringify(userData));
+
+      statusAlert.className = "status-alert success";
+      statusAlert.innerText = "Account successfully registered! You can now log in.";
+      statusAlert.style.display = "block";
+      
+      this.reset();
+      activeCode = "";
+    });
+  </script>
 </body>
 </html>
