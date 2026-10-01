@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phantoms Enterprises - Admin Dashboard</title>
+  
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: #0f172a; color: #f8fafc; padding: 20px; }
+    .admin-card { background: #1e293b; border-radius: 10px; padding: 20px; margin-bottom: 25px; border: 1px solid #334155; }
+    h2 { color: #f39c12; margin-bottom: 15px; font-size: 1.2rem; border-bottom: 1px solid #334155; padding-bottom: 8px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { text-align: left; padding: 12px; border-bottom: 1px solid #334155; font-size: 0.9rem; }
+    th { color: #94a3b8; font-weight: 600; background: #0f172a; }
+    .btn { padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.8rem; margin-right: 5px; }
+    .btn-approve { background: #27ae60; color: white; }
+    .btn-reject { background: #e74c3c; color: white; }
+    .badge-pending { color: #f39c12; font-weight: bold; }
+    .badge-approved { color: #27ae60; font-weight: bold; }
+    .badge-rejected { color: #e74c3c; font-weight: bold; }
+  </style>
+
+  <!-- Firebase Web Libraries -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+  <h1 style="margin-bottom: 20px; color: #ffffff;">Admin Control Panel</h1>
+
+  <!-- DEPOSIT REQUESTS SECTION -->
+  <div class="admin-card">
+    <h2>💵 Pending Deposit Requests</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>User Email / Phone</th>
+          <th>M-Pesa Code</th>
+          <th>Amount (KES)</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="depositTableBody">
+        <tr><td colspan="5">Loading deposit requests...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- WITHDRAWAL REQUESTS SECTION -->
+  <div class="admin-card">
+    <h2>🏧 Pending Withdrawal Requests</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>User Phone</th>
+          <th>Amount (KES)</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="withdrawTableBody">
+        <tr><td colspan="4">Loading withdrawal requests...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBfdA1xc1U66I-djERrDCLLbnZ3Cs1P6XA",
+      authDomain: "phantoms-198ca.firebaseapp.com",
+      projectId: "phantoms-198ca",
+      storageBucket: "phantoms-198ca.firebasestorage.app",
+      messagingSenderId: "268970498599",
+      appId: "1:268970498599:web:fef7f91e4c7d95ab458ce2"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Load Deposits
+    function loadDeposits() {
+      db.collection("depositRequests").onSnapshot(snapshot => {
+        const tbody = document.getElementById('depositTableBody');
+        if (snapshot.empty) {
+          tbody.innerHTML = "<tr><td colspan='5'>No deposit requests found.</td></tr>";
+          return;
+        }
+
+        let html = "";
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const id = doc.id;
+          const isPending = data.status === "pending";
+
+          html += `
+            <tr>
+              <td>${data.email || 'N/A'}<br><small style="color:#94a3b8">${data.phone || ''}</small></td>
+              <td><strong>${data.mpesaCode}</strong></td>
+              <td>KES ${data.amount.toLocaleString()}</td>
+              <td class="badge-${data.status}">${data.status.toUpperCase()}</td>
+              <td>
+                ${isPending ? `
+                  <button class="btn btn-approve" onclick="approveDeposit('${id}', '${data.userId}',${data.amount})">Approve & Credit</button>
+                  <button class="btn btn-reject" onclick="rejectDeposit('${id}')">Reject</button>
+                ` : 'Done'}
+              </td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+      });
+    }
+
+    // Approve Deposit
+    async function approveDeposit(reqId, userId, amount) {
+      if (!confirm("Approve this deposit and add KES " + amount + " to user balance?")) return;
+      try {
+        const userRef = db.collection("users").doc(userId);
+        await db.runTransaction(async (transaction) => {
+          const userDoc = await transaction.get(userRef);
+          if (!userDoc.exists) throw "User does not exist!";
+          const currentBal = userDoc.data().balance || 0;
+          transaction.update(userRef, { balance: currentBal + amount });
+          transaction.update(db.collection("depositRequests").doc(reqId), { status: "approved" });
+        });
+        alert("Deposit approved successfully!");
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    }
+
+    // Reject Deposit
+    async function rejectDeposit(reqId) {
+      if (!confirm("Reject this deposit request?")) return;
+      await db.collection("depositRequests").doc(reqId).update({ status: "rejected" });
+    }
+
+    // Load Withdrawals
+    function loadWithdrawals() {
+      db.collection("withdrawalRequests").onSnapshot(snapshot => {
+        const tbody = document.getElementById('withdrawTableBody');
+        if (snapshot.empty) {
+          tbody.innerHTML = "<tr><td colspan='4'>No withdrawal requests found.</td></tr>";
+          return;
+        }
+
+        let html = "";
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const id = doc.id;
+          const isPending = data.status === "pending";
+
+          html += `
+            <tr>
+              <td>${data.phone}</td>
+              <td>KES ${data.amount.toLocaleString()}</td>
+              <td class="badge-${data.status}">${data.status.toUpperCase()}</td>
+              <td>
+                ${isPending ? `
+                  <button class="btn btn-approve" onclick="approveWithdrawal('${id}')">Approve Sent</button>
+                  <button class="btn btn-reject" onclick="rejectWithdrawal('${id}', '${data.userId}',${data.amount})">Refund & Reject</button>
+                ` : 'Done'}
+              </td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+      });
+    }
+
+    // Approve Withdrawal
+    async function approveWithdrawal(reqId) {
+      if (!confirm("Confirm that you have sent money to the user via M-Pesa?")) return;
+      await db.collection("withdrawalRequests").doc(reqId).update({ status: "approved" });
+    }
+
+    // Reject Withdrawal & Refund User
+    async function rejectWithdrawal(reqId, userId, amount) {
+      if (!confirm("Reject withdrawal and refund KES " + amount + " back to user balance?")) return;
+      try {
+        const userRef = db.collection("users").doc(userId);
+        await db.runTransaction(async (transaction) => {
+          const userDoc = await transaction.get(userRef);
+          if (userDoc.exists) {
+            const currentBal = userDoc.data().balance || 0;
+            transaction.update(userRef, { balance: currentBal + amount });
+          }
+          transaction.update(db.collection("withdrawalRequests").doc(reqId), { status: "rejected" });
+        });
+        alert("Withdrawal rejected and funds returned to user.");
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    }
+
+    // Initialize Panel
+    loadDeposits();
+    loadWithdrawals();
+  </script>
+</body>
+  </html>
+  
