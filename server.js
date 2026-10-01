@@ -1,5 +1,6 @@
- const express = require('express');
+const express = require('express');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,16 +10,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// -------------------------------------------------------------
-// SUPER ADMIN CREDENTIALS
-// -------------------------------------------------------------
+// Super Admin Credentials
 const SUPER_ADMIN_CREDENTIALS = {
   username: 'phantomenterprises@gmail.com',
   password: '@18922caleb',
   email: 'phantomenterprises@gmail.com'
 };
 
-// In-Memory Storage for Users & Verification Codes
+// In-Memory Users & Verification Storage
 const registeredUsers = [];
 const verificationCodes = {};
 
@@ -44,7 +43,7 @@ async function sendBrevoEmail(toEmail, code) {
       'content-type': 'application/json'
     },
     body: JSON.stringify({
-      sender: { name: 'Phantoms Enterprises', email: 'phantomsenterprises@gmail.com' },
+      sender: { name: 'Phantoms Enterprises', email: 'phantomenterprises@gmail.com' },
       to: [{ email: toEmail }],
       subject: 'Your Verification Code - Phantoms Enterprises',
       htmlContent: `<div style="font-family:sans-serif;padding:20px;">
@@ -58,9 +57,18 @@ async function sendBrevoEmail(toEmail, code) {
   return response.ok;
 }
 
-// Route: Explicit Login Page
+// Dedicated /login route (Checks both root and public/ directory for login.html)
 app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'login.html'));
+  const rootLoginPath = path.join(__dirname, 'login.html');
+  const publicLoginPath = path.join(__dirname, 'public', 'login.html');
+
+  if (fs.existsSync(rootLoginPath)) {
+    res.sendFile(rootLoginPath);
+  } else if (fs.existsSync(publicLoginPath)) {
+    res.sendFile(publicLoginPath);
+  } else {
+    res.status(404).send('login.html not found. Please ensure login.html exists in your root or public folder.');
+  }
 });
 
 // ROUTE 1: Login (Super Admin & Registered Users)
@@ -133,7 +141,7 @@ app.get('/api/assets', (req, res) => {
   res.json({ success: true, assets: assetPrototypes });
 });
 
-// Fallback Route
+// Fallback Route (Only serves main dashboard for unknown routes)
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -141,4 +149,4 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
+                               
