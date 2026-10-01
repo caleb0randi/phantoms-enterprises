@@ -10,9 +10,9 @@ const USERS_FILE = path.join(__dirname, 'users.json');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files from root AND public directory
-app.use(express.static(__dirname));
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve static files, but DISABLE automatically serving index.html on /
+app.use(express.static(__dirname, { index: false }));
+app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 
 const verificationCodes = {};
 
@@ -53,23 +53,22 @@ function seedAdmin() {
 }
 seedAdmin();
 
-// Routes
+// Force the main URL to always show login.html
 app.get('/', (req, res) => {
-    // Check if login.html is in root or public folder
-    const rootPath = path.join(__dirname, 'login.html');
-    const publicPath = path.join(__dirname, 'public', 'login.html');
-    
-    if (fs.existsSync(rootPath)) {
-        res.sendFile(rootPath);
-    } else if (fs.existsSync(publicPath)) {
-        res.sendFile(publicPath);
+    const rootLogin = path.join(__dirname, 'login.html');
+    const publicLogin = path.join(__dirname, 'public', 'login.html');
+
+    if (fs.existsSync(rootLogin)) {
+        res.sendFile(rootLogin);
+    } else if (fs.existsSync(publicLogin)) {
+        res.sendFile(publicLogin);
     } else {
-        res.sendFile(path.join(__dirname, 'public', 'index.html'));
+        res.status(404).send('login.html file not found in root or public folder.');
     }
 });
 
+// Serve dashboard explicitly on /dashboard route
 app.get('/dashboard', (req, res) => {
-    // Checks public/index.html first, then root index.html
     const publicIndexPath = path.join(__dirname, 'public', 'index.html');
     const rootIndexPath = path.join(__dirname, 'index.html');
 
@@ -146,4 +145,3 @@ app.post('/api/login', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-        
