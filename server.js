@@ -9,10 +9,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Whitelist of authorized Super Admin email addresses
-const ADMIN_EMAILS = [
-  'phantomsenterprises@gmail.com'
-];
+// Super Admin Credentials
+const SUPER_ADMIN_CREDENTIALS = {
+  username: 'phantomenterprises@gmail.com',
+  password: '@18922caleb',
+  email: 'phantomenterprises@gmail.com'
+};
 
 // Mock In-Memory Asset Storage
 let assetPrototypes = [
@@ -25,26 +27,36 @@ app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'login.html'));
 });
 
-// API ROUTE 1: Login Endpoint with Whitelist Role Assignment
+// API ROUTE 1: Login Endpoint with Credentials Verification
 app.post('/api/login', (req, res) => {
-  const { email } = req.body;
+  const { username, password } = req.body;
 
-  if (!email) {
-    return res.status(400).json({ success: false, message: 'Email is required' });
+  if (!username || !password) {
+    return res.status(400).json({ success: false, message: 'Username and password are required' });
   }
 
-  const cleanEmail = email.trim().toLowerCase();
-  
-  // Check if logging-in email exists in ADMIN_EMAILS whitelist
-  const isAdmin = ADMIN_EMAILS.includes(cleanEmail);
-  const userRole = isAdmin ? 'admin' : 'user';
+  const cleanUsername = username.trim().toLowerCase();
+  const targetUsername = SUPER_ADMIN_CREDENTIALS.username.toLowerCase();
 
-  return res.json({
-    success: true,
-    user: {
-      email: cleanEmail,
-      role: userRole
-    }
+  // Check if provided credentials match Super Admin
+  if (
+    cleanUsername === targetUsername && 
+    password === SUPER_ADMIN_CREDENTIALS.password
+  ) {
+    return res.json({
+      success: true,
+      user: {
+        username: SUPER_ADMIN_CREDENTIALS.username,
+        email: SUPER_ADMIN_CREDENTIALS.email,
+        role: 'superadmin'
+      }
+    });
+  }
+
+  // Reject invalid attempts or fallback for standard user
+  return res.status(401).json({
+    success: false,
+    message: 'Invalid username or password'
   });
 });
 
@@ -68,4 +80,4 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-         
+            
