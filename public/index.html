@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Phantoms Enterprises - Platform</title>
+  <title>Phantoms Enterprises</title>
   <style>
     * {
       box-sizing: border-box;
@@ -404,7 +404,11 @@
   </div>
 
   <script>
-    const BREVO_API_KEY = "YOUR_BREVO_API_KEY_HERE";
+    // ==========================================
+    // BREVO API CONFIGURATION
+    // Update BREVO_API_KEY and SENDER_EMAIL below
+    // ==========================================
+    const BREVO_API_KEY = "xkeysib-YOUR_ACTUAL_API_KEY_HERE";
     const SENDER_EMAIL = "your-verified-sender@example.com";
     const SENDER_NAME = "Phantoms Enterprises";
 
@@ -432,7 +436,7 @@
       }
     }
 
-    // Sends code strictly to the user's email without showing the code on screen
+    // Direct Brevo Transmission Logic
     async function sendBrevoEmailCode() {
       const email = document.getElementById('regEmail').value;
       if (!email) {
@@ -443,6 +447,20 @@
       activeVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
       showAlert("Sending verification code to your email...");
 
+      const payload = {
+        sender: { name: SENDER_NAME, email: SENDER_EMAIL },
+        to: [{ email: email }],
+        subject: "Phantoms Enterprises - Verification Code",
+        htmlContent: `
+          <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+            <h2>Phantoms Enterprises Verification</h2>
+            <p>Your 6-digit account verification code is:</p>
+            <h1 style="color: #e67e22; letter-spacing: 2px;">${activeVerificationCode}</h1>
+            <p>If you did not request this code, please ignore this email.</p>
+          </div>
+        `
+      };
+
       try {
         const response = await fetch("https://api.brevo.com/v3/smtp/email", {
           method: "POST",
@@ -451,32 +469,30 @@
             "api-key": BREVO_API_KEY,
             "content-type": "application/json"
           },
-          body: JSON.stringify({
-            sender: { name: SENDER_NAME, email: SENDER_EMAIL },
-            to: [{ email: email }],
-            subject: "Your Phantoms Enterprises Code",
-            htmlContent: `<p>Your verification code is: <strong>${activeVerificationCode}</strong></p>`
-          })
+          body: JSON.stringify(payload)
         });
 
-        if (response.ok) {
+        const data = await response.json();
+
+        if (response.ok && data.messageId) {
           showAlert(`Verification code sent to ${email}. Please check your email inbox.`);
         } else {
-          showAlert(`Verification code sent to ${email}. Please check your email inbox.`);
+          console.error("Brevo API Response:", data);
+          showAlert(`Brevo Error: ${data.message || 'Check API key or verified sender.'}`, true);
         }
       } catch (err) {
-        showAlert(`Verification code sent to ${email}. Please check your email inbox.`);
+        console.error("Network or CORS error connecting to Brevo:", err);
+        showAlert("Connection failed. Check browser console (F12) for network logs.", true);
       }
     }
 
-    // Login user into the actual User Dashboard UI
+    // Launch User Dashboard UI
     function launchDashboard(user) {
       document.getElementById('authView').classList.add('hidden');
       document.getElementById('dashboardView').classList.remove('hidden');
       document.getElementById('logoutBtn').classList.remove('hidden');
       document.getElementById('statusAlert').style.display = "none";
       
-      // Personalize dashboard link
       document.getElementById('refLink').value = `https://phantoms.enterprises/register?ref=${user.phone || 'USER'}`;
     }
 
@@ -488,7 +504,7 @@
       showAlert("Signed out successfully.");
     }
 
-    // Register Handler
+    // Registration Form Logic
     document.getElementById('registerForm').addEventListener('submit', function(e) {
       e.preventDefault();
 
@@ -513,11 +529,11 @@
       users.push(user);
       localStorage.setItem('phantoms_users', JSON.stringify(users));
 
-      // Direct entry into dashboard interface upon registration
+      // Direct redirect into dashboard
       launchDashboard(user);
     });
 
-    // Login Handler
+    // Login Form Logic
     document.getElementById('loginForm').addEventListener('submit', function(e) {
       e.preventDefault();
 
@@ -528,7 +544,6 @@
       const validUser = users.find(u => (u.email === identifier || u.phone === identifier) && u.password === password);
 
       if (validUser) {
-        // Opens the User Dashboard Interface directly
         launchDashboard(validUser);
       } else {
         showAlert("Invalid credentials. Please check your details.", true);
