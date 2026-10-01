@@ -1,3 +1,4 @@
+```javascript
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
@@ -5,32 +6,27 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Super Admin Credentials (Prioritizes Environment Variables with Hardcoded Fallbacks)
 const SUPER_ADMIN_CREDENTIALS = {
   username: process.env.SUPER_ADMIN_USERNAME || 'phantomsenterprises@gmail.com',
   password: process.env.SUPER_ADMIN_PASSWORD || '@18922caleb',
   email: process.env.SUPER_ADMIN_EMAIL || 'phantomsenterprises@gmail.com'
 };
 
-// In-Memory Data Storage
-const registeredUsers = []; // Stores { email, password, phone, name }
-const verificationCodes = {}; // Registration codes
-const passwordResetCodes = {}; // Forgot password codes
-const pendingWithdrawals = []; // Stores pending withdrawal requests for Super Admin approval
+const registeredUsers = []; 
+const verificationCodes = {}; 
+const passwordResetCodes = {}; 
+const pendingWithdrawals = []; 
 
-// Mock Assets
-let assetPrototypes = [
-  { id: '1', name: 'Commercial Refrigerator X1', category: 'Appliances', leaseCost: 15000, dailyYield: 450, durationDays: 30, icon: '❄️' },
-  { id: '2', name: 'Industrial Washing Machine', category: 'Laundry', leaseCost: 22000, dailyYield: 680, durationDays: 45, icon: '🧺' },
-  { id: '3', name: 'Commercial Deep Fryer & Cooker', category: 'Kitchen Equipment', leaseCost: 18500, dailyYield: 550, durationDays: 30, icon: '🍳' }
-];
+function generateReferralCode(email) {
+  const prefix = email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  const random = Math.floor(1000 + Math.random() * 9000);
+  return `${prefix}${random}`;
+}
 
-// Brevo Email Sender Helper
 async function sendBrevoEmail(toEmail, subject, textContent, htmlContent) {
   const apiKey = process.env.BREVO_API_KEY;
   if (!apiKey) {
@@ -66,7 +62,6 @@ async function sendBrevoEmail(toEmail, subject, textContent, htmlContent) {
   }
 }
 
-// ROUTE: Dedicated /login route
 app.get('/login', (req, res) => {
   const rootLoginPath = path.join(__dirname, 'login.html');
   const publicLoginPath = path.join(__dirname, 'public', 'login.html');
@@ -76,11 +71,10 @@ app.get('/login', (req, res) => {
   } else if (fs.existsSync(publicLoginPath)) {
     res.sendFile(publicLoginPath);
   } else {
-    res.status(404).send('login.html not found. Please ensure login.html exists in your root or public directory.');
+    res.status(404).send('login.html not found in root or public directory.');
   }
 });
 
-// ROUTE 1: Login (Super Admin & Registered Users)
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
 
@@ -92,19 +86,18 @@ app.post('/api/login', (req, res) => {
   const superAdminUser = SUPER_ADMIN_CREDENTIALS.username.trim().toLowerCase();
   const superAdminEmail = SUPER_ADMIN_CREDENTIALS.email.trim().toLowerCase();
 
-  // Check Super Admin Credentials (matches either username or email)
   if ((cleanInput === superAdminUser || cleanInput === superAdminEmail) && password === SUPER_ADMIN_CREDENTIALS.password) {
     return res.json({
       success: true,
       user: {
         username: SUPER_ADMIN_CREDENTIALS.username,
         email: SUPER_ADMIN_CREDENTIALS.email,
-        role: 'superadmin'
+        role: 'superadmin',
+        referralCode: 'ADMIN'
       }
     });
   }
 
-  // Check Registered Users
   const user = registeredUsers.find(u => u.email.toLowerCase() === cleanInput && u.password === password);
   if (user) {
     return res.json({
@@ -112,7 +105,9 @@ app.post('/api/login', (req, res) => {
       user: {
         username: user.email,
         email: user.email,
-        role: 'user'
+        role: 'user',
+        referralCode: user.referralCode,
+        referredCount: user.referredCount || 0
       }
     });
   }
@@ -120,7 +115,6 @@ app.post('/api/login', (req, res) => {
   return res.status(401).json({ success: false, message: 'Invalid credentials. Please verify email and password.' });
 });
 
-// ROUTE 2: Registration - Send Brevo Code
 app.post('/api/register/send-code', async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ success: false, message: 'Email address is required' });
@@ -143,21 +137,45 @@ app.post('/api/register/send-code', async (req, res) => {
   }
 });
 
-// ROUTE 3: Registration - Verify Code & Create Account
 app.post('/api/register/verify', (req, res) => {
-  const { email, password, code } = req.body;
+  const { email, password, code, referredBy } = req.body;
   const cleanEmail = email ? email.toLowerCase() : '';
 
   if (verificationCodes[cleanEmail] && verificationCodes[cleanEmail] === code) {
     delete verificationCodes[cleanEmail];
-    registeredUsers.push({ email: cleanEmail, password });
-    return res.json({ success: true, message: 'Account verified and created successfully!' });
+    
+    const userRefCode = generateReferralCode(cleanEmail);
+    
+    if (referredBy) {
+      const referrer = registeredUsers.find(u => u.referralCode === referredBy || u.email.toLowerCase() === referredBy.toLowerCase());
+      if (referrer) {
+        referrer.referredCount = (referrer.referredCount || 0) + 1;
+      }
+    }
+
+    const newUser = {
+      email: cleanEmail,
+      password,
+      referralCode: userRefCode,
+      referredBy: referredBy || null,
+      referredCount: 0
+    };
+
+    registeredUsers.push(newUser);
+
+    return res.json({ 
+      success: true, 
+      message: 'Account verified and created successfully!',
+      user: {
+        email: newUser.email,
+        referralCode: newUser.referralCode
+      }
+    });
   }
 
   return res.status(400).json({ success: false, message: 'Invalid or expired verification code' });
 });
 
-// ROUTE 4: Forgot Password - Send Reset Code
 app.post('/api/forgot-password/send-code', async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ success: false, message: 'Email is required' });
@@ -182,7 +200,6 @@ app.post('/api/forgot-password/send-code', async (req, res) => {
   return res.json({ success: true, message: 'Password reset code sent to your email inbox.' });
 });
 
-// ROUTE 5: Forgot Password - Reset Password with Code
 app.post('/api/forgot-password/reset', (req, res) => {
   const { email, code, newPassword } = req.body;
   const cleanEmail = email ? email.toLowerCase() : '';
@@ -199,7 +216,22 @@ app.post('/api/forgot-password/reset', (req, res) => {
   return res.status(400).json({ success: false, message: 'Invalid or expired password reset code.' });
 });
 
-// ROUTE 6: Submit Withdrawal Request (Client Side)
+app.get('/api/user/referrals', (req, res) => {
+  const email = req.query.email;
+  if (!email) return res.status(400).json({ success: false, message: 'User email is required' });
+
+  const user = registeredUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
+  if (user) {
+    return res.json({
+      success: true,
+      referralCode: user.referralCode,
+      referredCount: user.referredCount || 0
+    });
+  }
+
+  return res.json({ success: true, referralCode: generateReferralCode(email), referredCount: 0 });
+});
+
 app.post('/api/withdraw/request', (req, res) => {
   const { userEmail, amount, provider, phone } = req.body;
   if (!userEmail || !amount || !provider || !phone) {
@@ -220,14 +252,12 @@ app.post('/api/withdraw/request', (req, res) => {
   return res.json({ success: true, message: 'Withdrawal request submitted! Awaiting Super Admin approval.', data: requestObj });
 });
 
-// ROUTE 7: Get Pending Withdrawals (Super Admin Only)
 app.get('/api/admin/withdrawals', (req, res) => {
   res.json({ success: true, withdrawals: pendingWithdrawals });
 });
 
-// ROUTE 8: Approve/Reject Withdrawal (Super Admin Power)
 app.post('/api/admin/approve-withdrawal', (req, res) => {
-  const { withdrawalId, action } = req.body; // action: 'Approve' or 'Reject'
+  const { withdrawalId, action } = req.body;
   const index = pendingWithdrawals.findIndex(w => w.id === withdrawalId);
 
   if (index !== -1) {
@@ -238,7 +268,6 @@ app.post('/api/admin/approve-withdrawal', (req, res) => {
   return res.status(404).json({ success: false, message: 'Withdrawal request not found' });
 });
 
-// ROUTE 9: Super Admin Force Change User Password
 app.post('/api/admin/reset-user-password', (req, res) => {
   const { targetEmail, newPassword } = req.body;
   const cleanEmail = targetEmail ? targetEmail.toLowerCase() : '';
@@ -252,7 +281,6 @@ app.post('/api/admin/reset-user-password', (req, res) => {
   return res.status(404).json({ success: false, message: 'Registered user email not found' });
 });
 
-// Fallback Route
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -260,5 +288,4 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Phantoms Enterprises Server running on port ${PORT}`);
 });
-      
-
+```
