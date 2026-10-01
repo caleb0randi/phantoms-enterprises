@@ -3,228 +3,97 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Phantoms Enterprises | Virtual Asset Leasing Platform</title>
+  <title>Phantoms Enterprises | Platform</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .glass { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(12px); }
     .gold-gradient { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased">
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans">
 
-  <!-- Header / Navigation -->
-  <header class="border-b border-slate-800 glass sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-      
-      <!-- Logo -->
-      <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('marketplace')">
-        <svg width="44" height="44" viewBox="0 0 100 100" class="shadow-lg rounded-xl">
-          <defs>
-            <linearGradient id="pg" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#3b82f6" />
-              <stop offset="100%" stop-color="#1d4ed8" />
-            </linearGradient>
-          </defs>
-          <rect width="100" height="100" rx="20" fill="url(#pg)"/>
-          <path d="M30 25 H55 C68 25, 68 50, 55 50 H42 V75 H30 Z" fill="#ffffff"/>
-          <circle cx="70" cy="30" r="6" fill="#f59e0b"/>
-          <path d="M60 65 L75 50 L90 65" stroke="#38bdf8" stroke-width="5" fill="none" stroke-linecap="round"/>
-        </svg>
-        <div>
-          <span class="text-xl font-black tracking-wider text-white">PHANTOMS</span>
-          <span class="block text-xs font-semibold text-amber-400 tracking-widest uppercase">Enterprises</span>
+  <!-- Navigation Bar -->
+  <nav class="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- Brand Logo -->
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">⚡</span>
+          <span class="font-black text-xl tracking-wider text-white">PHANTOMS</span>
         </div>
-      </div>
 
-      <!-- Nav Links -->
-      <nav class="hidden md:flex space-x-8 text-sm font-medium">
-        <button onclick="switchTab('marketplace')" class="hover:text-blue-400 transition">Asset Lease Market</button>
-        <button onclick="switchTab('dashboard')" class="hover:text-blue-400 transition">Investor Dashboard</button>
-        <!-- Admin button hidden by default using class "hidden" -->
-        <button id="admin-nav-link" onclick="switchTab('admin')" class="hidden text-amber-400 hover:text-amber-300 font-bold transition">Admin Control Panel</button>
-      </nav>
+        <!-- Right Side Nav Actions -->
+        <div id="navActions" class="flex items-center gap-4">
+          <!-- Super Admin Button (Hidden by default, shown when role is superadmin) -->
+          <a id="adminPanelBtn" href="/login" class="hidden px-4 py-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold text-sm hover:bg-amber-500/20 transition">
+            👑 Admin Panel
+          </a>
 
-      <!-- User Profile / Wallet Status -->
-      <div class="flex items-center space-x-4">
-        <div class="text-right hidden sm:block">
-          <span class="block text-xs text-slate-400">Ledger Balance</span>
-          <span id="user-balance" class="text-sm font-bold text-emerald-400">$5,000.00</span>
+          <!-- Dynamic Auth Button (Direct link to /login page) -->
+          <a id="authBtn" href="/login" class="px-5 py-2.5 rounded-xl gold-gradient text-slate-950 font-bold text-sm hover:opacity-90 transition shadow-lg">
+            Sign In / Register
+          </a>
         </div>
-        <button class="gold-gradient text-slate-950 font-bold px-4 py-2 rounded-lg text-sm shadow-md hover:opacity-90 transition">
-          Deposit Funds
-        </button>
+
       </div>
     </div>
-  </header>
+  </nav>
 
-  <!-- Main Content Container -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <!-- Hero Content -->
+  <main class="max-w-7xl mx-auto px-4 py-12">
+    <div class="text-center space-y-4 mb-12">
+      <h1 class="text-4xl md:text-6xl font-extrabold text-white">
+        Asset Leasing & Platform Management
+      </h1>
+      <p class="text-slate-400 max-w-2xl mx-auto">
+        Welcome to Phantoms Enterprises. Log in to access platform assets, manage yield protocols, and view system analytics.
+      </p>
+    </div>
 
-    <!-- Tab 1: Asset Lease Marketplace -->
-    <section id="tab-marketplace" class="space-y-8">
-      <div class="text-center max-w-3xl mx-auto space-y-3">
-        <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
-          High-Yield Electronic Asset Leasing
-        </h1>
-        <p class="text-slate-400 text-lg">
-          Lease verified commercial refrigerators, washing machines, and appliances. Earn daily automated payouts from real-world utility usage.
-        </p>
-      </div>
-
-      <!-- Asset Grid -->
-      <div id="assets-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Dynamically injected via JS -->
-      </div>
-    </section>
-
-    <!-- Tab 2: Investor Dashboard -->
-    <section id="tab-dashboard" class="hidden space-y-8">
-      <h2 class="text-3xl font-bold">Investor Overview</h2>
-      
-      <!-- Stats Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
-          <span class="text-slate-400 text-sm">Active Leases</span>
-          <span class="block text-3xl font-black text-blue-400 mt-2">2 Assets</span>
-        </div>
-        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
-          <span class="text-slate-400 text-sm">Total Invested</span>
-          <span class="block text-3xl font-black text-amber-400 mt-2">$370.00</span>
-        </div>
-        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
-          <span class="text-slate-400 text-sm">Daily Return</span>
-          <span class="block text-3xl font-black text-emerald-400 mt-2">$9.85 / day</span>
-        </div>
-        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
-          <span class="text-slate-400 text-sm">Available Cashout</span>
-          <span class="block text-3xl font-black text-emerald-400 mt-2">$5,000.00</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- Tab 3: Admin Control Panel -->
-    <section id="tab-admin" class="hidden space-y-8">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
-        <div>
-          <h2 class="text-2xl font-bold text-amber-400">Super Admin Management</h2>
-          <p class="text-slate-400 text-sm">Create, edit, or retire electronic rental prototypes</p>
-        </div>
-      </div>
-
-      <!-- Existing Asset Prototypes Table -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
-        <table class="w-full text-left text-sm text-slate-300">
-          <thead class="bg-slate-800 text-slate-400 text-xs uppercase tracking-wider">
-            <tr>
-              <th class="p-4">Item Name</th>
-              <th class="p-4">Category</th>
-              <th class="p-4">Lease Cost</th>
-              <th class="p-4">Daily Yield</th>
-              <th class="p-4">Duration</th>
-              <th class="p-4">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="admin-asset-rows" class="divide-y divide-slate-800">
-            <!-- Dynamically populated via JS -->
-          </tbody>
-        </table>
-      </div>
-    </section>
-
+    <!-- Admin Banner Container -->
+    <div id="adminBanner" class="hidden max-w-2xl mx-auto mb-8 p-6 bg-slate-900 border border-amber-500/40 rounded-2xl text-center glass shadow-2xl">
+      <span class="px-3 py-1 bg-amber-500/20 text-amber-400 text-xs font-bold rounded-full uppercase tracking-wider">Super Admin Active</span>
+      <h2 class="text-xl font-bold text-white mt-2">Welcome Back, Super Admin!</h2>
+      <p class="text-slate-400 text-sm mt-1">Full control access verified for phantomenterprises@gmail.com</p>
+    </div>
   </main>
 
-  <!-- JavaScript Application Logic -->
   <script>
-    async function fetchAssets() {
-      try {
-        const res = await fetch('/api/assets');
-        const data = await res.json();
-        if (data.success) {
-          renderMarketplace(data.assets);
-          renderAdminTable(data.assets);
-        }
-      } catch (err) {
-        console.error("Failed to load assets:", err);
+    // On page load, verify logged-in role from localStorage
+    document.addEventListener('DOMContentLoaded', () => {
+      const role = localStorage.getItem('userRole');
+      const email = localStorage.getItem('userEmail') || localStorage.getItem('username');
+      
+      const adminBtn = document.getElementById('adminPanelBtn');
+      const authBtn = document.getElementById('authBtn');
+      const adminBanner = document.getElementById('adminBanner');
+
+      if (role === 'superadmin' || role === 'admin') {
+        // Unhide Super Admin Portal Features
+        adminBtn.classList.remove('hidden');
+        adminBanner.classList.remove('hidden');
+
+        // Update Nav Auth Button to Logout
+        authBtn.innerText = 'Log Out';
+        authBtn.href = '#';
+        authBtn.onclick = (e) => {
+          e.preventDefault();
+          localStorage.clear();
+          window.location.reload();
+        };
+      } else if (email) {
+        // Regular User Logged In
+        authBtn.innerText = 'Log Out';
+        authBtn.href = '#';
+        authBtn.onclick = (e) => {
+          e.preventDefault();
+          localStorage.clear();
+          window.location.reload();
+        };
       }
-    }
-
-    function renderMarketplace(assets) {
-      const grid = document.getElementById('assets-grid');
-      grid.innerHTML = assets.map(item => `
-        <div class="bg-slate-900 border border-slate-800 hover:border-blue-500/50 rounded-2xl p-6 flex flex-col justify-between transition shadow-xl">
-          <div>
-            <div class="text-4xl mb-4">${item.icon}</div>
-            <span class="text-xs font-semibold text-blue-400 uppercase tracking-widest">${item.category}</span>
-            <h3 class="text-xl font-bold text-white mt-1">${item.name}</h3>
-            
-            <div class="mt-6 space-y-2 border-t border-b border-slate-800/80 py-4 text-sm">
-              <div class="flex justify-between">
-                <span class="text-slate-400">Lease Price:</span>
-                <span class="font-bold text-white">$${item.leaseCost.toFixed(2)}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-slate-400">Daily Return:</span>
-                <span class="font-bold text-emerald-400">+$${item.dailyYield.toFixed(2)} / day</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-slate-400">Duration:</span>
-                <span class="font-bold text-white">${item.durationDays} Days</span>
-              </div>
-            </div>
-          </div>
-          
-          <button class="w-full mt-6 bg-blue-600 hover:bg-blue-500 font-bold py-3 rounded-xl transition text-white shadow-lg">
-            Lease Appliance Now
-          </button>
-        </div>
-      `).join('');
-    }
-
-    function renderAdminTable(assets) {
-      const tbody = document.getElementById('admin-asset-rows');
-      tbody.innerHTML = assets.map(item => `
-        <tr>
-          <td class="p-4 font-bold text-white flex items-center space-x-2">
-            <span>${item.icon}</span>
-            <span>${item.name}</span>
-          </td>
-          <td class="p-4 text-slate-400">${item.category}</td>
-          <td class="p-4 font-semibold text-white">$${item.leaseCost.toFixed(2)}</td>
-          <td class="p-4 text-emerald-400 font-semibold">+$${item.dailyYield.toFixed(2)}</td>
-          <td class="p-4">${item.durationDays} Days</td>
-          <td class="p-4">
-            <button onclick="deleteAsset('${item.id}')" class="text-red-400 hover:text-red-300 font-semibold">Delete</button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    async function deleteAsset(id) {
-      if (confirm("Are you sure you want to remove this prototype?")) {
-        await fetch(`/api/admin/assets/${id}`, { method: 'DELETE' });
-        fetchAssets();
-      }
-    }
-
-    function switchTab(tabName) {
-      ['marketplace', 'dashboard', 'admin'].forEach(t => {
-        document.getElementById(`tab-${t}`).classList.add('hidden');
-      });
-      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-    }
-
-    // Check if logged in user is admin before showing control panel button
-    function checkAdminAccess() {
-      const userRole = localStorage.getItem('userRole'); 
-      if (userRole === 'admin' || userRole === 'superadmin') {
-        const adminBtn = document.getElementById('admin-nav-link');
-        if (adminBtn) adminBtn.classList.remove('hidden');
-      }
-    }
-
-    // Initial Load
-    fetchAssets();
-    checkAdminAccess();
+    });
   </script>
+
 </body>
 </html>
