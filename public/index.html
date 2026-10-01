@@ -1,527 +1,324 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Phantoms Enterprises</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    body { font-family: 'Inter', sans-serif; }
+    .fade-in { animation: fadeIn 0.3s ease-in-out; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-
-    body {
-      background-color: #f4f6f9;
-      color: #2c3e50;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 850px;
-      background: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-      padding: 25px;
-      margin-top: 10px;
-    }
-
-    /* Brand Header with Restored Orange Icon */
-    .brand-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
-      padding-bottom: 15px;
-      border-bottom: 2px solid #f0f3f6;
-    }
-
-    .brand-logo-wrap {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .logo-icon {
-      width: 40px;
-      height: 40px;
-    }
-
-    .brand-title {
-      font-size: 22px;
-      font-weight: 800;
-      color: #1a2b4c;
-    }
-
-    .brand-title span {
-      color: #e67e22;
-    }
-
-    /* Tab Switcher */
-    .tab-switcher {
-      display: flex;
-      background-color: #eef2f5;
-      border-radius: 8px;
-      padding: 4px;
-      margin-bottom: 20px;
-    }
-
-    .tab-btn {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      background: transparent;
-      color: #7f8c8d;
-      font-weight: 700;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 15px;
-    }
-
-    .tab-btn.active {
-      background-color: #ffffff;
-      color: #1a2b4c;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-    }
-
-    /* Form Styles */
-    .field-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-bottom: 15px;
-    }
-
-    .field-group label {
-      font-size: 13px;
-      font-weight: 600;
-      color: #34495e;
-    }
-
-    .input-box, select {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #dcdfe6;
-      border-radius: 8px;
-      font-size: 14px;
-      outline: none;
-    }
-
-    .action-btn {
-      width: 100%;
-      padding: 14px;
-      background-color: #3498db;
-      color: #ffffff;
-      border: none;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 15px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-
-    .action-btn:hover { background-color: #2980b9; }
-
-    .status-alert {
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 14px;
-      display: none;
-      margin-bottom: 20px;
-    }
-
-    .status-alert.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    .status-alert.error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-
-    /* Dashboard UI */
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
-    .stat-card {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      padding: 18px;
-      border-radius: 10px;
-    }
-
-    .stat-title { font-size: 12px; color: #64748b; font-weight: 700; text-transform: uppercase; }
-    .stat-value { font-size: 22px; font-weight: 800; color: #0f172a; margin-top: 5px; }
-
-    .action-row {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 25px;
-    }
-
-    .btn-action {
-      flex: 1;
-      padding: 14px;
-      border: none;
-      border-radius: 8px;
-      font-weight: 700;
-      cursor: pointer;
-      text-align: center;
-      font-size: 15px;
-    }
-
-    .btn-deposit { background-color: #27ae60; color: white; }
-    .btn-withdraw { background-color: #e74c3c; color: white; }
-
-    .dash-section {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-
-    .dash-section-title {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 15px;
-      color: #1e293b;
-    }
-
-    .rental-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 15px;
-    }
-
-    .rental-card {
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 15px;
-      background: #fafbfc;
-    }
-
-    .rental-card h4 { color: #1a2b4c; font-size: 16px; margin-bottom: 6px; }
-    .rental-price { font-size: 18px; font-weight: 800; color: #27ae60; margin-bottom: 8px; }
-    .rental-detail { font-size: 13px; color: #64748b; margin-bottom: 4px; }
-    
-    .rent-btn {
-      width: 100%;
-      margin-top: 12px;
-      padding: 10px;
-      background-color: #e67e22;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .logout-btn {
-      background: #94a3b8;
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-
-    /* Modal Styling */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(15, 23, 42, 0.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-
-    .modal-card {
-      background: white;
-      padding: 25px;
-      border-radius: 12px;
-      width: 100%;
-      max-width: 400px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .modal-title { font-size: 18px; font-weight: 700; color: #0f172a; }
-    .modal-actions { display: flex; gap: 10px; margin-top: 10px; }
-
-    .btn-cancel {
-      background: #cbd5e1;
-      color: #334155;
-      border: none;
-      padding: 12px;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      flex: 1;
-    }
-
-    .routing-info {
-      background-color: #eef2f5;
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 12px;
-      color: #475569;
-    }
-
-    .hidden { display: none !important; }
   </style>
 </head>
-<body>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col justify-between">
 
-  <div class="container">
-    
-    <!-- Top Header with Restored Logo Icon -->
-    <div class="brand-header">
-      <div class="brand-logo-wrap">
-        <svg class="logo-icon" viewBox="0 0 100 100" fill="none">
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+      <!-- Logo Header -->
+      <div class="flex items-center gap-3">
+        <svg class="w-10 h-10 shrink-0" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M50 5 L90 25 L50 45 L10 25 Z" fill="#F39C12"/>
           <path d="M10 25 L50 45 L50 95 L10 75 Z" fill="#E67E22"/>
           <path d="M50 45 L90 25 L90 75 L50 95 Z" fill="#D35400"/>
         </svg>
-        <h1 class="brand-title">PHANTOMS <span>ENTERPRISES</span></h1>
-      </div>
-      <button id="logoutBtn" class="logout-btn hidden" onclick="app.signOut()">Sign Out</button>
-    </div>
-
-    <!-- Alert Box -->
-    <div id="statusAlert" class="status-alert"></div>
-
-    <!-- AUTHENTICATION CONTAINER -->
-    <div id="authView">
-      <div class="tab-switcher">
-        <button type="button" class="tab-btn active" id="tabRegisterBtn" onclick="app.showTab('register')">Register</button>
-        <button type="button" class="tab-btn" id="tabLoginBtn" onclick="app.showTab('login')">Sign In</button>
+        <h1 class="text-xl md:text-2xl font-black tracking-tight text-slate-900 uppercase">
+          PHANTOMS <span class="text-orange-600">ENTERPRISES</span>
+        </h1>
       </div>
 
-      <!-- Register Box -->
-      <div id="registerBox">
-        <div class="field-group">
-          <label>Phone Number (e.g. 0712345678)</label>
-          <input type="text" id="regPhone" class="input-box" placeholder="Enter phone number">
-        </div>
-        <div class="field-group">
-          <label>Email Address</label>
-          <input type="email" id="regEmail" class="input-box" placeholder="Enter email address">
-        </div>
-        <div class="field-group">
-          <label>Password</label>
-          <input type="password" id="regPassword" class="input-box" placeholder="Create password">
-        </div>
-        <div class="field-group">
-          <label>Confirm Password</label>
-          <input type="password" id="regConfirmPassword" class="input-box" placeholder="Re-enter password">
-        </div>
-        <button type="button" class="action-btn" onclick="app.registerUser()">Register Account</button>
-      </div>
-
-      <!-- Login Box -->
-      <div id="loginBox" class="hidden">
-        <div class="field-group">
-          <label>Email Address or Phone Number</label>
-          <input type="text" id="loginIdentifier" class="input-box" placeholder="Enter email address or phone">
-        </div>
-        <div class="field-group">
-          <label>Password</label>
-          <input type="password" id="loginPassword" class="input-box" placeholder="Enter password">
-        </div>
-        <button type="button" class="action-btn" onclick="app.loginUser()">Sign In</button>
+      <!-- Logout / User Header Info -->
+      <div id="headerUserActions" class="hidden flex items-center gap-4">
+        <span id="userDisplayName" class="text-sm font-semibold text-slate-600 hidden sm:inline"></span>
+        <button id="btnSignOut" type="button" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-sm font-bold rounded-lg transition">
+          Sign Out
+        </button>
       </div>
     </div>
+  </header>
 
-    <!-- USER DASHBOARD VIEW -->
-    <div id="dashboardView" class="hidden">
+  <main class="max-w-4xl mx-auto w-full px-4 py-6 flex-grow">
+
+    <div id="alertBox" class="hidden mb-6 p-4 rounded-xl text-sm font-semibold fade-in"></div>
+
+    <section id="authCard" class="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 md:p-8 max-w-lg mx-auto fade-in">
       
-      <!-- Top Balance Overview -->
-      <div class="dashboard-grid">
-        <div class="stat-card">
-          <div class="stat-title">Total Balance</div>
-          <div class="stat-value" id="userBalance">KES 0.00</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-title">Active Investments</div>
-          <div class="stat-value" id="userInvestments">KES 0.00</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-title">Total Referrals</div>
-          <div class="stat-value" id="userReferrals">0 Users</div>
-        </div>
+      <!-- Side-by-Side Tab Switcher -->
+      <div class="grid grid-cols-2 bg-slate-100 p-1.5 rounded-xl mb-6 border border-slate-200">
+        <button id="tabRegister" type="button" class="py-2.5 text-sm font-bold rounded-lg transition-all text-slate-900 bg-white shadow-sm">
+          Register
+        </button>
+        <button id="tabSignIn" type="button" class="py-2.5 text-sm font-bold rounded-lg transition-all text-slate-500 hover:text-slate-900">
+          Sign In
+        </button>
       </div>
 
-      <!-- Quick Actions -->
-      <div class="action-row">
-        <button type="button" class="btn-action btn-deposit" onclick="app.openDepositModal()">Deposit Funds</button>
-        <button type="button" class="btn-action btn-withdraw" onclick="app.openWithdrawModal()">Withdraw Funds</button>
-      </div>
-
-      <!-- Rental Plans -->
-      <div class="dash-section">
-        <div class="dash-section-title">Available Rental Investment Plans</div>
-        <div class="rental-grid">
-          <div class="rental-card">
-            <h4>Phantom Rig Alpha</h4>
-            <div class="rental-price">KES 1,000</div>
-            <div class="rental-detail">Daily Income: <strong>KES 150 / day</strong></div>
-            <div class="rental-detail">Duration: <strong>10 Days</strong></div>
-            <button type="button" class="rent-btn" onclick="app.rentPlan('Phantom Rig Alpha', 1000)">Rent Plan</button>
-          </div>
-          <div class="rental-card">
-            <h4>Phantom Rig Pro</h4>
-            <div class="rental-price">KES 3,000</div>
-            <div class="rental-detail">Daily Income: <strong>KES 500 / day</strong></div>
-            <div class="rental-detail">Duration: <strong>15 Days</strong></div>
-            <button type="button" class="rent-btn" onclick="app.rentPlan('Phantom Rig Pro', 3000)">Rent Plan</button>
-          </div>
-          <div class="rental-card">
-            <h4>Phantom Enterprise Stack</h4>
-            <div class="rental-price">KES 10,000</div>
-            <div class="rental-detail">Daily Income: <strong>KES 1,800 / day</strong></div>
-            <div class="rental-detail">Duration: <strong>20 Days</strong></div>
-            <button type="button" class="rent-btn" onclick="app.rentPlan('Phantom Enterprise Stack', 10000)">Rent Plan</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Financial Profile -->
-      <div class="dash-section">
-        <div class="dash-section-title">Financial Personal Profile</div>
+      <!-- Registration Form View -->
+      <div id="formRegisterView" class="space-y-4">
         <div>
-          <div class="field-group">
-            <label>Full Legal Name</label>
-            <input type="text" id="profFullName" class="input-box" placeholder="Full name as on ID">
-          </div>
-          <div class="field-group">
-            <label>National ID / Account ID</label>
-            <input type="text" id="profNationalId" class="input-box" placeholder="Enter ID number">
-          </div>
-          <div class="field-group">
-            <label>Financial Payout Phone Number</label>
-            <input type="text" id="profPayoutPhone" class="input-box" placeholder="07XXXXXXXX">
-          </div>
-          <button type="button" class="action-btn" style="width:200px;" onclick="app.saveProfile()">Save Profile</button>
+          <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Phone Number (e.g. 0712345678)</label>
+          <input id="regPhone" type="text" placeholder="Enter phone number" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Email Address</label>
+          <input id="regEmail" type="email" placeholder="Enter email address" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Password</label>
+          <input id="regPassword" type="password" placeholder="Create password" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Confirm Password</label>
+          <input id="regConfirmPassword" type="password" placeholder="Re-enter password" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm">
+        </div>
+        <button id="btnSubmitRegister" type="button" class="w-full py-3.5 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl shadow-md transition text-base mt-2">
+          Register Account
+        </button>
+      </div>
+
+      <!-- Sign In Form View -->
+      <div id="formSignInView" class="hidden space-y-4">
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Username (Email or Phone Number)</label>
+          <input id="loginIdentifier" type="text" placeholder="Enter your email or phone" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Password</label>
+          <input id="loginPassword" type="password" placeholder="Enter your password" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm">
+        </div>
+        <button id="btnSubmitSignIn" type="button" class="w-full py-3.5 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl shadow-md transition text-base mt-2">
+          Sign In
+        </button>
+      </div>
+
+    </section>
+
+    <section id="dashboardCard" class="hidden space-y-6 fade-in">
+      
+      <!-- Top Balance Overview Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <p class="text-xs font-bold uppercase text-slate-500">Total Balance</p>
+          <p id="dashBalance" class="text-2xl font-black text-slate-900 mt-1">KES 0.00</p>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <p class="text-xs font-bold uppercase text-slate-500">Active Investments</p>
+          <p id="dashInvestments" class="text-2xl font-black text-slate-900 mt-1">KES 0.00</p>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <p class="text-xs font-bold uppercase text-slate-500">Total Referrals</p>
+          <p id="dashReferrals" class="text-2xl font-black text-slate-900 mt-1">0 Users</p>
         </div>
       </div>
 
-    </div>
+      <!-- Action Buttons -->
+      <div class="grid grid-cols-2 gap-4">
+        <button id="btnOpenDeposit" type="button" class="py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl shadow-md transition text-center text-base">
+          Deposit Funds
+        </button>
+        <button id="btnOpenWithdraw" type="button" class="py-4 bg-rose-600 hover:bg-rose-700 text-white font-extrabold rounded-2xl shadow-md transition text-center text-base">
+          Withdraw Funds
+        </button>
+      </div>
 
-  </div>
+      <!-- Investment Plans -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <h2 class="text-lg font-bold text-slate-900 mb-4">Available Rental Investment Plans</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col justify-between">
+            <div>
+              <h3 class="font-bold text-slate-900 text-base">Phantom Rig Alpha</h3>
+              <p class="text-emerald-600 font-black text-xl my-1">KES 1,000</p>
+              <p class="text-xs text-slate-600">Daily Return: <span class="font-bold">KES 150/day</span></p>
+              <p class="text-xs text-slate-600">Duration: <span class="font-bold">10 Days</span></p>
+            </div>
+            <button type="button" onclick="app.rentPlan('Phantom Rig Alpha', 1000)" class="mt-4 w-full py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs rounded-lg transition">
+              Rent Plan
+            </button>
+          </div>
 
-  <!-- DEPOSIT MODAL -->
-  <div id="depositModal" class="modal-overlay hidden">
-    <div class="modal-card">
-      <div class="modal-title">Deposit Funds</div>
-      <div class="routing-info">Routing deposits to Merchant Number: <strong>0111414027</strong></div>
-      <div class="field-group">
-        <label>Payment Method</label>
-        <select id="depNetwork">
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col justify-between">
+            <div>
+              <h3 class="font-bold text-slate-900 text-base">Phantom Rig Pro</h3>
+              <p class="text-emerald-600 font-black text-xl my-1">KES 3,000</p>
+              <p class="text-xs text-slate-600">Daily Return: <span class="font-bold">KES 500/day</span></p>
+              <p class="text-xs text-slate-600">Duration: <span class="font-bold">15 Days</span></p>
+            </div>
+            <button type="button" onclick="app.rentPlan('Phantom Rig Pro', 3000)" class="mt-4 w-full py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs rounded-lg transition">
+              Rent Plan
+            </button>
+          </div>
+
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col justify-between">
+            <div>
+              <h3 class="font-bold text-slate-900 text-base">Phantom Enterprise Stack</h3>
+              <p class="text-emerald-600 font-black text-xl my-1">KES 10,000</p>
+              <p class="text-xs text-slate-600">Daily Return: <span class="font-bold">KES 1,800/day</span></p>
+              <p class="text-xs text-slate-600">Duration: <span class="font-bold">20 Days</span></p>
+            </div>
+            <button type="button" onclick="app.rentPlan('Phantom Enterprise Stack', 10000)" class="mt-4 w-full py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs rounded-lg transition">
+              Rent Plan
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Financial Personal Profile Form -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <h2 class="text-lg font-bold text-slate-900 mb-4">Financial Personal Profile</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Full Legal Name</label>
+            <input id="profFullName" type="text" placeholder="Legal ID Name" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">National ID / Passport</label>
+            <input id="profNationalId" type="text" placeholder="ID Number" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Payout Phone Number</label>
+            <input id="profPayoutPhone" type="text" placeholder="07XXXXXXXX" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm">
+          </div>
+        </div>
+        <button id="btnSaveProfile" type="button" class="mt-4 px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-sm transition">
+          Save Profile Details
+        </button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <div id="depositModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
+      <h3 class="text-lg font-extrabold text-slate-900">Deposit Funds</h3>
+      <div class="bg-slate-100 p-3 rounded-xl text-xs text-slate-600">
+        Payments auto-routed to Merchant Number: <span class="font-extrabold text-slate-900">0111414027</span>
+      </div>
+      <div>
+        <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Payment Method</label>
+        <select id="depNetwork" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm">
           <option value="Safaricom M-Pesa">Safaricom M-Pesa</option>
           <option value="Airtel Money">Airtel Money</option>
         </select>
       </div>
-      <div class="field-group">
-        <label>Phone Number</label>
-        <input type="text" id="depPhone" class="input-box" placeholder="07XXXXXXXX">
+      <div>
+        <label class="block text-xs font-bold uppercase text-slate-600 mb-1">M-Pesa / Phone Number</label>
+        <input id="depPhone" type="text" placeholder="07XXXXXXXX" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm">
       </div>
-      <div class="field-group">
-        <label>Deposit Amount (KES)</label>
-        <input type="number" id="depAmount" class="input-box" placeholder="Enter amount">
+      <div>
+        <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Amount (KES)</label>
+        <input id="depAmount" type="number" placeholder="Enter amount" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm">
       </div>
-      <div class="modal-actions">
-        <button type="button" class="btn-cancel" onclick="app.closeDepositModal()">Cancel</button>
-        <button type="button" class="action-btn" style="background:#27ae60; flex:1;" onclick="app.processDeposit()">Confirm & Send STK Push</button>
+      <div class="flex gap-3 pt-2">
+        <button id="btnCloseDeposit" type="button" class="flex-1 py-3 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-xl text-sm transition">
+          Cancel
+        </button>
+        <button id="btnConfirmDeposit" type="button" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm transition">
+          Send STK Push
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- WITHDRAWAL MODAL -->
-  <div id="withdrawModal" class="modal-overlay hidden">
-    <div class="modal-card">
-      <div class="modal-title">Withdraw Funds</div>
-      <div class="field-group">
-        <label>Destination Network</label>
-        <select id="wdNetwork">
+  <div id="withdrawModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
+      <h3 class="text-lg font-extrabold text-slate-900">Withdraw Funds</h3>
+      <div>
+        <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Payout Network</label>
+        <select id="wdNetwork" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm">
           <option value="Safaricom M-Pesa">Safaricom M-Pesa</option>
           <option value="Airtel Money">Airtel Money</option>
         </select>
       </div>
-      <div class="field-group">
-        <label>Payout Phone Number</label>
-        <input type="text" id="wdPhone" class="input-box" placeholder="07XXXXXXXX">
+      <div>
+        <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Destination Phone Number</label>
+        <input id="wdPhone" type="text" placeholder="07XXXXXXXX" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm">
       </div>
-      <div class="field-group">
-        <label>Withdrawal Amount (KES)</label>
-        <input type="number" id="wdAmount" class="input-box" placeholder="Enter amount">
+      <div>
+        <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Amount (KES)</label>
+        <input id="wdAmount" type="number" placeholder="Enter amount" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm">
       </div>
-      <div class="modal-actions">
-        <button type="button" class="btn-cancel" onclick="app.closeWithdrawModal()">Cancel</button>
-        <button type="button" class="action-btn" style="background:#e74c3c; flex:1;" onclick="app.processWithdrawal()">Confirm Withdrawal</button>
+      <div class="flex gap-3 pt-2">
+        <button id="btnCloseWithdraw" type="button" class="flex-1 py-3 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-xl text-sm transition">
+          Cancel
+        </button>
+        <button id="btnConfirmWithdraw" type="button" class="flex-1 py-3 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-sm transition">
+          Confirm Withdrawal
+        </button>
       </div>
     </div>
   </div>
 
   <script>
-    // Global Application Object
-    window.app = {
+    const app = {
       merchantNumber: "0111414027",
-      currentUser: null,
       users: [],
+      currentUser: null,
 
-      showAlert: function(msg, isError) {
-        var box = document.getElementById('statusAlert');
-        box.className = isError ? "status-alert error" : "status-alert success";
-        box.innerText = msg;
-        box.style.display = "block";
+      showAlert: function(message, isError = false) {
+        const box = document.getElementById('alertBox');
+        box.className = isError 
+          ? "mb-6 p-4 rounded-xl text-sm font-semibold fade-in bg-rose-100 text-rose-800 border border-rose-200"
+          : "mb-6 p-4 rounded-xl text-sm font-semibold fade-in bg-emerald-100 text-emerald-800 border border-emerald-200";
+        box.innerText = message;
+        box.classList.remove('hidden');
       },
 
-      showTab: function(tabName) {
-        document.getElementById('statusAlert').style.display = "none";
-        if (tabName === 'register') {
-          document.getElementById('registerBox').classList.remove('hidden');
-          document.getElementById('loginBox').classList.add('hidden');
-          document.getElementById('tabRegisterBtn').classList.add('active');
-          document.getElementById('tabLoginBtn').classList.remove('active');
+      hideAlert: function() {
+        document.getElementById('alertBox').classList.add('hidden');
+      },
+
+      switchTab: function(targetTab) {
+        app.hideAlert();
+        const tabRegister = document.getElementById('tabRegister');
+        const tabSignIn = document.getElementById('tabSignIn');
+        const formRegister = document.getElementById('formRegisterView');
+        const formSignIn = document.getElementById('formSignInView');
+
+        if (targetTab === 'register') {
+          tabRegister.className = "py-2.5 text-sm font-bold rounded-lg transition-all text-slate-900 bg-white shadow-sm";
+          tabSignIn.className = "py-2.5 text-sm font-bold rounded-lg transition-all text-slate-500 hover:text-slate-900";
+          formRegister.classList.remove('hidden');
+          formSignIn.classList.add('hidden');
         } else {
-          document.getElementById('registerBox').classList.add('hidden');
-          document.getElementById('loginBox').classList.remove('hidden');
-          document.getElementById('tabLoginBtn').classList.add('active');
-          document.getElementById('tabRegisterBtn').classList.remove('active');
+          tabSignIn.className = "py-2.5 text-sm font-bold rounded-lg transition-all text-slate-900 bg-white shadow-sm";
+          tabRegister.className = "py-2.5 text-sm font-bold rounded-lg transition-all text-slate-500 hover:text-slate-900";
+          formSignIn.classList.remove('hidden');
+          formRegister.classList.add('hidden');
         }
       },
 
-      registerUser: function() {
-        var phone = document.getElementById('regPhone').value.trim();
-        var email = document.getElementById('regEmail').value.trim().toLowerCase();
-        var password = document.getElementById('regPassword').value;
-        var confirmPassword = document.getElementById('regConfirmPassword').value;
+      register: function() {
+        const phone = document.getElementById('regPhone').value.trim();
+        const email = document.getElementById('regEmail').value.trim().toLowerCase();
+        const password = document.getElementById('regPassword').value;
+        const confirmPassword = document.getElementById('regConfirmPassword').value;
 
         if (!phone || !email || !password || !confirmPassword) {
-          app.showAlert("Please fill in all details.", true);
+          app.showAlert("Please fill in all registration fields.", true);
           return;
         }
 
         if (password !== confirmPassword) {
-          app.showAlert("Passwords do not match. Please try again.", true);
+          app.showAlert("Passwords do not match. Please check and try again.", true);
           return;
         }
 
-        var exists = app.users.some(function(u) { return u.phone === phone || u.email === email; });
-        if (exists) {
-          app.showAlert("An account already exists with this email or phone. Click Sign In.", true);
+        const userExists = app.users.some(u => u.phone === phone || u.email === email);
+        if (userExists) {
+          app.showAlert("An account with this email or phone already exists. Click 'Sign In' to log in.", true);
           return;
         }
 
-        var newUser = {
+        const newUser = {
           phone: phone,
           email: email,
           password: password,
@@ -535,80 +332,60 @@
 
         app.users.push(newUser);
         app.currentUser = newUser;
-        app.openDashboard();
-        app.showAlert("Account created successfully! Welcome.");
+        app.loadDashboard();
+        app.showAlert("Registration successful! Account activated.");
       },
 
-      loginUser: function() {
-        var id = document.getElementById('loginIdentifier').value.trim().toLowerCase();
-        var pass = document.getElementById('loginPassword').value;
+      signIn: function() {
+        const identifier = document.getElementById('loginIdentifier').value.trim().toLowerCase();
+        const password = document.getElementById('loginPassword').value;
 
-        if (!id || !pass) {
-          app.showAlert("Please enter your email/phone and password.", true);
+        if (!identifier || !password) {
+          app.showAlert("Please enter your username (email/phone) and password.", true);
           return;
         }
 
-        var user = app.users.find(function(u) {
-          return (u.phone.toLowerCase() === id || u.email.toLowerCase() === id) && u.password === pass;
-        });
+        const foundUser = app.users.find(u => 
+          (u.email.toLowerCase() === identifier || u.phone.toLowerCase() === identifier) && u.password === password
+        );
 
-        if (user) {
-          app.currentUser = user;
-          app.openDashboard();
+        if (foundUser) {
+          app.currentUser = foundUser;
+          app.loadDashboard();
           app.showAlert("Signed in successfully!");
         } else {
-          app.showAlert("Invalid email/phone or password.", true);
+          app.showAlert("Invalid username or password.", true);
         }
       },
 
-      openDashboard: function() {
-        document.getElementById('authView').classList.add('hidden');
-        document.getElementById('dashboardView').classList.remove('hidden');
-        document.getElementById('logoutBtn').classList.remove('hidden');
+      loadDashboard: function() {
+        document.getElementById('authCard').classList.add('hidden');
+        document.getElementById('dashboardCard').classList.remove('hidden');
+        document.getElementById('headerUserActions').classList.remove('hidden');
+        document.getElementById('userDisplayName').innerText = app.currentUser.email;
 
         document.getElementById('profFullName').value = app.currentUser.fullName || '';
         document.getElementById('profNationalId').value = app.currentUser.nationalId || '';
         document.getElementById('profPayoutPhone').value = app.currentUser.payoutPhone || app.currentUser.phone;
 
-        app.renderUI();
+        app.updateDashboardUI();
       },
 
-      renderUI: function() {
+      updateDashboardUI: function() {
         if (!app.currentUser) return;
-        document.getElementById('userBalance').innerText = "KES " + (app.currentUser.balance || 0).toLocaleString();
-        document.getElementById('userInvestments').innerText = "KES " + (app.currentUser.investments || 0).toLocaleString();
-        document.getElementById('userReferrals').innerText = (app.currentUser.referrals || 0) + " Users";
+        document.getElementById('dashBalance').innerText = `KES ${(app.currentUser.balance || 0).toLocaleString('.2f')}`;
+        document.getElementById('dashInvestments').innerText = `KES ${(app.currentUser.investments || 0).toLocaleString('.2f')}`;
+        document.getElementById('dashReferrals').innerText = `${app.currentUser.referrals || 0} Users`;
       },
 
       signOut: function() {
         app.currentUser = null;
-        document.getElementById('dashboardView').classList.add('hidden');
-        document.getElementById('logoutBtn').classList.add('hidden');
-        document.getElementById('authView').classList.remove('hidden');
-        app.showTab('login');
-        app.showAlert("Signed out.");
+        document.getElementById('dashboardCard').classList.add('hidden');
+        document.getElementById('headerUserActions').classList.add('hidden');
+        document.getElementById('authCard').classList.remove('hidden');
+        app.switchTab('signIn');
+        app.showAlert("You have been signed out.");
       },
 
-      openDepositModal: function() {
-        document.getElementById('depPhone').value = app.currentUser.payoutPhone || app.currentUser.phone;
-        document.getElementById('depositModal').classList.remove('hidden');
-      },
-
-      closeDepositModal: function() {
-        document.getElementById('depositModal').classList.add('hidden');
-      },
-
-      processDeposit: function() {
-        var net = document.getElementById('depNetwork').value;
-        var phone = document.getElementById('depPhone').value.trim();
-        var amt = parseFloat(document.getElementById('depAmount').value);
-
-        if (!phone || !amt || amt <= 0) {
-          alert("Enter a valid phone number and deposit amount.");
-          return;
-        }
-
-        app.closeDepositModal();
-        alert("STK Push sent to " + phone + " via " + net + ".\nRouting to Merchant: " + app.merchantNumber + ".\n\nEnter PIN on your mobile phone.");
-
-        app.currentUser.balan
+      rentPlan: function(planName, cost) {
+        if (app.currentUser.balance < cost)
