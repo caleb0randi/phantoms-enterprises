@@ -27,6 +27,7 @@
     <div class="menu-item" onclick="app.switchView('withdrawView')">🏧 Withdraw Funds</div>
     <div class="menu-item" onclick="app.switchView('investmentsView')">💼 Available Investments</div>
     <div class="menu-item" onclick="app.switchView('myInvestmentsView')">⭐ My Investments</div>
+    <div class="menu-item" onclick="app.switchView('transactionsView')">📜 Transaction History</div>
     <div class="menu-item" style="margin-top: auto; background: #c0392b;" onclick="app.signOut()">🚪 Sign Out</div>
   </div>
 
@@ -194,6 +195,16 @@
       </div>
     </div>
 
+    <!-- 7. TRANSACTION HISTORY VIEW -->
+    <div id="transactionsView" class="app-view hidden">
+      <div class="dash-section">
+        <div class="dash-section-title">📜 My Transaction History</div>
+        <div id="transactionList" style="margin-top: 15px;">
+          <p style="color:#64748b; font-size:14px;">Loading history...</p>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <script>
@@ -264,6 +275,8 @@
 
         if (viewId === 'myInvestmentsView') {
           app.loadMyInvestments();
+        } else if (viewId === 'transactionsView' && typeof app.loadTransactions === 'function') {
+          app.loadTransactions();
         }
       },
 
@@ -471,5 +484,9 @@
       }
     });
   </script>
+
+  <!-- External JavaScript Files -->
+  <script src="transactions.js"></script>
 </body>
-</html>
+  </html>
+  
