@@ -10,7 +10,7 @@
     
     .container { width: 100%; max-width: 850px; background: #ffffff; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); padding: 20px; margin-top: 10px; position: relative; }
 
-    /* Header & Navigation */
+    /* Header Navigation */
     .brand-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f3f6; }
     .brand-logo-wrap { display: flex; align-items: center; gap: 12px; }
     .logo-icon { width: 36px; height: 36px; }
@@ -19,16 +19,16 @@
 
     .menu-trigger { font-size: 24px; cursor: pointer; background: #f0f3f6; border: none; border-radius: 8px; padding: 6px 12px; color: #1a2b4c; font-weight: bold; }
     
-    /* Slide-out Navigation Menu */
-    .nav-drawer { position: fixed; top: 0; right: -280px; width: 270px; height: 100%; background: #1a2b4c; color: white; transition: right 0.3s ease; z-index: 2000; box-shadow: -5px 0 15px rgba(0,0,0,0.2); padding: 25px 20px; display: flex; flex-direction: column; gap: 15px; }
+    /* Slide-out Navigation Drawer */
+    .nav-drawer { position: fixed; top: 0; right: -280px; width: 270px; height: 100%; background: #1a2b4c; color: white; transition: right 0.3s ease; z-index: 2000; box-shadow: -5px 0 15px rgba(0,0,0,0.2); padding: 25px 20px; display: flex; flex-direction: column; gap: 12px; }
     .nav-drawer.open { right: 0; }
     .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #2c3e50; padding-bottom: 10px; }
     .nav-close { font-size: 22px; cursor: pointer; background: none; border: none; color: #e67e22; font-weight: bold; }
     
     .menu-item { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 8px; color: #ecf0f1; text-decoration: none; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-    .menu-item:hover, .menu-item.active { background: #e67e22; color: white; }
+    .menu-item:hover { background: #e67e22; color: white; }
 
-    /* Forms & Tabs */
+    /* Auth Tab Controls */
     .tab-switcher { display: flex; background-color: #eef2f5; border-radius: 8px; padding: 4px; margin-bottom: 20px; }
     .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; color: #7f8c8d; font-weight: 700; border-radius: 6px; cursor: pointer; font-size: 15px; }
     .tab-btn.active { background-color: #ffffff; color: #1a2b4c; box-shadow: 0 2px 5px rgba(0,0,0,0.08); }
@@ -60,13 +60,12 @@
     .rental-detail { font-size: 13px; color: #64748b; margin-bottom: 4px; }
     
     .rent-btn { width: 100%; margin-top: 12px; padding: 10px; background-color: #e67e22; color: white; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; }
-    
     .pay-instruction { background-color: #fff8e1; border: 1px solid #ffe082; padding: 12px; border-radius: 8px; font-size: 13px; color: #7f6000; margin-bottom: 15px; line-height: 1.5; }
 
     .hidden { display: none !important; }
   </style>
 
-  <!-- Firebase Libraries -->
+  <!-- Firebase Web Libraries -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -76,7 +75,7 @@
   <!-- Drawer Menu Overlay -->
   <div id="navDrawer" class="nav-drawer">
     <div class="nav-header">
-      <span style="font-size: 16px; font-weight: bold;">Menu</span>
+      <span style="font-size: 16px; font-weight: bold;">Navigation</span>
       <button class="nav-close" onclick="app.toggleMenu()">✕</button>
     </div>
     <div class="menu-item" onclick="app.switchView('dashboardView')">📊 Dashboard</div>
@@ -110,7 +109,7 @@
         <button type="button" class="tab-btn" id="tabLoginBtn" onclick="app.showTab('login')">Sign In</button>
       </div>
 
-      <!-- Register -->
+      <!-- Register Box -->
       <div id="registerBox">
         <div class="field-group">
           <label>Phone Number (e.g. 0712345678)</label>
@@ -131,8 +130,8 @@
         <button type="button" class="action-btn" onclick="app.registerUser()">Register Account</button>
       </div>
 
-      <!-- Sign In -->
-      <div id="loginBox" class="hidden">
+      <!-- Sign In Box -->
+      <div id="loginBox" class="hidden" style="display: none;">
         <div class="field-group">
           <label>Email Address</label>
           <input type="email" id="loginEmail" class="input-box" placeholder="Enter email address">
@@ -145,7 +144,7 @@
       </div>
     </div>
 
-    <!-- MAIN APP VIEWS (GATED BY LOGIN) -->
+    <!-- APPLICATION VIEWS -->
     
     <!-- 1. DASHBOARD VIEW -->
     <div id="dashboardView" class="app-view hidden">
@@ -172,20 +171,20 @@
     <!-- 2. PROFILE VIEW -->
     <div id="profileView" class="app-view hidden">
       <div class="dash-section">
-        <div class="dash-section-title">User Account Profile</div>
+        <div class="dash-section-title">User Profile Details</div>
         <div class="field-group"><label>Email Address:</label><strong id="profileEmail">-</strong></div>
         <div class="field-group"><label>Phone Number:</label><strong id="profilePhone">-</strong></div>
         <div class="field-group"><label>Account Status:</label><span style="color:#27ae60; font-weight:bold;">Active</span></div>
       </div>
     </div>
 
-    <!-- 3. DEPOSIT VIEW (MANUAL MPESA VERIFICATION) -->
+    <!-- 3. DEPOSIT VIEW -->
     <div id="depositView" class="app-view hidden">
       <div class="dash-section">
         <div class="dash-section-title">Deposit Funds via M-Pesa</div>
         <div class="pay-instruction">
           <strong>Step 1:</strong> Send money directly to phone/till: <strong>0111414027</strong><br>
-          <strong>Step 2:</strong> Copy the M-Pesa confirmation code (e.g., <em>QK1234567</em>) and submit it below for verification.
+          <strong>Step 2:</strong> Enter the M-Pesa confirmation transaction code (e.g., <em>QK1234567</em>) below.
         </div>
         <div class="field-group">
           <label>M-Pesa Transaction Code</label>
@@ -215,7 +214,7 @@
       </div>
     </div>
 
-    <!-- 5. AVAILABLE INVESTMENTS VIEW -->
+    <!-- 5. AVAILABLE INVESTMENTS -->
     <div id="investmentsView" class="app-view hidden">
       <div class="dash-section">
         <div class="dash-section-title">Available Rental Investment Packages</div>
@@ -255,7 +254,6 @@
   </div>
 
   <script>
-    // FIREBASE CREDENTIALS
     const firebaseConfig = {
       apiKey: "AIzaSyBfdA1xc1U66I-djERrDCLLbnZ3Cs1P6XA",
       authDomain: "phantoms-198ca.firebaseapp.com",
@@ -287,16 +285,25 @@
 
       showTab: function(tabName) {
         document.getElementById('statusAlert').style.display = "none";
+        const regBox = document.getElementById('registerBox');
+        const loginBox = document.getElementById('loginBox');
+        const regBtn = document.getElementById('tabRegisterBtn');
+        const loginBtn = document.getElementById('tabLoginBtn');
+
         if (tabName === 'register') {
-          document.getElementById('registerBox').classList.remove('hidden');
-          document.getElementById('loginBox').classList.add('hidden');
-          document.getElementById('tabRegisterBtn').classList.add('active');
-          document.getElementById('tabLoginBtn').classList.remove('active');
+          regBox.style.display = "block";
+          regBox.classList.remove('hidden');
+          loginBox.style.display = "none";
+          loginBox.classList.add('hidden');
+          regBtn.classList.add('active');
+          loginBtn.classList.remove('active');
         } else {
-          document.getElementById('registerBox').classList.add('hidden');
-          document.getElementById('loginBox').classList.remove('hidden');
-          document.getElementById('tabLoginBtn').classList.add('active');
-          document.getElementById('tabRegisterBtn').classList.remove('active');
+          regBox.style.display = "none";
+          regBox.classList.add('hidden');
+          loginBox.style.display = "block";
+          loginBox.classList.remove('hidden');
+          loginBtn.classList.add('active');
+          regBtn.classList.remove('active');
         }
       },
 
@@ -414,8 +421,4 @@
         try {
           await db.collection("withdrawalRequests").add({
             userId: app.currentUser.uid,
-            phone: phone,
-            amount: amt,
-            status: "pending",
-            createdAt: new Date()
- 
+         
