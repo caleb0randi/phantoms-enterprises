@@ -9,7 +9,10 @@ const USERS_FILE = path.join(__dirname, 'users.json');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve static files from root AND public directory
 app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, 'public')));
 
 const verificationCodes = {};
 
@@ -52,11 +55,29 @@ seedAdmin();
 
 // Routes
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'login.html'));
+    // Check if login.html is in root or public folder
+    const rootPath = path.join(__dirname, 'login.html');
+    const publicPath = path.join(__dirname, 'public', 'login.html');
+    
+    if (fs.existsSync(rootPath)) {
+        res.sendFile(rootPath);
+    } else if (fs.existsSync(publicPath)) {
+        res.sendFile(publicPath);
+    } else {
+        res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    }
 });
 
 app.get('/dashboard', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    // Checks public/index.html first, then root index.html
+    const publicIndexPath = path.join(__dirname, 'public', 'index.html');
+    const rootIndexPath = path.join(__dirname, 'index.html');
+
+    if (fs.existsSync(publicIndexPath)) {
+        res.sendFile(publicIndexPath);
+    } else {
+        res.sendFile(rootIndexPath);
+    }
 });
 
 // Request Verification Code via Email
@@ -125,4 +146,4 @@ app.post('/api/login', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-      
+        
