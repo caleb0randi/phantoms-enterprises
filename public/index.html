@@ -406,10 +406,9 @@
   <script>
     // ==========================================
     // BREVO API CONFIGURATION
-    // Update BREVO_API_KEY and SENDER_EMAIL below
     // ==========================================
-    const BREVO_API_KEY = "xkeysib-YOUR_ACTUAL_API_KEY_HERE";
-    const SENDER_EMAIL = "your-verified-sender@example.com";
+    const BREVO_API_KEY = "xkeysib-24b7c3746631ee627a987c9a7881e2204be761b0358e8534dae55d7";
+    const SENDER_EMAIL = "Phantomsenterprices@gmail.com";
     const SENDER_NAME = "Phantoms Enterprises";
 
     let activeVerificationCode = "";
@@ -436,7 +435,7 @@
       }
     }
 
-    // Direct Brevo Transmission Logic
+    // Direct Brevo Email Transmission
     async function sendBrevoEmailCode() {
       const email = document.getElementById('regEmail').value;
       if (!email) {
@@ -475,14 +474,14 @@
         const data = await response.json();
 
         if (response.ok && data.messageId) {
-          showAlert(`Verification code sent to ${email}. Please check your email inbox.`);
+          showAlert(`Verification code sent to ${email}. Please check your inbox.`);
         } else {
-          console.error("Brevo API Response:", data);
-          showAlert(`Brevo Error: ${data.message || 'Check API key or verified sender.'}`, true);
+          console.error("Brevo API Response Error:", data);
+          showAlert(`Brevo Error: ${data.message || 'Key not found or unverified sender.'}`, true);
         }
       } catch (err) {
-        console.error("Network or CORS error connecting to Brevo:", err);
-        showAlert("Connection failed. Check browser console (F12) for network logs.", true);
+        console.error("Network Error:", err);
+        showAlert("Connection failed. Check network or console.", true);
       }
     }
 
@@ -504,7 +503,7 @@
       showAlert("Signed out successfully.");
     }
 
-    // Registration Form Logic
+    // Registration Handler
     document.getElementById('registerForm').addEventListener('submit', function(e) {
       e.preventDefault();
 
@@ -529,11 +528,11 @@
       users.push(user);
       localStorage.setItem('phantoms_users', JSON.stringify(users));
 
-      // Direct redirect into dashboard
+      // Direct entry into dashboard interface upon registration
       launchDashboard(user);
     });
 
-    // Login Form Logic
+    // Login Handler
     document.getElementById('loginForm').addEventListener('submit', function(e) {
       e.preventDefault();
 
