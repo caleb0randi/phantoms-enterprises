@@ -1,171 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phantoms Enterprises - Authentication</title>
-    <style>
-        body { font-family: Arial, sans-serif; background: #f4f4f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 380px; }
-        h2 { margin-top: 0; text-align: center; color: #333; }
-        .input-group { margin-bottom: 1rem; }
-        label { display: block; margin-bottom: 0.3rem; color: #666; font-size: 0.9rem; }
-        input { width: 100%; padding: 0.6rem; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { width: 100%; padding: 0.7rem; background: #007bff; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 0.5rem; }
-        button:hover { background: #0056b3; }
-        .toggle-link { text-align: center; margin-top: 1rem; font-size: 0.9rem; }
-        .toggle-link a { color: #007bff; text-decoration: none; cursor: pointer; }
-        .code-row { display: flex; gap: 0.5rem; }
-        .code-row button { width: auto; white-space: nowrap; font-size: 0.8rem; margin: 0; }
-        .alert { padding: 0.5rem; margin-bottom: 1rem; border-radius: 4px; display: none; font-size: 0.85rem; text-align: center; }
-        .alert-error { background: #ffe6e6; color: #d9534f; }
-        .alert-success { background: #e6ffe6; color: #5cb85c; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | Phantoms Enterprises</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .glass { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(12px); }
+    .gold-gradient { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+  </style>
 </head>
-<body>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans flex items-center justify-center p-4">
 
-<div class="card">
-    <h2 id="form-title">Login</h2>
-    <div id="msg" class="alert"></div>
+  <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl glass">
+    
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-black text-white tracking-wider">PHANTOMS</h1>
+      <p class="text-amber-400 text-xs font-semibold uppercase tracking-widest mt-1">Enterprises Access Portal</p>
+    </div>
 
-    <!-- LOGIN FORM -->
-    <form id="login-form">
-        <div class="input-group">
-            <label>Username</label>
-            <input type="text" id="login-username" autocomplete="username" required>
-        </div>
-        <div class="input-group">
-            <label>Password</label>
-            <input type="password" id="login-password" autocomplete="current-password" required>
-        </div>
-        <button type="submit">Log In</button>
-        <div class="toggle-link">
-            Don't have an account? <a onclick="showSignup()">Create an Account</a>
-        </div>
+    <!-- Login Form -->
+    <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-6">
+      <div>
+        <label for="email" class="block text-sm font-medium text-slate-300 mb-2">Email Address</label>
+        <input 
+          type="email" 
+          id="email" 
+          required 
+          placeholder="phantomsenterprises@gmail.com"
+          class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-blue-500 transition"
+        >
+      </div>
+
+      <button 
+        type="submit" 
+        class="w-full gold-gradient text-slate-950 font-bold py-3 rounded-xl hover:opacity-90 transition shadow-lg"
+      >
+        Sign In
+      </button>
     </form>
 
-    <!-- SIGNUP FORM -->
-    <form id="signup-form" style="display: none;">
-        <div class="input-group">
-            <label>Username</label>
-            <input type="text" id="signup-username" required>
-        </div>
-        <div class="input-group">
-            <label>Email or Phone Number</label>
-            <div class="code-row">
-                <input type="email" id="signup-contact" required placeholder="user@example.com">
-                <button type="button" onclick="sendCode()">Get Code</button>
-            </div>
-        </div>
-        <div class="input-group">
-            <label>Verification Code</label>
-            <input type="text" id="signup-code" required placeholder="6-digit code">
-        </div>
-        <div class="input-group">
-            <label>Password</label>
-            <input type="password" id="signup-password" required>
-        </div>
-        <button type="submit">Sign Up</button>
-        <div class="toggle-link">
-            Already have an account? <a onclick="showLogin()">Log In</a>
-        </div>
-    </form>
-</div>
+    <div id="statusMessage" class="mt-4 text-center text-sm font-semibold hidden"></div>
 
-<script>
-    const msg = document.getElementById('msg');
+  </div>
 
-    function showMsg(text, isError = true) {
-        msg.textContent = text;
-        msg.className = `alert ${isError ? 'alert-error' : 'alert-success'}`;
-        msg.style.display = 'block';
-    }
+  <script>
+    async function handleLogin(event) {
+      event.preventDefault();
+      
+      const emailInput = document.getElementById('email').value;
+      const statusMsg = document.getElementById('statusMessage');
 
-    function showSignup() {
-        document.getElementById('login-form').style.display = 'none';
-        document.getElementById('signup-form').style.display = 'block';
-        document.getElementById('form-title').textContent = 'Create Account';
-        msg.style.display = 'none';
-    }
+      statusMsg.className = "mt-4 text-center text-sm font-semibold text-blue-400";
+      statusMsg.innerText = "Authenticating...";
+      statusMsg.classList.remove('hidden');
 
-    function showLogin() {
-        document.getElementById('signup-form').style.display = 'none';
-        document.getElementById('login-form').style.display = 'block';
-        document.getElementById('form-title').textContent = 'Login';
-        msg.style.display = 'none';
-    }
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: emailInput })
+        });
 
-    async function sendCode() {
-        const contact = document.getElementById('signup-contact').value;
-        if (!contact) return showMsg('Please enter an email address.');
+        const data = await response.json();
 
-        try {
-            const res = await fetch('/api/send-code', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contact })
-            });
-            const data = await res.json();
-            
-            if (data.success) {
-                showMsg('Verification code sent to your email!', false);
-            } else {
-                showMsg(data.message);
-            }
-        } catch (err) {
-            showMsg('Error sending verification code. Please try again.');
+        if (data.success) {
+          // Save role and email sent back from server whitelist
+          localStorage.setItem('userRole', data.user.role);
+          localStorage.setItem('userEmail', data.user.email);
+
+          statusMsg.className = "mt-4 text-center text-sm font-semibold text-emerald-400";
+          statusMsg.innerText = `Login successful! Redirecting as ${data.user.role}...`;
+
+          // Redirect to main platform dashboard
+          setTimeout(() => {
+            window.location.href = '/index.html';
+          }, 1000);
+        } else {
+          statusMsg.className = "mt-4 text-center text-sm font-semibold text-red-400";
+          statusMsg.innerText = data.message || "Login failed.";
         }
+      } catch (err) {
+        console.error("Login error:", err);
+        statusMsg.className = "mt-4 text-center text-sm font-semibold text-red-400";
+        statusMsg.innerText = "Server error. Please try again.";
+      }
     }
+  </script>
 
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const username = document.getElementById('login-username').value;
-        const password = document.getElementById('login-password').value;
-
-        try {
-            const res = await fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-            const data = await res.json();
-
-            if (data.success) {
-                localStorage.setItem('phantom_user', JSON.stringify(data.user));
-                window.location.href = '/dashboard';
-            } else {
-                showMsg(data.message || 'Invalid username or password.');
-            }
-        } catch (err) {
-            showMsg('Login request failed. Server error.');
-        }
-    });
-
-    document.getElementById('signup-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const username = document.getElementById('signup-username').value;
-        const contact = document.getElementById('signup-contact').value;
-        const code = document.getElementById('signup-code').value;
-        const password = document.getElementById('signup-password').value;
-
-        try {
-            const res = await fetch('/api/signup', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, contact, password, code })
-            });
-            const data = await res.json();
-
-            if (data.success) {
-                showMsg('Account created! Please log in.', false);
-                setTimeout(showLogin, 1500);
-            } else {
-                showMsg(data.message);
-            }
-        } catch (err) {
-            showMsg('Signup request failed.');
-        }
-    });
-</script>
 </body>
 </html>
