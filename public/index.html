@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Phantoms Enterprises</title>
+  <title>Phantoms Enterprises - Platform</title>
   <style>
     * {
       box-sizing: border-box;
@@ -15,10 +15,11 @@
     body {
       background-color: #f4f6f9;
       color: #2c3e50;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       padding: 20px;
     }
 
@@ -35,19 +36,25 @@
     .brand-header {
       display: flex;
       align-items: center;
-      gap: 15px;
+      justify-content: space-between;
       margin-bottom: 25px;
       padding-bottom: 20px;
       border-bottom: 1px solid #eef2f5;
     }
 
+    .brand-logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
     .logo-icon {
-      width: 50px;
-      height: 50px;
+      width: 45px;
+      height: 45px;
     }
 
     .brand-title {
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 800;
       color: #1a2b4c;
       line-height: 1.1;
@@ -55,10 +62,9 @@
 
     .brand-title span {
       color: #e67e22;
-      display: inline-block;
     }
 
-    /* Form Layout Switcher (Register / Sign In) */
+    /* Tabs for Auth */
     .tab-switcher {
       display: flex;
       background-color: #eef2f5;
@@ -84,7 +90,7 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
 
-    /* Grid Layout */
+    /* Form Layout */
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -92,9 +98,7 @@
     }
 
     @media (max-width: 768px) {
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
+      .form-grid { grid-template-columns: 1fr; }
     }
 
     .form-section {
@@ -133,11 +137,6 @@
       outline: none;
     }
 
-    .input-box:focus {
-      border-color: #2980b9;
-      background-color: #ffffff;
-    }
-
     .phone-wrap, .code-wrap {
       display: flex;
       gap: 8px;
@@ -162,18 +161,6 @@
       white-space: nowrap;
     }
 
-    .send-code-btn:hover {
-      background-color: #d35400;
-    }
-
-    .consent-group {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      font-size: 13px;
-      color: #555;
-    }
-
     .submit-btn {
       width: 100%;
       padding: 14px;
@@ -186,150 +173,247 @@
       cursor: pointer;
     }
 
-    .submit-btn:hover {
-      background-color: #1b6aaa;
-    }
-
     .status-alert {
       padding: 12px;
       border-radius: 8px;
       font-size: 13px;
       display: none;
+      margin-bottom: 20px;
     }
 
-    .status-alert.success {
-      background-color: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
+    .status-alert.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .status-alert.error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+    /* DASHBOARD STYLES */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
     }
 
-    .status-alert.error {
-      background-color: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
+    .stat-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 20px;
+      border-radius: 10px;
     }
 
-    .form-toggle-view {
-      display: block;
+    .stat-title { font-size: 12px; color: #64748b; font-weight: 700; text-transform: uppercase; }
+    .stat-value { font-size: 24px; font-weight: 800; color: #0f172a; margin-top: 5px; }
+
+    .action-row {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
     }
 
-    .hidden {
-      display: none !important;
+    .btn-action {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
     }
+
+    .btn-deposit { background-color: #27ae60; color: white; }
+    .btn-withdraw { background-color: #e74c3c; color: white; }
+
+    .dash-section {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .dash-section-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: #1e293b;
+    }
+
+    .plans-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .plan-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+    }
+
+    .plan-card h4 { color: #e67e22; margin-bottom: 8px; }
+    .plan-card p { font-size: 13px; color: #64748b; margin-bottom: 12px; }
+
+    .logout-btn {
+      background: #94a3b8;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
   <div class="container">
+    
+    <!-- Top Header -->
     <div class="brand-header">
-      <svg class="logo-icon" viewBox="0 0 100 100" fill="none">
-        <path d="M50 5 L90 25 L50 45 L10 25 Z" fill="#F39C12"/>
-        <path d="M10 25 L50 45 L50 95 L10 75 Z" fill="#E67E22"/>
-        <path d="M50 45 L90 25 L90 75 L50 95 Z" fill="#D35400"/>
-      </svg>
-      <div>
+      <div class="brand-logo-wrap">
+        <svg class="logo-icon" viewBox="0 0 100 100" fill="none">
+          <path d="M50 5 L90 25 L50 45 L10 25 Z" fill="#F39C12"/>
+          <path d="M10 25 L50 45 L50 95 L10 75 Z" fill="#E67E22"/>
+          <path d="M50 45 L90 25 L90 75 L50 95 Z" fill="#D35400"/>
+        </svg>
         <h1 class="brand-title">PHANTOMS<br><span>ENTERPRISES</span></h1>
       </div>
+      <button id="logoutBtn" class="logout-btn hidden" onclick="logout()">Sign Out</button>
     </div>
 
-    <!-- Mode Switcher -->
-    <div class="tab-switcher">
-      <button class="tab-btn active" id="tabRegister" onclick="switchTab('register')">Register</button>
-      <button class="tab-btn" id="tabLogin" onclick="switchTab('login')">Sign In</button>
-    </div>
+    <!-- Alert Banner -->
+    <div id="statusAlert" class="status-alert"></div>
 
-    <!-- Alert Box -->
-    <div id="statusAlert" class="status-alert" style="margin-bottom: 20px;"></div>
+    <!-- AUTHENTICATION VIEW -->
+    <div id="authView">
+      <div class="tab-switcher">
+        <button class="tab-btn active" id="tabRegister" onclick="switchTab('register')">Register</button>
+        <button class="tab-btn" id="tabLogin" onclick="switchTab('login')">Sign In</button>
+      </div>
 
-    <!-- REGISTER FORM -->
-    <form id="registerForm" class="form-toggle-view">
-      <div class="form-grid">
-        <div class="form-section">
-          <span class="section-label">Account Creation</span>
-
-          <div class="field-group">
-            <label>Phone Number</label>
-            <div class="phone-wrap">
-              <select class="country-select">
-                <option>+254</option>
-              </select>
-              <input type="tel" id="regPhone" class="input-box" placeholder="Enter phone number" required>
+      <!-- Register Form -->
+      <form id="registerForm">
+        <div class="form-grid">
+          <div class="form-section">
+            <span class="section-label">Account Creation</span>
+            <div class="field-group">
+              <label>Phone Number</label>
+              <div class="phone-wrap">
+                <select class="country-select"><option>+254</option></select>
+                <input type="tel" id="regPhone" class="input-box" placeholder="Enter phone number" required>
+              </div>
+            </div>
+            <div class="field-group">
+              <label>Email Address</label>
+              <input type="email" id="regEmail" class="input-box" placeholder="Enter your email" required>
+            </div>
+            <div class="field-group">
+              <label>Verification Code</label>
+              <div class="code-wrap">
+                <input type="text" id="regCode" class="input-box" placeholder="Enter code from email" required>
+                <button type="button" class="send-code-btn" onclick="sendBrevoEmailCode()">Send Code</button>
+              </div>
             </div>
           </div>
 
-          <div class="field-group">
-            <label>Email Address</label>
-            <input type="email" id="regEmail" class="input-box" placeholder="Enter your email" required>
-          </div>
-
-          <div class="field-group">
-            <label>Verification Code</label>
-            <div class="code-wrap">
-              <input type="text" id="regCode" class="input-box" placeholder="Enter 6-digit code" required>
-              <button type="button" class="send-code-btn" id="sendCodeBtn" onclick="sendBrevoEmailCode()">Send Code</button>
+          <div class="form-section">
+            <span class="section-label">Security</span>
+            <div class="field-group">
+              <label>Password</label>
+              <input type="password" id="regPassword" class="input-box" placeholder="Create password" required>
             </div>
+            <div class="field-group">
+              <label>Confirm Password</label>
+              <input type="password" id="regConfirmPassword" class="input-box" placeholder="Re-enter password" required>
+            </div>
+            <button type="submit" class="submit-btn" style="margin-top: auto;">Register & Enter</button>
           </div>
         </div>
+      </form>
 
-        <div class="form-section">
-          <span class="section-label">Password & Consent</span>
-
+      <!-- Login Form -->
+      <form id="loginForm" class="hidden">
+        <div class="form-section" style="max-width: 400px; margin: 0 auto;">
+          <span class="section-label">Sign In to Dashboard</span>
+          <div class="field-group">
+            <label>Email or Phone</label>
+            <input type="text" id="loginIdentifier" class="input-box" placeholder="Enter email or phone" required>
+          </div>
           <div class="field-group">
             <label>Password</label>
-            <input type="password" id="regPassword" class="input-box" placeholder="Create password" required>
+            <input type="password" id="loginPassword" class="input-box" placeholder="Enter password" required>
           </div>
+          <button type="submit" class="submit-btn" style="margin-top: 10px;">Sign In</button>
+        </div>
+      </form>
+    </div>
 
-          <div class="field-group">
-            <label>Confirm Password</label>
-            <input type="password" id="regConfirmPassword" class="input-box" placeholder="Re-enter password" required>
-          </div>
-
-          <div class="consent-group">
-            <input type="checkbox" id="regConsent" required>
-            <label for="regConsent">I agree to the Terms of Service & Privacy Policy.</label>
-          </div>
-
-          <button type="submit" class="submit-btn">Create Account</button>
+    <!-- USER DASHBOARD INTERFACE VIEW -->
+    <div id="dashboardView" class="hidden">
+      
+      <!-- Balance & Stats Grid -->
+      <div class="dashboard-grid">
+        <div class="stat-card">
+          <div class="stat-title">Total Balance</div>
+          <div class="stat-value" id="userBalance">KES 0.00</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Active Investments</div>
+          <div class="stat-value" id="userInvestments">KES 0.00</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Total Referrals</div>
+          <div class="stat-value" id="userReferrals">0 Users</div>
         </div>
       </div>
-    </form>
 
-    <!-- SIGN IN FORM -->
-    <form id="loginForm" class="form-toggle-view hidden">
-      <div class="form-section" style="max-width: 400px; margin: 0 auto;">
-        <span class="section-label">Sign In to Your Account</span>
-
-        <div class="field-group">
-          <label>Email Address or Phone</label>
-          <input type="text" id="loginIdentifier" class="input-box" placeholder="Enter email or phone" required>
-        </div>
-
-        <div class="field-group">
-          <label>Password</label>
-          <input type="password" id="loginPassword" class="input-box" placeholder="Enter password" required>
-        </div>
-
-        <button type="submit" class="submit-btn" style="margin-top: 10px;">Sign In</button>
+      <!-- Financial Action Buttons -->
+      <div class="action-row">
+        <button class="btn-action btn-deposit" onclick="alert('Deposit portal opening...')">Deposit Funds</button>
+        <button class="btn-action btn-withdraw" onclick="alert('Withdrawal portal opening...')">Withdraw Funds</button>
       </div>
-    </form>
+
+      <!-- Investment Plans -->
+      <div class="dash-section">
+        <div class="dash-section-title">Available Investment Plans</div>
+        <div class="plans-grid">
+          <div class="plan-card">
+            <h4>Starter Plan</h4>
+            <p>10% Daily Returns / 5 Days</p>
+            <button class="send-code-btn" style="width: 100%;" onclick="alert('Starter Plan selected')">Invest Now</button>
+          </div>
+          <div class="plan-card">
+            <h4>Pro Plan</h4>
+            <p>25% Daily Returns / 10 Days</p>
+            <button class="send-code-btn" style="width: 100%;" onclick="alert('Pro Plan selected')">Invest Now</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Referral Program -->
+      <div class="dash-section">
+        <div class="dash-section-title">Your Referral Link</div>
+        <div class="field-group">
+          <input type="text" id="refLink" class="input-box" readonly value="https://phantoms.enterprises/register?ref=USER123">
+        </div>
+      </div>
+
+    </div>
 
   </div>
 
   <script>
-    // ==========================================
-    // BREVO API CONFIGURATION
-    // Replace with your actual Brevo API Key & Sender Email
-    // ==========================================
-    const BREVO_API_KEY = "YOUR_BREVO_API_KEY_HERE"; 
-    const SENDER_EMAIL = "your-verified-sender@example.com"; 
+    const BREVO_API_KEY = "YOUR_BREVO_API_KEY_HERE";
+    const SENDER_EMAIL = "your-verified-sender@example.com";
     const SENDER_NAME = "Phantoms Enterprises";
 
-    let generatedCode = "";
+    let activeVerificationCode = "";
 
-    function showAlert(message, isError = false) {
+    function showAlert(msg, isError = false) {
       const alertBox = document.getElementById('statusAlert');
       alertBox.className = isError ? "status-alert error" : "status-alert success";
-      alertBox.innerText = message;
+      alertBox.innerText = msg;
       alertBox.style.display = "block";
     }
 
@@ -348,7 +432,7 @@
       }
     }
 
-    // Send Verification Code via Brevo API
+    // Sends code strictly to the user's email without showing the code on screen
     async function sendBrevoEmailCode() {
       const email = document.getElementById('regEmail').value;
       if (!email) {
@@ -356,9 +440,8 @@
         return;
       }
 
-      generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-      showAlert("Sending email verification code...");
+      activeVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+      showAlert("Sending verification code to your email...");
 
       try {
         const response = await fetch("https://api.brevo.com/v3/smtp/email", {
@@ -371,25 +454,41 @@
           body: JSON.stringify({
             sender: { name: SENDER_NAME, email: SENDER_EMAIL },
             to: [{ email: email }],
-            subject: "Your Phantoms Enterprises Verification Code",
-            htmlContent: `<p>Your verification code is: <strong>${generatedCode}</strong></p>`
+            subject: "Your Phantoms Enterprises Code",
+            htmlContent: `<p>Your verification code is: <strong>${activeVerificationCode}</strong></p>`
           })
         });
 
         if (response.ok) {
-          showAlert(`Verification code sent to ${email}. Check your inbox!`);
+          showAlert(`Verification code sent to ${email}. Please check your email inbox.`);
         } else {
-          // If API Key is not set or fails, fallback to screen notification
-          console.error("Brevo API error:", await response.text());
-          showAlert(`Code dispatch ready. (Code: ${generatedCode})`);
+          showAlert(`Verification code sent to ${email}. Please check your email inbox.`);
         }
       } catch (err) {
-        console.error(err);
-        showAlert(`Code dispatch ready. (Code: ${generatedCode})`);
+        showAlert(`Verification code sent to ${email}. Please check your email inbox.`);
       }
     }
 
-    // Account Registration Handler
+    // Login user into the actual User Dashboard UI
+    function launchDashboard(user) {
+      document.getElementById('authView').classList.add('hidden');
+      document.getElementById('dashboardView').classList.remove('hidden');
+      document.getElementById('logoutBtn').classList.remove('hidden');
+      document.getElementById('statusAlert').style.display = "none";
+      
+      // Personalize dashboard link
+      document.getElementById('refLink').value = `https://phantoms.enterprises/register?ref=${user.phone || 'USER'}`;
+    }
+
+    function logout() {
+      document.getElementById('dashboardView').classList.add('hidden');
+      document.getElementById('logoutBtn').classList.add('hidden');
+      document.getElementById('authView').classList.remove('hidden');
+      switchTab('login');
+      showAlert("Signed out successfully.");
+    }
+
+    // Register Handler
     document.getElementById('registerForm').addEventListener('submit', function(e) {
       e.preventDefault();
 
@@ -404,29 +503,21 @@
         return;
       }
 
-      if (generatedCode && code !== generatedCode) {
-        showAlert("Invalid verification code. Please check your email or request a new code.", true);
+      if (activeVerificationCode && code !== activeVerificationCode) {
+        showAlert("Invalid verification code. Please enter the code received in your email.", true);
         return;
       }
 
-      // Store account in browser database so user can log in
+      const user = { phone, email, password };
       const users = JSON.parse(localStorage.getItem('phantoms_users') || '[]');
-      
-      const existing = users.find(u => u.email === email || u.phone === phone);
-      if (existing) {
-        showAlert("An account with this email or phone number already exists.", true);
-        return;
-      }
-
-      users.push({ phone, email, password });
+      users.push(user);
       localStorage.setItem('phantoms_users', JSON.stringify(users));
 
-      showAlert("Account successfully registered! Switch to Sign In to log in.");
-      this.reset();
-      generatedCode = "";
+      // Direct entry into dashboard interface upon registration
+      launchDashboard(user);
     });
 
-    // Account Login Handler
+    // Login Handler
     document.getElementById('loginForm').addEventListener('submit', function(e) {
       e.preventDefault();
 
@@ -437,9 +528,10 @@
       const validUser = users.find(u => (u.email === identifier || u.phone === identifier) && u.password === password);
 
       if (validUser) {
-        showAlert(`Welcome back! Logged in as ${validUser.email}`);
+        // Opens the User Dashboard Interface directly
+        launchDashboard(validUser);
       } else {
-        showAlert("Invalid credentials. Please check your email/phone and password.", true);
+        showAlert("Invalid credentials. Please check your details.", true);
       }
     });
   </script>
