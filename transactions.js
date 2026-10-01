@@ -1,74 +1,190 @@
-window.app.loadTransactions = async function() {
-  const container = document.getElementById('transactionList');
-  if (!container) return;
-  container.innerHTML = "<p style='color:#64748b; font-size:14px;'>Loading transactions...</p>";
+// transactions.js - Existing file loaded by index.html
 
-  try {
-    const userId = window.app.currentUser.uid;
-    const depSnap = await db.collection("depositRequests").where("userId", "==", userId).get();
-    const wdSnap = await db.collection("withdrawalRequests").where("userId", "==", userId).get();
-
-    let records = [];
-
-    depSnap.forEach(doc => {
-      const d = doc.data();
-      records.push({
-        type: "Deposit",
-        amount: d.amount,
-        detail: d.mpesaCode ? `Code: ${d.mpesaCode}` : '',
-        status: d.status || 'pending',
-        date: d.createdAt ? d.createdAt.toDate() : new Date(0)
-      });
-    });
-
-    wdSnap.forEach(doc => {
-      const d = doc.data();
-      records.push({
-        type: "Withdrawal",
-        amount: d.amount,
-        detail: d.phone ? `Phone: ${d.phone}` : '',
-        status: d.status || 'pending',
-        date: d.createdAt ? d.createdAt.toDate() : new Date(0)
-      });
-    });
-
-    if (records.length === 0) {
-      container.innerHTML = "<p style='color:#64748b; font-size:14px;'>No transactions found.</p>";
-      return;
+(function () {
+  // Wait until app, db, and auth are available
+  const checkAppReady = setInterval(() => {
+    if (window.app && window.db && window.auth) {
+      clearInterval(checkAppReady);
+      setupEarningsSystem();
     }
+  }, 100);
 
-    records.sort((a, b) => b.date - a.date);
+  function setupEarningsSystem() {
+    // 1. INJECT THE DEDICATED EARNINGS VIEW INTO DOM
+    function injectEarningsView() {
+      const container = document.querySelector(".container");
+      if (!container || document.getElementById("earningsView")) return;
 
-    let html = "";
-    records.forEach(item => {
-      let color = "#f39c12";
-      let statusText = "⏳ PENDING";
-
-      if (item.status === "approved") {
-        color = "#27ae60";
-        statusText = "✅ APPROVED";
-      } else if (item.status === "rejected") {
-        color = "#e74c3c";
-        statusText = "❌ REJECTED";
-      }
-
-      html += `
-        <div style="background:#1e293b; border:1px solid #334155; padding:12px; border-radius:8px; margin-bottom:10px;">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <strong style="color:#ffffff;">${item.type === 'Deposit' ? '💵 Deposit' : '🏧 Withdrawal'}</strong>
-            <span style="color:${color}; font-weight:bold; font-size:0.8rem;">${statusText}</span>
+      const earningsView = document.createElement("div");
+      earningsView.id = "earningsView";
+      earningsView.className = "app-view hidden";
+      earningsView.innerHTML = `
+        <div class="dash-section">
+          <div class="dash-section-title">💰 My Daily Earnings</div>
+          <div style="background:#1e293b; color:#fff; padding:15px; border-radius:8px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:14px; color:#94a3b8;">Total Earnings Claimed:</span>
+            <strong id="totalEarningsDisplay" style="font-size:18px; color:#27ae60;">KES 0.00</strong>
           </div>
-          <div style="color:#f39c12; font-weight:bold; font-size:1.1rem; margin:4px 0;">KES ${item.amount.toLocaleString()}</div>
-          <div style="color:#94a3b8; font-size:0.8rem; display:flex; justify-content:space-between;">
-            <span>${item.detail}</span>
-            <span>${item.date.toLocaleDateString()}</span>
-          </div>
+          <div id="earningsPackageList">Loading investment return packages...</div>
         </div>
       `;
-    });
 
-    container.innerHTML = html;
-  } catch (err) {
-    container.innerHTML = "<p style='color:red;'>Error loading transactions.</p>";
+      container.appendChild(earningsView);
+    }
+
+    // 2. INJECT "MY EARNINGS" BUTTON IN NAV DRAWER BELOW TRANSACTION HISTORY
+    function injectMenuItem() {
+      const navDrawer = document.getElementById("navDrawer");
+      if (!navDrawer || document.getElementById("drawerEarningsBtn")) return;
+
+      const menuItems = navDrawer.querySelectorAll(".menu-item");
+      let txItem = null;
+      menuItems.forEach((item) => {
+        if (item.innerText.includes("Transaction History")) {
+          txItem = item;
+        }
+      });
+
+      const earningsBtn = document.createElement("div");
+      earningsBtn.id = "drawerEarningsBtn";
+      earningsBtn.className = "menu-item";
+      earningsBtn.innerHTML = "💰 My Earnings";
+      earningsBtn.onclick = function () {
+        app.switchView("earningsView");
+      };
+
+      if (txItem && txItem.nextSibling) {
+        navDrawer.insertBefore(earningsBtn, txItem.nextSibling);
+      } else {
+        navDrawer.appendChild(earningsBtn);
+      }
+    }
+
+    // Execute DOM injections
+    injectEarningsView();
+    injectMenuItem();
+
+    // 3. LOAD EARNINGS DATA & PACKAGES
+    window.app.loadEarnings = async function () {
+      if (!app.currentUser) return;
+
+      const totalDisplay = document.getElementById("totalEarningsDisplay");
+      if (totalDisplay) {
+        const total = app.userData ? app.userData.totalEarnings || 0 : 0;
+        totalDisplay.innerText = "KES " + total.toLocaleString();
+      }
+
+      const listContainer = document.getElementById("earningsPackageList");
+      if (!listContainer) return;
+
+      listContainer.innerHTML = "Loading earnings data...";
+
+      try {
+        const snapshot = await db
+          .collection("userInvestments")
+          .where("userId", "==", app.currentUser.uid)
+          .get();
+
+        if (snapshot.empty) {
+          listContainer.innerHTML =
+            "<p style='color:#64748b; font-size:14px;'>No active packages found. Rent a package to start claiming daily earnings.</p>";
+          return;
+        }
+
+        const todayStr = new Date().toISOString().split("T")[0];
+        let cardsHtml = "<div style='display:flex; flex-direction:column; gap:10px;'>";
+
+        snapshot.forEach((doc) => {
+          const item = doc.data();
+          const docId = doc.id;
+          const dailyRate = calculateDailyProfit(item.packageName, item.cost);
+          const alreadyClaimed = item.lastClaimedDate === todayStr;
+
+          cardsHtml += `
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <strong style="color:#1a2b4c;">${item.packageName}</strong><br>
+                <span style="font-size:12px; color:#64748b;">Daily Profit: KES ${dailyRate.toLocaleString()}</span>
+              </div>
+              <div>
+                ${
+                  alreadyClaimed
+                    ? `<button disabled style="background:#cbd5e1; color:#64748b; border:none; padding:6px 12px; border-radius:4px; font-size:12px; cursor:not-allowed;">Claimed Today</button>`
+                    : `<button onclick="app.claimDailyEarning('${docId}',${dailyRate})" style="background:#27ae60; color:#fff; border:none; padding:6px 12px; border-radius:4px; font-size:12px; font-weight:bold; cursor:pointer;">Claim KES ${dailyRate}</button>`
+                }
+              </div>
+            </div>
+          `;
+        });
+
+        cardsHtml += "</div>";
+        listContainer.innerHTML = cardsHtml;
+      } catch (err) {
+        listContainer.innerHTML =
+          "<p style='color:#e74c3c; font-size:13px;'>Error loading packages: " + err.message + "</p>";
+      }
+    };
+
+    // Hook loadEarnings into app.switchView
+    const originalSwitchView = window.app.switchView;
+    window.app.switchView = function (viewId) {
+      if (originalSwitchView) originalSwitchView(viewId);
+      if (viewId === "earningsView") {
+        app.loadEarnings();
+      }
+    };
+
+    // Ensure elements stay injected when UI updates
+    const originalUpdateUI = window.app.updateUI;
+    window.app.updateUI = function () {
+      if (originalUpdateUI) originalUpdateUI();
+      injectEarningsView();
+      injectMenuItem();
+    };
+
+    // 4. CLAIM DAILY EARNING FUNCTION
+    window.app.claimDailyEarning = async function (docId, rate) {
+      if (!app.currentUser) return;
+
+      const todayStr = new Date().toISOString().split("T")[0];
+
+      try {
+        await db.collection("userInvestments").doc(docId).update({
+          lastClaimedDate: todayStr,
+        });
+
+        const newBalance = (app.userData.balance || 0) + rate;
+        const newTotal = (app.userData.totalEarnings || 0) + rate;
+
+        await db.collection("users").doc(app.currentUser.uid).update({
+          balance: newBalance,
+          totalEarnings: newTotal,
+        });
+
+        await db.collection("transactions").add({
+          userId: app.currentUser.uid,
+          type: "Daily Earning Claim",
+          amount: rate,
+          createdAt: new Date(),
+        });
+
+        app.userData.balance = newBalance;
+        app.userData.totalEarnings = newTotal;
+        app.updateUI();
+        app.showAlert("Successfully claimed KES " + rate + "!");
+
+        app.loadEarnings();
+      } catch (err) {
+        app.showAlert("Failed to claim: " + err.message, true);
+      }
+    };
+
+    function calculateDailyProfit(packageName, cost) {
+      if (cost === 1000) return 150;
+      if (cost === 3000) return 500;
+      if (cost === 10000) return 1800;
+      return Math.round(cost * 0.15);
+    }
   }
-};
+})();
+        
