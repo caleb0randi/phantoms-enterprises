@@ -3,263 +3,227 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Access Portal | Phantoms Enterprises</title>
+  <title>Phantoms Enterprises | Welcome</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    .glass { background: rgba(15, 23, 42, 0.90); backdrop-filter: blur(16px); }
-    .gold-gradient { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+    body { background-color: #0d0d0d; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .gold-btn { background: linear-gradient(180deg, #f3d09a 0%, #d4a359 100%); color: #1c1305; }
+    .gold-btn-outline { border: 1px solid #d4a359; color: #f3d09a; }
+    .input-box { background: #1c1c1e; border: 1px solid #2c2c2e; color: #ffffff; }
+    .captcha-box { background: #e3b3cf; color: #4a1534; font-family: monospace; letter-spacing: 6px; }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen font-sans flex items-center justify-center p-4">
+<body class="min-h-screen text-slate-100 flex flex-col justify-between p-4 max-w-md mx-auto relative">
 
-  <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl glass my-auto">
-    
-    <div class="text-center mb-6">
-      <span class="text-4xl">⚡</span>
-      <h1 class="text-3xl font-black text-white tracking-wider mt-2">PHANTOMS</h1>
-      <p class="text-amber-400 text-xs font-bold uppercase tracking-widest mt-1">Enterprises Access Portal</p>
+  <!-- Floating Telegram Support Icon -->
+  <a href="https://t.me" target="_blank" class="fixed right-4 bottom-24 bg-sky-500 p-3 rounded-full shadow-lg z-50 hover:scale-110 transition">
+    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.56 8.16l-1.97 9.28c-.15.68-.55.84-1.12.52l-3.05-2.25-1.47 1.42c-.16.16-.3.3-.62.3l.22-3.09 5.63-5.09c.24-.22-.05-.34-.38-.13l-6.96 4.38-2.99-.94c-.65-.2-.66-.65.14-.97l11.7-4.51c.54-.2 1.02.13.87.88z"/></svg>
+  </a>
+
+  <!-- Header Branding matched to image -->
+  <div class="pt-6 pb-4 text-center">
+    <div class="flex items-center justify-center gap-2">
+      <div class="w-8 h-8 bg-red-600 rounded-sm"></div>
+      <h1 class="text-3xl font-black tracking-wider text-white">PHANTOMS</h1>
     </div>
-
-    <!-- Referral Banner -->
-    <div id="refBanner" class="hidden mb-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-center text-xs text-amber-400 font-semibold">
-      🎁 You were invited! Create an account below.
-    </div>
-
-    <!-- Navigation Tabs -->
-    <div class="flex mb-6 bg-slate-950 p-1.5 rounded-2xl border border-slate-800">
-      <button id="loginTabBtn" onclick="switchTab('login')" class="flex-1 py-2.5 text-xs font-bold rounded-xl bg-amber-500 text-slate-950 shadow-md">Sign In</button>
-      <button id="registerTabBtn" onclick="switchTab('register')" class="flex-1 py-2.5 text-xs font-bold rounded-xl text-slate-400">Register</button>
-      <button id="forgotTabBtn" onclick="switchTab('forgot')" class="flex-1 py-2.5 text-xs font-bold rounded-xl text-slate-400">Forgot PIN</button>
-    </div>
-
-    <!-- 1. Login Form -->
-    <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
-      <div>
-        <label class="block text-xs font-semibold text-slate-400 mb-1">Username / Email</label>
-        <input type="text" id="username" required placeholder="phantomsenterprises@gmail.com" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold text-slate-400 mb-1">Password</label>
-        <input type="password" id="password" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
-      </div>
-      <button type="submit" class="w-full gold-gradient text-slate-950 font-bold py-3.5 rounded-xl hover:opacity-90 transition text-xs shadow-lg">Sign In</button>
-    </form>
-
-    <!-- 2. Registration Form -->
-    <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-4 hidden">
-      <div>
-        <label class="block text-xs font-semibold text-slate-400 mb-1">Email Address</label>
-        <div class="flex gap-2">
-          <input type="email" id="regEmail" required placeholder="user@gmail.com" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
-          <button type="button" onclick="sendRegisterCode()" class="px-3 py-2 bg-slate-800 text-amber-400 text-xs font-bold rounded-xl hover:bg-slate-700 whitespace-nowrap">Send Code</button>
-        </div>
-      </div>
-      <div>
-        <label class="block text-xs font-semibold text-slate-400 mb-1">Verification Code</label>
-        <input type="text" id="regCode" required placeholder="6-digit email code" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold text-slate-400 mb-1">Create Password</label>
-        <input type="password" id="regPassword" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold text-slate-400 mb-1">Referral Code (Optional)</label>
-        <input type="text" id="regRefCode" placeholder="Inviter code" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-amber-400 focus:outline-none focus:border-amber-500">
-      </div>
-      <button type="submit" class="w-full gold-gradient text-slate-950 font-bold py-3.5 rounded-xl hover:opacity-90 transition text-xs shadow-lg">Verify & Create Account</button>
-    </form>
-
-    <!-- 3. Forgot Password Form -->
-    <form id="forgotForm" onsubmit="handleForgotPasswordReset(event)" class="space-y-4 hidden">
-      <div>
-        <label class="block text-xs font-semibold text-slate-400 mb-1">Registered Email Address</label>
-        <div class="flex gap-2">
-          <input type="email" id="forgotEmail" required placeholder="your-email@gmail.com" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
-          <button type="button" onclick="sendForgotCode()" class="px-3 py-2 bg-slate-800 text-amber-400 text-xs font-bold rounded-xl hover:bg-slate-700 whitespace-nowrap">Send Reset Code</button>
-        </div>
-      </div>
-      <div>
-        <label class="block text-xs font-semibold text-slate-400 mb-1">Reset Code</label>
-        <input type="text" id="forgotCode" required placeholder="6-digit code" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold text-slate-400 mb-1">New Password</label>
-        <input type="password" id="forgotNewPassword" required placeholder="Enter new password" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
-      </div>
-      <button type="submit" class="w-full bg-amber-500 text-slate-950 font-bold py-3.5 rounded-xl hover:bg-amber-400 transition text-xs shadow-lg">Reset Password</button>
-    </form>
-
-    <div id="statusMessage" class="mt-4 text-center text-xs font-semibold hidden"></div>
-
+    <p class="text-amber-400/80 text-xs font-semibold tracking-widest uppercase mt-1">ENTERPRISES</p>
   </div>
 
+  <!-- Form Switcher Tabs -->
+  <div class="flex bg-slate-900/90 p-1 rounded-xl mb-4 border border-slate-800 text-xs">
+    <button id="tabReg" onclick="switchForm('register')" class="flex-1 py-2 font-bold rounded-lg gold-btn">Register</button>
+    <button id="tabLog" onclick="switchForm('login')" class="flex-1 py-2 font-bold text-slate-400">Sign In</button>
+  </div>
+
+  <!-- Registration Form matching Prototype Image -->
+  <form id="regForm" onsubmit="handleRegistration(event)" class="space-y-3">
+    <!-- Phone Field with +254 prefix -->
+    <div class="flex items-center input-box rounded-full px-4 py-3">
+      <span class="mr-2 text-slate-400 text-sm">📱</span>
+      <span class="text-slate-300 text-xs font-bold mr-2">+254</span>
+      <input type="tel" id="regPhone" required placeholder="Enter phone number" class="bg-transparent border-none outline-none w-full text-xs text-white">
+    </div>
+
+    <!-- Password -->
+    <div class="flex items-center input-box rounded-full px-4 py-3">
+      <span class="mr-2 text-slate-400 text-sm">🔒</span>
+      <input type="password" id="regPassword" required placeholder="Please input a password" class="bg-transparent border-none outline-none w-full text-xs text-white">
+    </div>
+
+    <!-- Confirm Password -->
+    <div class="flex items-center input-box rounded-full px-4 py-3">
+      <span class="mr-2 text-slate-400 text-sm">🔒</span>
+      <input type="password" id="regConfirmPassword" required placeholder="Please enter your login password again" class="bg-transparent border-none outline-none w-full text-xs text-white">
+    </div>
+
+    <!-- Invite Code -->
+    <div class="flex items-center input-box rounded-full px-4 py-3">
+      <span class="mr-2 text-slate-400 text-sm">✉️️</span>
+      <input type="text" id="regInviteCode" placeholder="Invite code (optional)" class="bg-transparent border-none outline-none w-full text-xs text-white">
+    </div>
+
+    <!-- Visual Captcha Field -->
+    <div class="flex items-center justify-between gap-2">
+      <div class="flex items-center input-box rounded-full px-4 py-3 flex-1">
+        <span class="mr-2 text-slate-400 text-sm">🛡️</span>
+        <input type="text" id="regCaptcha" required placeholder="Please enter the verification code" class="bg-transparent border-none outline-none w-full text-xs text-white">
+      </div>
+      <div id="captchaDisplay" onclick="generateCaptcha()" class="captcha-box px-4 py-2.5 rounded-full font-bold text-base cursor-pointer select-none">
+        7006
+      </div>
+    </div>
+
+    <!-- Submit Register -->
+    <button type="submit" class="w-full gold-btn font-bold py-3.5 rounded-full text-sm shadow-md hover:brightness-105 transition mt-2">
+      Register
+    </button>
+  </form>
+
+  <!-- Login Form -->
+  <form id="logForm" onsubmit="handleLogin(event)" class="space-y-3 hidden">
+    <div class="flex items-center input-box rounded-full px-4 py-3">
+      <span class="mr-2 text-slate-400 text-sm">📱</span>
+      <input type="text" id="logUsername" required placeholder="Phone number or email" class="bg-transparent border-none outline-none w-full text-xs text-white">
+    </div>
+    <div class="flex items-center input-box rounded-full px-4 py-3">
+      <span class="mr-2 text-slate-400 text-sm">🔒</span>
+      <input type="password" id="logPassword" required placeholder="Password" class="bg-transparent border-none outline-none w-full text-xs text-white">
+    </div>
+    <button type="submit" class="w-full gold-btn font-bold py-3.5 rounded-full text-sm shadow-md hover:brightness-105 transition mt-2">
+      Sign In
+    </button>
+  </form>
+
+  <!-- Toggle Link Button matching Prototype -->
+  <div class="mt-3">
+    <button id="toggleBtn" onclick="switchForm('login')" class="w-full gold-btn-outline font-semibold py-3 rounded-full text-xs bg-slate-950/60">
+      Already have an account, log in now
+    </button>
+  </div>
+
+  <!-- Resource Action Buttons matching Prototype -->
+  <div class="space-y-2 mt-4">
+    <button onclick="alert('Company Recruitment details: Contact admin via Telegram support.')" class="w-full py-3 rounded-full bg-amber-200/90 text-slate-950 text-xs font-bold shadow">
+      Company Recruitment
+    </button>
+    <button onclick="alert('Android application coming soon to Google Play Store.')" class="w-full py-3 rounded-full bg-emerald-400/90 text-slate-950 text-xs font-bold shadow">
+      Android applications
+    </button>
+  </div>
+
+  <div id="statusMsg" class="mt-3 text-center text-xs font-bold text-amber-400 hidden"></div>
+
   <script>
+    let generatedCode = "7006";
+
     document.addEventListener('DOMContentLoaded', () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const refCode = urlParams.get('ref');
-      if (refCode) {
-        document.getElementById('regRefCode').value = refCode;
-        document.getElementById('refBanner').classList.remove('hidden');
-        switchTab('register');
+      // Direct access check: If already logged in, redirect straight to dashboard
+      if (localStorage.getItem('userEmail') || localStorage.getItem('userRole')) {
+        window.location.href = '/dashboard';
+        return;
       }
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const ref = urlParams.get('ref') || urlParams.get('inviteCode');
+      if (ref) {
+        document.getElementById('regInviteCode').value = ref;
+      }
+      generateCaptcha();
     });
 
-    function switchTab(tab) {
-      const loginForm = document.getElementById('loginForm');
-      const registerForm = document.getElementById('registerForm');
-      const forgotForm = document.getElementById('forgotForm');
-      
-      const loginBtn = document.getElementById('loginTabBtn');
-      const regBtn = document.getElementById('registerTabBtn');
-      const forgotBtn = document.getElementById('forgotTabBtn');
+    function generateCaptcha() {
+      generatedCode = Math.floor(1000 + Math.random() * 9000).toString();
+      document.getElementById('captchaDisplay').innerText = generatedCode;
+    }
 
-      loginForm.classList.add('hidden');
-      registerForm.classList.add('hidden');
-      forgotForm.classList.add('hidden');
+    function switchForm(mode) {
+      const regForm = document.getElementById('regForm');
+      const logForm = document.getElementById('logForm');
+      const tabReg = document.getElementById('tabReg');
+      const tabLog = document.getElementById('tabLog');
+      const toggleBtn = document.getElementById('toggleBtn');
 
-      loginBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl text-slate-400";
-      regBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl text-slate-400";
-      forgotBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl text-slate-400";
+      if (mode === 'register') {
+        regForm.classList.remove('hidden');
+        logForm.classList.add('hidden');
+        tabReg.className = "flex-1 py-2 font-bold rounded-lg gold-btn";
+        tabLog.className = "flex-1 py-2 font-bold text-slate-400";
+        toggleBtn.innerText = "Already have an account, log in now";
+        toggleBtn.onclick = () => switchForm('login');
+      } else {
+        regForm.classList.add('hidden');
+        logForm.classList.remove('hidden');
+        tabLog.className = "flex-1 py-2 font-bold rounded-lg gold-btn";
+        tabReg.className = "flex-1 py-2 font-bold text-slate-400";
+        toggleBtn.innerText = "Need an account? Register now";
+        toggleBtn.onclick = () => switchForm('register');
+      }
+    }
 
-      if (tab === 'login') {
-        loginForm.classList.remove('hidden');
-        loginBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl bg-amber-500 text-slate-950 shadow-md";
-      } else if (tab === 'register') {
-        registerForm.classList.remove('hidden');
-        regBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl bg-amber-500 text-slate-950 shadow-md";
-      } else if (tab === 'forgot') {
-        forgotForm.classList.remove('hidden');
-        forgotBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl bg-amber-500 text-slate-950 shadow-md";
+    async function handleRegistration(e) {
+      e.preventDefault();
+      const phone = document.getElementById('regPhone').value;
+      const password = document.getElementById('regPassword').value;
+      const confirmPassword = document.getElementById('regConfirmPassword').value;
+      const inviteCode = document.getElementById('regInviteCode').value;
+      const captcha = document.getElementById('regCaptcha').value;
+      const status = document.getElementById('statusMsg');
+
+      if (captcha !== generatedCode) {
+        status.innerText = "Verification captcha incorrect. Click code to refresh.";
+        status.classList.remove('hidden');
+        return;
+      }
+
+      const res = await fetch('/api/register/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, password, confirmPassword, inviteCode, captcha })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        status.className = "mt-3 text-center text-xs font-bold text-emerald-400";
+        status.innerText = "Registration successful! Please sign in.";
+        status.classList.remove('hidden');
+        setTimeout(() => switchForm('login'), 1000);
+      } else {
+        status.className = "mt-3 text-center text-xs font-bold text-red-400";
+        status.innerText = data.message;
+        status.classList.remove('hidden');
       }
     }
 
     async function handleLogin(e) {
       e.preventDefault();
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-      const status = document.getElementById('statusMessage');
+      const username = document.getElementById('logUsername').value;
+      const password = document.getElementById('logPassword').value;
+      const status = document.getElementById('statusMsg');
 
-      status.className = "mt-4 text-center text-xs font-semibold text-blue-400";
-      status.innerText = "Authenticating...";
-      status.classList.remove('hidden');
-
-      try {
-        const res = await fetch('/api/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
-        });
-        const data = await res.json();
-
-        if (data.success) {
-          localStorage.setItem('userRole', data.user.role);
-          localStorage.setItem('userEmail', data.user.email);
-          localStorage.setItem('username', data.user.username);
-          if (data.user.referralCode) localStorage.setItem('referralCode', data.user.referralCode);
-          
-          status.className = "mt-4 text-center text-xs font-semibold text-emerald-400";
-          status.innerText = "Login successful! Redirecting...";
-          setTimeout(() => window.location.href = '/', 600);
-        } else {
-          status.className = "mt-4 text-center text-xs font-semibold text-red-400";
-          status.innerText = data.message || "Invalid credentials.";
-        }
-      } catch (err) {
-        status.className = "mt-4 text-center text-xs font-semibold text-red-400";
-        status.innerText = "Server error. Please try again.";
-      }
-    }
-
-    async function sendRegisterCode() {
-      const email = document.getElementById('regEmail').value;
-      const status = document.getElementById('statusMessage');
-      if (!email) return alert('Enter email address first');
-
-      status.className = "mt-4 text-center text-xs font-semibold text-blue-400";
-      status.innerText = "Sending code via Brevo...";
-      status.classList.remove('hidden');
-
-      const res = await fetch('/api/register/send-code', {
+      const res = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ username, password })
       });
+
       const data = await res.json();
-      status.className = "mt-4 text-center text-xs font-semibold text-emerald-400";
-      status.innerText = data.message;
-    }
-
-    async function handleRegister(e) {
-      e.preventDefault();
-      const email = document.getElementById('regEmail').value;
-      const code = document.getElementById('regCode').value;
-      const password = document.getElementById('regPassword').value;
-      const referredBy = document.getElementById('regRefCode').value;
-      const status = document.getElementById('statusMessage');
-
-      const res = await fetch('/api/register/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code, password, referredBy })
-      });
-      const data = await res.json();
-
       if (data.success) {
-        status.className = "mt-4 text-center text-xs font-semibold text-emerald-400";
-        status.innerText = "Account created! Redirecting to sign in...";
-        setTimeout(() => switchTab('login'), 1200);
+        localStorage.setItem('userRole', data.user.role);
+        localStorage.setItem('userEmail', data.user.email);
+        localStorage.setItem('username', data.user.username);
+        if (data.user.referralCode) localStorage.setItem('referralCode', data.user.referralCode);
+
+        status.className = "mt-3 text-center text-xs font-bold text-emerald-400";
+        status.innerText = "Login successful! Loading dashboard...";
+        status.classList.remove('hidden');
+        setTimeout(() => window.location.href = '/dashboard', 600);
       } else {
-        status.className = "mt-4 text-center text-xs font-semibold text-red-400";
+        status.className = "mt-3 text-center text-xs font-bold text-red-400";
         status.innerText = data.message;
-      }
-    }
-
-    async function sendForgotCode() {
-      const email = document.getElementById('forgotEmail').value;
-      const status = document.getElementById('statusMessage');
-      if (!email) return alert('Enter registered email address');
-
-      status.className = "mt-4 text-center text-xs font-semibold text-blue-400";
-      status.innerText = "Sending reset code...";
-      status.classList.remove('hidden');
-
-      const res = await fetch('/api/forgot-password/send-code', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-      const data = await res.json();
-
-      status.className = data.success ? "mt-4 text-center text-xs font-semibold text-emerald-400" : "mt-4 text-center text-xs font-semibold text-red-400";
-      status.innerText = data.message;
-    }
-
-    async function handleForgotPasswordReset(e) {
-      e.preventDefault();
-      const email = document.getElementById('forgotEmail').value;
-      const code = document.getElementById('forgotCode').value;
-      const newPassword = document.getElementById('forgotNewPassword').value;
-      const status = document.getElementById('statusMessage');
-
-      const res = await fetch('/api/forgot-password/reset', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code, newPassword })
-      });
-      const data = await res.json();
-
-      if (data.success) {
-        status.className = "mt-4 text-center text-xs font-semibold text-emerald-400";
-        status.innerText = "Password reset! You can now log in.";
-        setTimeout(() => switchTab('login'), 1200);
-      } else {
-        status.className = "mt-4 text-center text-xs font-semibold text-red-400";
-        status.innerText = data.message;
+        status.classList.remove('hidden');
       }
     }
   </script>
 
 </body>
 </html>
-
-  
