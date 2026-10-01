@@ -12,13 +12,17 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans flex items-center justify-center p-4">
 
-  <!-- Centered Portal Box -->
   <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl glass my-auto">
     
-    <div class="text-center mb-8">
+    <div class="text-center mb-6">
       <span class="text-4xl">⚡</span>
       <h1 class="text-3xl font-black text-white tracking-wider mt-2">PHANTOMS</h1>
       <p class="text-amber-400 text-xs font-bold uppercase tracking-widest mt-1">Enterprises Access Portal</p>
+    </div>
+
+    <!-- Referral Banner -->
+    <div id="refBanner" class="hidden mb-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-center text-xs text-amber-400 font-semibold">
+      🎁 You were invited! Create an account below.
     </div>
 
     <!-- Navigation Tabs -->
@@ -32,7 +36,7 @@
     <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
       <div>
         <label class="block text-xs font-semibold text-slate-400 mb-1">Username / Email</label>
-        <input type="text" id="username" required placeholder="e.g. phantomsenterprises@gmail.com" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
+        <input type="text" id="username" required placeholder="phantomsenterprises@gmail.com" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
       </div>
       <div>
         <label class="block text-xs font-semibold text-slate-400 mb-1">Password</label>
@@ -57,6 +61,10 @@
       <div>
         <label class="block text-xs font-semibold text-slate-400 mb-1">Create Password</label>
         <input type="password" id="regPassword" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-400 mb-1">Referral Code (Optional)</label>
+        <input type="text" id="regRefCode" placeholder="Inviter code" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-amber-400 focus:outline-none focus:border-amber-500">
       </div>
       <button type="submit" class="w-full gold-gradient text-slate-950 font-bold py-3.5 rounded-xl hover:opacity-90 transition text-xs shadow-lg">Verify & Create Account</button>
     </form>
@@ -86,6 +94,16 @@
   </div>
 
   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const refCode = urlParams.get('ref');
+      if (refCode) {
+        document.getElementById('regRefCode').value = refCode;
+        document.getElementById('refBanner').classList.remove('hidden');
+        switchTab('register');
+      }
+    });
+
     function switchTab(tab) {
       const loginForm = document.getElementById('loginForm');
       const registerForm = document.getElementById('registerForm');
@@ -122,7 +140,7 @@
       const status = document.getElementById('statusMessage');
 
       status.className = "mt-4 text-center text-xs font-semibold text-blue-400";
-      status.innerText = "Authenticating credentials...";
+      status.innerText = "Authenticating...";
       status.classList.remove('hidden');
 
       try {
@@ -137,8 +155,10 @@
           localStorage.setItem('userRole', data.user.role);
           localStorage.setItem('userEmail', data.user.email);
           localStorage.setItem('username', data.user.username);
+          if (data.user.referralCode) localStorage.setItem('referralCode', data.user.referralCode);
+          
           status.className = "mt-4 text-center text-xs font-semibold text-emerald-400";
-          status.innerText = `Login successful as ${data.user.role}! Redirecting...`;
+          status.innerText = "Login successful! Redirecting...";
           setTimeout(() => window.location.href = '/', 600);
         } else {
           status.className = "mt-4 text-center text-xs font-semibold text-red-400";
@@ -153,7 +173,7 @@
     async function sendRegisterCode() {
       const email = document.getElementById('regEmail').value;
       const status = document.getElementById('statusMessage');
-      if (!email) return alert('Enter email first');
+      if (!email) return alert('Enter email address first');
 
       status.className = "mt-4 text-center text-xs font-semibold text-blue-400";
       status.innerText = "Sending code via Brevo...";
@@ -174,18 +194,19 @@
       const email = document.getElementById('regEmail').value;
       const code = document.getElementById('regCode').value;
       const password = document.getElementById('regPassword').value;
+      const referredBy = document.getElementById('regRefCode').value;
       const status = document.getElementById('statusMessage');
 
       const res = await fetch('/api/register/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code, password })
+        body: JSON.stringify({ email, code, password, referredBy })
       });
       const data = await res.json();
 
       if (data.success) {
         status.className = "mt-4 text-center text-xs font-semibold text-emerald-400";
-        status.innerText = "Account created! Redirecting to login...";
+        status.innerText = "Account created! Redirecting to sign in...";
         setTimeout(() => switchTab('login'), 1200);
       } else {
         status.className = "mt-4 text-center text-xs font-semibold text-red-400";
@@ -196,7 +217,7 @@
     async function sendForgotCode() {
       const email = document.getElementById('forgotEmail').value;
       const status = document.getElementById('statusMessage');
-      if (!email) return alert('Enter registered email first');
+      if (!email) return alert('Enter registered email address');
 
       status.className = "mt-4 text-center text-xs font-semibold text-blue-400";
       status.innerText = "Sending reset code...";
@@ -209,13 +230,8 @@
       });
       const data = await res.json();
 
-      if (data.success) {
-        status.className = "mt-4 text-center text-xs font-semibold text-emerald-400";
-        status.innerText = data.message;
-      } else {
-        status.className = "mt-4 text-center text-xs font-semibold text-red-400";
-        status.innerText = data.message;
-      }
+      status.className = data.success ? "mt-4 text-center text-xs font-semibold text-emerald-400" : "mt-4 text-center text-xs font-semibold text-red-400";
+      status.innerText = data.message;
     }
 
     async function handleForgotPasswordReset(e) {
@@ -234,7 +250,7 @@
 
       if (data.success) {
         status.className = "mt-4 text-center text-xs font-semibold text-emerald-400";
-        status.innerText = "Password reset successfully! Redirecting to login...";
+        status.innerText = "Password reset! You can now log in.";
         setTimeout(() => switchTab('login'), 1200);
       } else {
         status.className = "mt-4 text-center text-xs font-semibold text-red-400";
@@ -244,5 +260,6 @@
   </script>
 
 </body>
-  </html>
+</html>
+
   
