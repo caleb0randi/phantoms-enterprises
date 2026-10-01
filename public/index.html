@@ -137,7 +137,7 @@
       outline: none;
     }
 
-    .phone-wrap, .code-wrap {
+    .phone-wrap {
       display: flex;
       gap: 8px;
     }
@@ -148,17 +148,6 @@
       border-radius: 8px;
       background: #f8fafc;
       font-weight: 600;
-    }
-
-    .send-code-btn {
-      padding: 0 16px;
-      background-color: #e67e22;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      white-space: nowrap;
     }
 
     .submit-btn {
@@ -308,13 +297,6 @@
               <label>Email Address</label>
               <input type="email" id="regEmail" class="input-box" placeholder="Enter your email" required>
             </div>
-            <div class="field-group">
-              <label>Verification Code</label>
-              <div class="code-wrap">
-                <input type="text" id="regCode" class="input-box" placeholder="Enter code from email" required>
-                <button type="button" class="send-code-btn" onclick="sendBrevoEmailCode()">Send Code</button>
-              </div>
-            </div>
           </div>
 
           <div class="form-section">
@@ -381,12 +363,12 @@
           <div class="plan-card">
             <h4>Starter Plan</h4>
             <p>10% Daily Returns / 5 Days</p>
-            <button class="send-code-btn" style="width: 100%;" onclick="alert('Starter Plan selected')">Invest Now</button>
+            <button class="submit-btn" style="width: 100%;" onclick="alert('Starter Plan selected')">Invest Now</button>
           </div>
           <div class="plan-card">
             <h4>Pro Plan</h4>
             <p>25% Daily Returns / 10 Days</p>
-            <button class="send-code-btn" style="width: 100%;" onclick="alert('Pro Plan selected')">Invest Now</button>
+            <button class="submit-btn" style="width: 100%;" onclick="alert('Pro Plan selected')">Invest Now</button>
           </div>
         </div>
       </div>
@@ -404,15 +386,6 @@
   </div>
 
   <script>
-    // ==========================================
-    // BREVO API CONFIGURATION
-    // ==========================================
-    const BREVO_API_KEY = "xkeysib-24b7c3746631ee627a987c9a7881e2204be761b0358e8534dae55d7";
-    const SENDER_EMAIL = "Phantomsenterprices@gmail.com";
-    const SENDER_NAME = "Phantoms Enterprises";
-
-    let activeVerificationCode = "";
-
     function showAlert(msg, isError = false) {
       const alertBox = document.getElementById('statusAlert');
       alertBox.className = isError ? "status-alert error" : "status-alert success";
@@ -435,56 +408,6 @@
       }
     }
 
-    // Direct Brevo Email Transmission
-    async function sendBrevoEmailCode() {
-      const email = document.getElementById('regEmail').value;
-      if (!email) {
-        showAlert("Please enter an email address first.", true);
-        return;
-      }
-
-      activeVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-      showAlert("Sending verification code to your email...");
-
-      const payload = {
-        sender: { name: SENDER_NAME, email: SENDER_EMAIL },
-        to: [{ email: email }],
-        subject: "Phantoms Enterprises - Verification Code",
-        htmlContent: `
-          <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
-            <h2>Phantoms Enterprises Verification</h2>
-            <p>Your 6-digit account verification code is:</p>
-            <h1 style="color: #e67e22; letter-spacing: 2px;">${activeVerificationCode}</h1>
-            <p>If you did not request this code, please ignore this email.</p>
-          </div>
-        `
-      };
-
-      try {
-        const response = await fetch("https://api.brevo.com/v3/smtp/email", {
-          method: "POST",
-          headers: {
-            "accept": "application/json",
-            "api-key": BREVO_API_KEY,
-            "content-type": "application/json"
-          },
-          body: JSON.stringify(payload)
-        });
-
-        const data = await response.json();
-
-        if (response.ok && data.messageId) {
-          showAlert(`Verification code sent to ${email}. Please check your inbox.`);
-        } else {
-          console.error("Brevo API Response Error:", data);
-          showAlert(`Brevo Error: ${data.message || 'Key not found or unverified sender.'}`, true);
-        }
-      } catch (err) {
-        console.error("Network Error:", err);
-        showAlert("Connection failed. Check network or console.", true);
-      }
-    }
-
     // Launch User Dashboard UI
     function launchDashboard(user) {
       document.getElementById('authView').classList.add('hidden');
@@ -503,13 +426,12 @@
       showAlert("Signed out successfully.");
     }
 
-    // Registration Handler
+    // Direct Registration Handler (No email verification required)
     document.getElementById('registerForm').addEventListener('submit', function(e) {
       e.preventDefault();
 
       const phone = document.getElementById('regPhone').value;
       const email = document.getElementById('regEmail').value;
-      const code = document.getElementById('regCode').value;
       const password = document.getElementById('regPassword').value;
       const confirmPassword = document.getElementById('regConfirmPassword').value;
 
@@ -518,17 +440,12 @@
         return;
       }
 
-      if (activeVerificationCode && code !== activeVerificationCode) {
-        showAlert("Invalid verification code. Please enter the code received in your email.", true);
-        return;
-      }
-
       const user = { phone, email, password };
       const users = JSON.parse(localStorage.getItem('phantoms_users') || '[]');
       users.push(user);
       localStorage.setItem('phantoms_users', JSON.stringify(users));
 
-      // Direct entry into dashboard interface upon registration
+      // Direct entry into dashboard
       launchDashboard(user);
     });
 
