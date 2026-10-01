@@ -4,74 +4,31 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Phantoms Enterprises</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
-    body { background-color: #f4f6f9; color: #2c3e50; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-    
-    .container { width: 100%; max-width: 850px; background: #ffffff; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); padding: 25px; margin-top: 10px; }
 
-    .brand-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f3f6; }
-    .brand-logo-wrap { display: flex; align-items: center; gap: 12px; }
-    .logo-icon { width: 40px; height: 40px; }
-    .brand-title { font-size: 22px; font-weight: 800; color: #1a2b4c; }
-    .brand-title span { color: #e67e22; }
+  <!-- External Stylesheet Link -->
+  <link rel="stylesheet" href="styles.css">
 
-    .tab-switcher { display: flex; background-color: #eef2f5; border-radius: 8px; padding: 4px; margin-bottom: 20px; }
-    .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; color: #7f8c8d; font-weight: 700; border-radius: 6px; cursor: pointer; font-size: 15px; }
-    .tab-btn.active { background-color: #ffffff; color: #1a2b4c; box-shadow: 0 2px 5px rgba(0,0,0,0.08); }
-
-    .field-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; }
-    .field-group label { font-size: 13px; font-weight: 600; color: #34495e; }
-    .input-box, select { width: 100%; padding: 12px; border: 1px solid #dcdfe6; border-radius: 8px; font-size: 14px; outline: none; }
-
-    .action-btn { width: 100%; padding: 14px; background-color: #3498db; color: #ffffff; border: none; border-radius: 8px; font-weight: 700; font-size: 15px; cursor: pointer; margin-top: 10px; }
-    .action-btn:hover { background-color: #2980b9; }
-
-    .status-alert { padding: 12px; border-radius: 8px; font-size: 14px; display: none; margin-bottom: 20px; }
-    .status-alert.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    .status-alert.error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-
-    /* Dashboard UI */
-    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-    .stat-card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 18px; border-radius: 10px; }
-    .stat-title { font-size: 12px; color: #64748b; font-weight: 700; text-transform: uppercase; }
-    .stat-value { font-size: 22px; font-weight: 800; color: #0f172a; margin-top: 5px; }
-
-    .action-row { display: flex; gap: 12px; margin-bottom: 25px; }
-    .btn-action { flex: 1; padding: 14px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; text-align: center; font-size: 15px; }
-    .btn-deposit { background-color: #27ae60; color: white; }
-    .btn-withdraw { background-color: #e74c3c; color: white; }
-
-    .dash-section { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; margin-bottom: 20px; }
-    .dash-section-title { font-size: 16px; font-weight: 700; margin-bottom: 15px; color: #1e293b; }
-
-    .rental-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
-    .rental-card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; background: #fafbfc; }
-    .rental-card h4 { color: #1a2b4c; font-size: 16px; margin-bottom: 6px; }
-    .rental-price { font-size: 18px; font-weight: 800; color: #27ae60; margin-bottom: 8px; }
-    .rental-detail { font-size: 13px; color: #64748b; margin-bottom: 4px; }
-    
-    .rent-btn { width: 100%; margin-top: 12px; padding: 10px; background-color: #e67e22; color: white; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; }
-    .logout-btn { background: #94a3b8; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; }
-
-    /* Modal Styling */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-    .modal-card { background: white; padding: 25px; border-radius: 12px; width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 12px; }
-    .modal-title { font-size: 18px; font-weight: 700; color: #0f172a; }
-    .modal-actions { display: flex; gap: 10px; margin-top: 10px; }
-
-    .btn-cancel { background: #cbd5e1; color: #334155; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; flex: 1; }
-    .routing-info { background-color: #eef2f5; padding: 8px 12px; border-radius: 6px; font-size: 12px; color: #475569; }
-
-    .hidden { display: none !important; }
-  </style>
-
-  <!-- Official Firebase Web Libraries -->
+  <!-- Firebase Web Libraries -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
+
+  <!-- Drawer Menu Overlay -->
+  <div id="navDrawer" class="nav-drawer">
+    <div class="nav-header">
+      <span style="font-size: 16px; font-weight: bold;">Navigation</span>
+      <button class="nav-close" onclick="app.toggleMenu()">✕</button>
+    </div>
+    <div class="menu-item" onclick="app.switchView('dashboardView')">📊 Dashboard</div>
+    <div class="menu-item" onclick="app.switchView('profileView')">👤 Profile</div>
+    <div class="menu-item" onclick="app.switchView('depositView')">💵 Deposit Funds</div>
+    <div class="menu-item" onclick="app.switchView('withdrawView')">🏧 Withdraw Funds</div>
+    <div class="menu-item" onclick="app.switchView('investmentsView')">💼 Available Investments</div>
+    <div class="menu-item" onclick="app.switchView('myInvestmentsView')">⭐ My Investments</div>
+    <div class="menu-item" style="margin-top: auto; background: #c0392b;" onclick="app.signOut()">🚪 Sign Out</div>
+  </div>
 
   <div class="container">
     <div class="brand-header">
@@ -83,12 +40,12 @@
         </svg>
         <h1 class="brand-title">PHANTOMS <span>ENTERPRISES</span></h1>
       </div>
-      <button id="logoutBtn" class="logout-btn hidden" onclick="app.signOut()">Sign Out</button>
+      <button id="menuBtn" class="menu-trigger hidden" onclick="app.toggleMenu()">☰</button>
     </div>
 
     <div id="statusAlert" class="status-alert"></div>
 
-    <!-- AUTHENTICATION FORM -->
+    <!-- AUTHENTICATION VIEW -->
     <div id="authView">
       <div class="tab-switcher">
         <button type="button" class="tab-btn active" id="tabRegisterBtn" onclick="app.showTab('register')">Register</button>
@@ -117,7 +74,7 @@
       </div>
 
       <!-- Sign In Box -->
-      <div id="loginBox" class="hidden">
+      <div id="loginBox" class="hidden" style="display: none;">
         <div class="field-group">
           <label>Email Address</label>
           <input type="email" id="loginEmail" class="input-box" placeholder="Enter email address">
@@ -130,8 +87,10 @@
       </div>
     </div>
 
-    <!-- DASHBOARD VIEW -->
-    <div id="dashboardView" class="hidden">
+    <!-- APPLICATION VIEWS -->
+    
+    <!-- 1. DASHBOARD VIEW -->
+    <div id="dashboardView" class="app-view hidden">
       <div class="dashboard-grid">
         <div class="stat-card">
           <div class="stat-title">Total Balance</div>
@@ -141,89 +100,103 @@
           <div class="stat-title">Active Investments</div>
           <div class="stat-value" id="userInvestments">KES 0.00</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-title">Account Email</div>
-          <div class="stat-value" id="userDisplayEmail" style="font-size: 15px;">-</div>
-        </div>
-      </div>
-
-      <div class="action-row">
-        <button type="button" class="btn-action btn-deposit" onclick="app.openDepositModal()">Deposit Funds</button>
-        <button type="button" class="btn-action btn-withdraw" onclick="app.openWithdrawModal()">Withdraw Funds</button>
       </div>
 
       <div class="dash-section">
-        <div class="dash-section-title">Available Rental Investment Plans</div>
+        <div class="dash-section-title">Quick Actions</div>
+        <div style="display: flex; gap: 10px;">
+          <button class="action-btn" style="background:#27ae60;" onclick="app.switchView('depositView')">Deposit Funds</button>
+          <button class="action-btn" style="background:#e74c3c;" onclick="app.switchView('withdrawView')">Withdraw Funds</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. PROFILE VIEW -->
+    <div id="profileView" class="app-view hidden">
+      <div class="dash-section">
+        <div class="dash-section-title">User Profile Details</div>
+        <div class="field-group"><label>Email Address:</label><strong id="profileEmail">-</strong></div>
+        <div class="field-group"><label>Phone Number:</label><strong id="profilePhone">-</strong></div>
+        <div class="field-group"><label>Account Status:</label><span style="color:#27ae60; font-weight:bold;">Active</span></div>
+      </div>
+    </div>
+
+    <!-- 3. DEPOSIT VIEW -->
+    <div id="depositView" class="app-view hidden">
+      <div class="dash-section">
+        <div class="dash-section-title">Deposit Funds via M-Pesa</div>
+        <div class="pay-instruction">
+          <strong>Step 1:</strong> Send money directly to phone/till: <strong>0111414027</strong><br>
+          <strong>Step 2:</strong> Enter the M-Pesa confirmation transaction code (e.g., <em>QK1234567</em>) below.
+        </div>
+        <div class="field-group">
+          <label>M-Pesa Transaction Code</label>
+          <input type="text" id="depMpesaCode" class="input-box" placeholder="e.g. SJK1234567">
+        </div>
+        <div class="field-group">
+          <label>Deposit Amount (KES)</label>
+          <input type="number" id="depAmount" class="input-box" placeholder="Enter amount sent">
+        </div>
+        <button type="button" class="action-btn" style="background:#27ae60;" onclick="app.submitDepositRequest()">Submit Payment Code</button>
+      </div>
+    </div>
+
+    <!-- 4. WITHDRAW VIEW -->
+    <div id="withdrawView" class="app-view hidden">
+      <div class="dash-section">
+        <div class="dash-section-title">Withdraw Funds</div>
+        <div class="field-group">
+          <label>M-Pesa Phone Number</label>
+          <input type="text" id="wdPhone" class="input-box" placeholder="07XXXXXXXX">
+        </div>
+        <div class="field-group">
+          <label>Amount to Withdraw (KES)</label>
+          <input type="number" id="wdAmount" class="input-box" placeholder="Enter amount">
+        </div>
+        <button type="button" class="action-btn" style="background:#e74c3c;" onclick="app.processWithdrawal()">Submit Withdrawal Request</button>
+      </div>
+    </div>
+
+    <!-- 5. AVAILABLE INVESTMENTS -->
+    <div id="investmentsView" class="app-view hidden">
+      <div class="dash-section">
+        <div class="dash-section-title">Available Rental Investment Packages</div>
         <div class="rental-grid">
           <div class="rental-card">
             <h4>Phantom Rig Alpha</h4>
             <div class="rental-price">KES 1,000</div>
-            <div class="rental-detail">Daily Income: <strong>KES 150 / day</strong></div>
-            <button type="button" class="rent-btn" onclick="app.rentPlan('Phantom Rig Alpha', 1000)">Rent Plan</button>
+            <div class="rental-detail">Daily Profit: <strong>KES 150 / day</strong></div>
+            <button type="button" class="rent-btn" onclick="app.rentPlan('Phantom Rig Alpha', 1000)">Rent Package</button>
           </div>
           <div class="rental-card">
             <h4>Phantom Rig Pro</h4>
             <div class="rental-price">KES 3,000</div>
-            <div class="rental-detail">Daily Income: <strong>KES 500 / day</strong></div>
-            <button type="button" class="rent-btn" onclick="app.rentPlan('Phantom Rig Pro', 3000)">Rent Plan</button>
+            <div class="rental-detail">Daily Profit: <strong>KES 500 / day</strong></div>
+            <button type="button" class="rent-btn" onclick="app.rentPlan('Phantom Rig Pro', 3000)">Rent Package</button>
           </div>
           <div class="rental-card">
             <h4>Phantom Enterprise Stack</h4>
             <div class="rental-price">KES 10,000</div>
-            <div class="rental-detail">Daily Income: <strong>KES 1,800 / day</strong></div>
-            <button type="button" class="rent-btn" onclick="app.rentPlan('Phantom Enterprise Stack', 10000)">Rent Plan</button>
+            <div class="rental-detail">Daily Profit: <strong>KES 1,800 / day</strong></div>
+            <button type="button" class="rent-btn" onclick="app.rentPlan('Phantom Enterprise Stack', 10000)">Rent Package</button>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. MY INVESTMENTS VIEW -->
+    <div id="myInvestmentsView" class="app-view hidden">
+      <div class="dash-section">
+        <div class="dash-section-title">My Purchased Investment Packages</div>
+        <div id="myInvestmentList">
+          <p style="color:#64748b; font-size:14px;">Loading active investments...</p>
         </div>
       </div>
     </div>
 
   </div>
 
-  <!-- DEPOSIT MODAL -->
-  <div id="depositModal" class="modal-overlay hidden">
-    <div class="modal-card">
-      <div class="modal-title">Deposit Funds</div>
-      <div class="routing-info">Merchant Routing ID: <strong>0111414027</strong></div>
-      <div class="field-group">
-        <label>Payment Method</label>
-        <select id="depNetwork"><option>Safaricom M-Pesa</option><option>Airtel Money</option></select>
-      </div>
-      <div class="field-group">
-        <label>Phone Number</label>
-        <input type="text" id="depPhone" class="input-box" placeholder="07XXXXXXXX">
-      </div>
-      <div class="field-group">
-        <label>Deposit Amount (KES)</label>
-        <input type="number" id="depAmount" class="input-box" placeholder="Enter amount">
-      </div>
-      <div class="modal-actions">
-        <button type="button" class="btn-cancel" onclick="app.closeDepositModal()">Cancel</button>
-        <button type="button" class="action-btn" style="background:#27ae60; flex:1;" onclick="app.processDeposit()">Send STK Push</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- WITHDRAW MODAL -->
-  <div id="withdrawModal" class="modal-overlay hidden">
-    <div class="modal-card">
-      <div class="modal-title">Withdraw Funds</div>
-      <div class="field-group">
-        <label>Payout Phone Number</label>
-        <input type="text" id="wdPhone" class="input-box" placeholder="07XXXXXXXX">
-      </div>
-      <div class="field-group">
-        <label>Amount (KES)</label>
-        <input type="number" id="wdAmount" class="input-box" placeholder="Enter amount">
-      </div>
-      <div class="modal-actions">
-        <button type="button" class="btn-cancel" onclick="app.closeWithdrawModal()">Cancel</button>
-        <button type="button" class="action-btn" style="background:#e74c3c; flex:1;" onclick="app.processWithdrawal()">Withdraw</button>
-      </div>
-    </div>
-  </div>
-
   <script>
-    // YOUR FIREBASE CONFIGURATION (AUTO-CONFIGURED)
     const firebaseConfig = {
       apiKey: "AIzaSyBfdA1xc1U66I-djERrDCLLbnZ3Cs1P6XA",
       authDomain: "phantoms-198ca.firebaseapp.com",
@@ -249,18 +222,43 @@
         box.style.display = "block";
       },
 
+      toggleMenu: function() {
+        document.getElementById('navDrawer').classList.toggle('open');
+      },
+
       showTab: function(tabName) {
         document.getElementById('statusAlert').style.display = "none";
+        const regBox = document.getElementById('registerBox');
+        const loginBox = document.getElementById('loginBox');
+        const regBtn = document.getElementById('tabRegisterBtn');
+        const loginBtn = document.getElementById('tabLoginBtn');
+
         if (tabName === 'register') {
-          document.getElementById('registerBox').classList.remove('hidden');
-          document.getElementById('loginBox').classList.add('hidden');
-          document.getElementById('tabRegisterBtn').classList.add('active');
-          document.getElementById('tabLoginBtn').classList.remove('active');
+          regBox.style.display = "block";
+          regBox.classList.remove('hidden');
+          loginBox.style.display = "none";
+          loginBox.classList.add('hidden');
+          regBtn.classList.add('active');
+          loginBtn.classList.remove('active');
         } else {
-          document.getElementById('registerBox').classList.add('hidden');
-          document.getElementById('loginBox').classList.remove('hidden');
-          document.getElementById('tabLoginBtn').classList.add('active');
-          document.getElementById('tabRegisterBtn').classList.remove('active');
+          regBox.style.display = "none";
+          regBox.classList.add('hidden');
+          loginBox.style.display = "block";
+          loginBox.classList.remove('hidden');
+          loginBtn.classList.add('active');
+          regBtn.classList.remove('active');
+        }
+      },
+
+      switchView: function(viewId) {
+        const views = document.querySelectorAll('.app-view');
+        views.forEach(v => v.classList.add('hidden'));
+        document.getElementById(viewId).classList.remove('hidden');
+        document.getElementById('navDrawer').classList.remove('open');
+        document.getElementById('statusAlert').style.display = "none";
+
+        if (viewId === 'myInvestmentsView') {
+          app.loadMyInvestments();
         }
       },
 
@@ -314,57 +312,73 @@
       },
 
       signOut: function() {
-        auth.signOut().then(() => app.showAlert("Signed out."));
+        auth.signOut().then(() => {
+          document.getElementById('navDrawer').classList.remove('open');
+          app.showAlert("Signed out.");
+        });
       },
 
       updateUI: function() {
         if (!app.userData) return;
         document.getElementById('userBalance').innerText = "KES " + (app.userData.balance || 0).toLocaleString();
         document.getElementById('userInvestments').innerText = "KES " + (app.userData.investments || 0).toLocaleString();
-        document.getElementById('userDisplayEmail').innerText = app.userData.email;
+        document.getElementById('profileEmail').innerText = app.userData.email;
+        document.getElementById('profilePhone').innerText = app.userData.phone;
       },
 
-      openDepositModal: function() {
-        document.getElementById('depPhone').value = app.userData ? app.userData.phone : '';
-        document.getElementById('depositModal').classList.remove('hidden');
-      },
-      closeDepositModal: function() { document.getElementById('depositModal').classList.add('hidden'); },
-
-      processDeposit: async function() {
-        const phone = document.getElementById('depPhone').value.trim();
+      submitDepositRequest: async function() {
+        const code = document.getElementById('depMpesaCode').value.trim().toUpperCase();
         const amt = parseFloat(document.getElementById('depAmount').value);
 
-        if (!phone || !amt || amt <= 0) { alert("Enter valid phone and amount."); return; }
+        if (!code || !amt || amt <= 0) {
+          app.showAlert("Please enter a valid M-Pesa code and amount.", true);
+          return;
+        }
 
-        app.closeDepositModal();
-        alert("STK Push sent to " + phone + ".\nRouted to Merchant: " + app.merchantNumber + ".\nEnter PIN on your phone.");
+        try {
+          await db.collection("depositRequests").add({
+            userId: app.currentUser.uid,
+            email: app.userData.email,
+            phone: app.userData.phone,
+            mpesaCode: code,
+            amount: amt,
+            status: "pending",
+            createdAt: new Date()
+          });
 
-        const newBal = (app.userData.balance || 0) + amt;
-        await db.collection("users").doc(app.currentUser.uid).update({ balance: newBal });
-        app.userData.balance = newBal;
-        app.updateUI();
-        app.showAlert("Deposit of KES " + amt.toLocaleString() + " added successfully!");
+          document.getElementById('depMpesaCode').value = "";
+          document.getElementById('depAmount').value = "";
+          app.showAlert("Payment code submitted! Funds will reflect upon admin verification.");
+        } catch (err) {
+          app.showAlert(err.message, true);
+        }
       },
-
-      openWithdrawModal: function() {
-        document.getElementById('wdPhone').value = app.userData ? app.userData.phone : '';
-        document.getElementById('withdrawModal').classList.remove('hidden');
-      },
-      closeWithdrawModal: function() { document.getElementById('withdrawModal').classList.add('hidden'); },
 
       processWithdrawal: async function() {
         const phone = document.getElementById('wdPhone').value.trim();
         const amt = parseFloat(document.getElementById('wdAmount').value);
 
-        if (!phone || !amt || amt <= 0) { alert("Enter valid phone and amount."); return; }
-        if (amt > (app.userData.balance || 0)) { alert("Insufficient Balance."); return; }
+        if (!phone || !amt || amt <= 0) { app.showAlert("Enter valid phone and amount.", true); return; }
+        if (amt > (app.userData.balance || 0)) { app.showAlert("Insufficient Balance.", true); return; }
 
-        app.closeWithdrawModal();
-        const newBal = app.userData.balance - amt;
-        await db.collection("users").doc(app.currentUser.uid).update({ balance: newBal });
-        app.userData.balance = newBal;
-        app.updateUI();
-        app.showAlert("Withdrawal of KES " + amt.toLocaleString() + " processed!");
+        try {
+          await db.collection("withdrawalRequests").add({
+            userId: app.currentUser.uid,
+            phone: phone,
+            amount: amt,
+            status: "pending",
+            createdAt: new Date()
+          });
+
+          const newBal = app.userData.balance - amt;
+          await db.collection("users").doc(app.currentUser.uid).update({ balance: newBal });
+          app.userData.balance = newBal;
+          app.updateUI();
+          document.getElementById('wdAmount').value = "";
+          app.showAlert("Withdrawal request for KES " + amt.toLocaleString() + " submitted!");
+        } catch (err) {
+          app.showAlert(err.message, true);
+        }
       },
 
       rentPlan: async function(name, cost) {
@@ -373,18 +387,60 @@
           return;
         }
 
-        const newBal = app.userData.balance - cost;
-        const newInv = (app.userData.investments || 0) + cost;
+        try {
+          const newBal = app.userData.balance - cost;
+          const newInv = (app.userData.investments || 0) + cost;
 
-        await db.collection("users").doc(app.currentUser.uid).update({
-          balance: newBal,
-          investments: newInv
-        });
+          await db.collection("users").doc(app.currentUser.uid).update({
+            balance: newBal,
+            investments: newInv
+          });
 
-        app.userData.balance = newBal;
-        app.userData.investments = newInv;
-        app.updateUI();
-        app.showAlert("Rented " + name + " for KES " + cost.toLocaleString() + "!");
+          await db.collection("userInvestments").add({
+            userId: app.currentUser.uid,
+            packageName: name,
+            cost: cost,
+            purchasedAt: new Date()
+          });
+
+          app.userData.balance = newBal;
+          app.userData.investments = newInv;
+          app.updateUI();
+          app.showAlert("Successfully rented " + name + "!");
+        } catch (err) {
+          app.showAlert(err.message, true);
+        }
+      },
+
+      loadMyInvestments: async function() {
+        const container = document.getElementById('myInvestmentList');
+        container.innerHTML = "Loading your active plans...";
+
+        try {
+          const snapshot = await db.collection("userInvestments")
+            .where("userId", "==", app.currentUser.uid)
+            .get();
+
+          if (snapshot.empty) {
+            container.innerHTML = "<p style='color:#64748b; font-size:14px;'>You have no active investment packages yet.</p>";
+            return;
+          }
+
+          let html = "<div style='display:flex; flex-direction:column; gap:10px;'>";
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            html += `
+              <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:8px;">
+                <strong style="color:#1a2b4c;">${data.packageName}</strong><br>
+                <span style="color:#27ae60; font-weight:bold;">Amount: KES ${data.cost.toLocaleString()}</span>
+              </div>
+            `;
+          });
+          html += "</div>";
+          container.innerHTML = html;
+        } catch (err) {
+          container.innerHTML = "<p style='color:red;'>Failed to load investments.</p>";
+        }
       }
     };
 
@@ -395,16 +451,18 @@
         if (doc.exists) {
           app.userData = doc.data();
           document.getElementById('authView').classList.add('hidden');
-          document.getElementById('dashboardView').classList.remove('hidden');
-          document.getElementById('logoutBtn').classList.remove('hidden');
+          document.getElementById('menuBtn').classList.remove('hidden');
+          app.switchView('dashboardView');
           app.updateUI();
         }
       } else {
         app.currentUser = null;
         app.userData = null;
         document.getElementById('authView').classList.remove('hidden');
-        document.getElementById('dashboardView').classList.add('hidden');
-        document.getElementById('logoutBtn').classList.add('hidden');
+        document.getElementById('menuBtn').classList.add('hidden');
+        const views = document.querySelectorAll('.app-view');
+        views.forEach(v => v.classList.add('hidden'));
+        app.showTab('register');
       }
     });
   </script>
