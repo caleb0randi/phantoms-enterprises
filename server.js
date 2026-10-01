@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
-const { sendVerificationEmail } = require('./mailer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,6 +21,11 @@ let assetPrototypes = [
   { id: '1', name: 'Commercial Refrigerator X1', category: 'Appliances', leaseCost: 150.00, dailyYield: 4.50, durationDays: 30, icon: '❄️' },
   { id: '2', name: 'Industrial Washing Machine', category: 'Laundry', leaseCost: 220.00, dailyYield: 5.35, durationDays: 45, icon: '🧺' }
 ];
+
+// Serve login page explicitly when visiting /login
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'login.html'));
+});
 
 // API ROUTE 1: Login Endpoint with Whitelist Role Assignment
 app.post('/api/login', (req, res) => {
@@ -66,3 +70,4 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+         
