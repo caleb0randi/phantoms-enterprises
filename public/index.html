@@ -32,7 +32,7 @@
       margin-top: 10px;
     }
 
-    /* Brand Header */
+    /* Brand Header with Restored Orange Icon */
     .brand-header {
       display: flex;
       align-items: center;
@@ -63,7 +63,7 @@
       color: #e67e22;
     }
 
-    /* Tab Controls */
+    /* Tab Switcher */
     .tab-switcher {
       display: flex;
       background-color: #eef2f5;
@@ -82,7 +82,6 @@
       border-radius: 6px;
       cursor: pointer;
       font-size: 15px;
-      transition: all 0.2s ease;
     }
 
     .tab-btn.active {
@@ -91,7 +90,7 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.08);
     }
 
-    /* Form Fields */
+    /* Form Styles */
     .field-group {
       display: flex;
       flex-direction: column;
@@ -114,11 +113,7 @@
       outline: none;
     }
 
-    .input-box:focus {
-      border-color: #2980b9;
-    }
-
-    .submit-btn {
+    .action-btn {
       width: 100%;
       padding: 14px;
       background-color: #3498db;
@@ -131,7 +126,7 @@
       margin-top: 10px;
     }
 
-    .submit-btn:hover { background-color: #2980b9; }
+    .action-btn:hover { background-color: #2980b9; }
 
     .status-alert {
       padding: 12px;
@@ -144,7 +139,7 @@
     .status-alert.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
     .status-alert.error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
-    /* DASHBOARD STYLES */
+    /* Dashboard UI */
     .dashboard-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -197,7 +192,6 @@
       color: #1e293b;
     }
 
-    /* RENTAL STORE */
     .rental-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -237,7 +231,7 @@
       font-weight: 600;
     }
 
-    /* POPUP MODALS */
+    /* Modal Styling */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -288,7 +282,7 @@
 
   <div class="container">
     
-    <!-- Top Header -->
+    <!-- Top Header with Restored Logo Icon -->
     <div class="brand-header">
       <div class="brand-logo-wrap">
         <svg class="logo-icon" viewBox="0 0 100 100" fill="none">
@@ -298,52 +292,52 @@
         </svg>
         <h1 class="brand-title">PHANTOMS <span>ENTERPRISES</span></h1>
       </div>
-      <button id="logoutBtn" class="logout-btn hidden">Sign Out</button>
+      <button id="logoutBtn" class="logout-btn hidden" onclick="app.signOut()">Sign Out</button>
     </div>
 
-    <!-- Alert Banner -->
+    <!-- Alert Box -->
     <div id="statusAlert" class="status-alert"></div>
 
     <!-- AUTHENTICATION CONTAINER -->
     <div id="authView">
       <div class="tab-switcher">
-        <button type="button" class="tab-btn active" id="tabRegisterBtn">Register</button>
-        <button type="button" class="tab-btn" id="tabLoginBtn">Sign In</button>
+        <button type="button" class="tab-btn active" id="tabRegisterBtn" onclick="app.showTab('register')">Register</button>
+        <button type="button" class="tab-btn" id="tabLoginBtn" onclick="app.showTab('login')">Sign In</button>
       </div>
 
-      <!-- Register Form -->
-      <form id="registerForm">
+      <!-- Register Box -->
+      <div id="registerBox">
         <div class="field-group">
           <label>Phone Number (e.g. 0712345678)</label>
-          <input type="text" id="regPhone" class="input-box" placeholder="Enter phone number" required>
+          <input type="text" id="regPhone" class="input-box" placeholder="Enter phone number">
         </div>
         <div class="field-group">
           <label>Email Address</label>
-          <input type="email" id="regEmail" class="input-box" placeholder="Enter email address" required>
+          <input type="email" id="regEmail" class="input-box" placeholder="Enter email address">
         </div>
         <div class="field-group">
           <label>Password</label>
-          <input type="password" id="regPassword" class="input-box" placeholder="Create password" required>
+          <input type="password" id="regPassword" class="input-box" placeholder="Create password">
         </div>
         <div class="field-group">
           <label>Confirm Password</label>
-          <input type="password" id="regConfirmPassword" class="input-box" placeholder="Re-enter password" required>
+          <input type="password" id="regConfirmPassword" class="input-box" placeholder="Re-enter password">
         </div>
-        <button type="submit" class="submit-btn">Register Account</button>
-      </form>
+        <button type="button" class="action-btn" onclick="app.registerUser()">Register Account</button>
+      </div>
 
-      <!-- Login Form -->
-      <form id="loginForm" class="hidden">
+      <!-- Login Box -->
+      <div id="loginBox" class="hidden">
         <div class="field-group">
           <label>Email Address or Phone Number</label>
-          <input type="text" id="loginIdentifier" class="input-box" placeholder="Enter email address or phone" required>
+          <input type="text" id="loginIdentifier" class="input-box" placeholder="Enter email address or phone">
         </div>
         <div class="field-group">
           <label>Password</label>
-          <input type="password" id="loginPassword" class="input-box" placeholder="Enter password" required>
+          <input type="password" id="loginPassword" class="input-box" placeholder="Enter password">
         </div>
-        <button type="submit" class="submit-btn">Sign In</button>
-      </form>
+        <button type="button" class="action-btn" onclick="app.loginUser()">Sign In</button>
+      </div>
     </div>
 
     <!-- USER DASHBOARD VIEW -->
@@ -367,8 +361,8 @@
 
       <!-- Quick Actions -->
       <div class="action-row">
-        <button type="button" class="btn-action btn-deposit" id="openDepositBtn">Deposit Funds</button>
-        <button type="button" class="btn-action btn-withdraw" id="openWithdrawBtn">Withdraw Funds</button>
+        <button type="button" class="btn-action btn-deposit" onclick="app.openDepositModal()">Deposit Funds</button>
+        <button type="button" class="btn-action btn-withdraw" onclick="app.openWithdrawModal()">Withdraw Funds</button>
       </div>
 
       <!-- Rental Plans -->
@@ -380,21 +374,21 @@
             <div class="rental-price">KES 1,000</div>
             <div class="rental-detail">Daily Income: <strong>KES 150 / day</strong></div>
             <div class="rental-detail">Duration: <strong>10 Days</strong></div>
-            <button type="button" class="rent-btn" onclick="rentPlan('Phantom Rig Alpha', 1000)">Rent Plan</button>
+            <button type="button" class="rent-btn" onclick="app.rentPlan('Phantom Rig Alpha', 1000)">Rent Plan</button>
           </div>
           <div class="rental-card">
             <h4>Phantom Rig Pro</h4>
             <div class="rental-price">KES 3,000</div>
             <div class="rental-detail">Daily Income: <strong>KES 500 / day</strong></div>
             <div class="rental-detail">Duration: <strong>15 Days</strong></div>
-            <button type="button" class="rent-btn" onclick="rentPlan('Phantom Rig Pro', 3000)">Rent Plan</button>
+            <button type="button" class="rent-btn" onclick="app.rentPlan('Phantom Rig Pro', 3000)">Rent Plan</button>
           </div>
           <div class="rental-card">
             <h4>Phantom Enterprise Stack</h4>
             <div class="rental-price">KES 10,000</div>
             <div class="rental-detail">Daily Income: <strong>KES 1,800 / day</strong></div>
             <div class="rental-detail">Duration: <strong>20 Days</strong></div>
-            <button type="button" class="rent-btn" onclick="rentPlan('Phantom Enterprise Stack', 10000)">Rent Plan</button>
+            <button type="button" class="rent-btn" onclick="app.rentPlan('Phantom Enterprise Stack', 10000)">Rent Plan</button>
           </div>
         </div>
       </div>
@@ -402,7 +396,7 @@
       <!-- Financial Profile -->
       <div class="dash-section">
         <div class="dash-section-title">Financial Personal Profile</div>
-        <form id="profileForm">
+        <div>
           <div class="field-group">
             <label>Full Legal Name</label>
             <input type="text" id="profFullName" class="input-box" placeholder="Full name as on ID">
@@ -415,8 +409,8 @@
             <label>Financial Payout Phone Number</label>
             <input type="text" id="profPayoutPhone" class="input-box" placeholder="07XXXXXXXX">
           </div>
-          <button type="submit" class="submit-btn" style="width:200px;">Save Profile</button>
-        </form>
+          <button type="button" class="action-btn" style="width:200px;" onclick="app.saveProfile()">Save Profile</button>
+        </div>
       </div>
 
     </div>
@@ -444,8 +438,8 @@
         <input type="number" id="depAmount" class="input-box" placeholder="Enter amount">
       </div>
       <div class="modal-actions">
-        <button type="button" class="btn-cancel" id="closeDepositBtn">Cancel</button>
-        <button type="button" class="submit-btn" style="background:#27ae60; flex:1;" id="confirmDepositBtn">Confirm & Send STK Push</button>
+        <button type="button" class="btn-cancel" onclick="app.closeDepositModal()">Cancel</button>
+        <button type="button" class="action-btn" style="background:#27ae60; flex:1;" onclick="app.processDeposit()">Confirm & Send STK Push</button>
       </div>
     </div>
   </div>
@@ -470,95 +464,64 @@
         <input type="number" id="wdAmount" class="input-box" placeholder="Enter amount">
       </div>
       <div class="modal-actions">
-        <button type="button" class="btn-cancel" id="closeWithdrawBtn">Cancel</button>
-        <button type="button" class="submit-btn" style="background:#e74c3c; flex:1;" id="confirmWithdrawBtn">Confirm Withdrawal</button>
+        <button type="button" class="btn-cancel" onclick="app.closeWithdrawModal()">Cancel</button>
+        <button type="button" class="action-btn" style="background:#e74c3c; flex:1;" onclick="app.processWithdrawal()">Confirm Withdrawal</button>
       </div>
     </div>
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      const SYSTEM_MERCHANT = "0111414027";
-      let currentUser = null;
-      let userDatabase = [];
+    // Global Application Object
+    window.app = {
+      merchantNumber: "0111414027",
+      currentUser: null,
+      users: [],
 
-      // Alert helper
-      function showAlert(msg, isError = false) {
-        const box = document.getElementById('statusAlert');
+      showAlert: function(msg, isError) {
+        var box = document.getElementById('statusAlert');
         box.className = isError ? "status-alert error" : "status-alert success";
         box.innerText = msg;
         box.style.display = "block";
-      }
+      },
 
-      // Tab switching: Register vs Sign In
-      document.getElementById('tabRegisterBtn').addEventListener('click', function() {
+      showTab: function(tabName) {
         document.getElementById('statusAlert').style.display = "none";
-        document.getElementById('registerForm').classList.remove('hidden');
-        document.getElementById('loginForm').classList.add('hidden');
-        document.getElementById('tabRegisterBtn').classList.add('active');
-        document.getElementById('tabLoginBtn').classList.remove('active');
-      });
-
-      document.getElementById('tabLoginBtn').addEventListener('click', function() {
-        document.getElementById('statusAlert').style.display = "none";
-        document.getElementById('registerForm').classList.add('hidden');
-        document.getElementById('loginForm').classList.remove('hidden');
-        document.getElementById('tabLoginBtn').classList.add('active');
-        document.getElementById('tabRegisterBtn').classList.remove('active');
-      });
-
-      // UI Update logic
-      function updateUI() {
-        if (!currentUser) return;
-        document.getElementById('userBalance').innerText = `KES ${(currentUser.balance || 0).toLocaleString('.2f')}`;
-        document.getElementById('userInvestments').innerText = `KES ${(currentUser.investments || 0).toLocaleString('.2f')}`;
-        document.getElementById('userReferrals').innerText = `${currentUser.referrals || 0} Users`;
-      }
-
-      function launchDashboard(user) {
-        currentUser = user;
-        document.getElementById('authView').classList.add('hidden');
-        document.getElementById('dashboardView').classList.remove('hidden');
-        document.getElementById('logoutBtn').classList.remove('hidden');
-        
-        document.getElementById('profFullName').value = user.fullName || '';
-        document.getElementById('profNationalId').value = user.nationalId || '';
-        document.getElementById('profPayoutPhone').value = user.payoutPhone || user.phone;
-
-        updateUI();
-      }
-
-      function saveUserRecord() {
-        const idx = userDatabase.findIndex(u => u.phone === currentUser.phone || u.email === currentUser.email);
-        if (idx !== -1) {
-          userDatabase[idx] = currentUser;
+        if (tabName === 'register') {
+          document.getElementById('registerBox').classList.remove('hidden');
+          document.getElementById('loginBox').classList.add('hidden');
+          document.getElementById('tabRegisterBtn').classList.add('active');
+          document.getElementById('tabLoginBtn').classList.remove('active');
         } else {
-          userDatabase.push(currentUser);
+          document.getElementById('registerBox').classList.add('hidden');
+          document.getElementById('loginBox').classList.remove('hidden');
+          document.getElementById('tabLoginBtn').classList.add('active');
+          document.getElementById('tabRegisterBtn').classList.remove('active');
         }
-        updateUI();
-      }
+      },
 
-      // Handle Registration Submit
-      document.getElementById('registerForm').addEventListener('submit', function(e) {
-        e.preventDefault();
+      registerUser: function() {
+        var phone = document.getElementById('regPhone').value.trim();
+        var email = document.getElementById('regEmail').value.trim().toLowerCase();
+        var password = document.getElementById('regPassword').value;
+        var confirmPassword = document.getElementById('regConfirmPassword').value;
 
-        const phone = document.getElementById('regPhone').value.trim();
-        const email = document.getElementById('regEmail').value.trim().toLowerCase();
-        const password = document.getElementById('regPassword').value;
-        const confirmPassword = document.getElementById('regConfirmPassword').value;
+        if (!phone || !email || !password || !confirmPassword) {
+          app.showAlert("Please fill in all details.", true);
+          return;
+        }
 
         if (password !== confirmPassword) {
-          showAlert("Passwords do not match. Please re-enter passwords.", true);
+          app.showAlert("Passwords do not match. Please try again.", true);
           return;
         }
 
-        const exists = userDatabase.some(u => u.phone === phone || u.email === email);
+        var exists = app.users.some(function(u) { return u.phone === phone || u.email === email; });
         if (exists) {
-          showAlert("An account with this phone or email already exists. Click 'Sign In' to log in.", true);
+          app.showAlert("An account already exists with this email or phone. Click Sign In.", true);
           return;
         }
 
-        const newUser = {
+        var newUser = {
           phone: phone,
           email: email,
           password: password,
@@ -570,46 +533,82 @@
           payoutPhone: phone
         };
 
-        userDatabase.push(newUser);
-        showAlert("Account created successfully!");
-        launchDashboard(newUser);
-      });
+        app.users.push(newUser);
+        app.currentUser = newUser;
+        app.openDashboard();
+        app.showAlert("Account created successfully! Welcome.");
+      },
 
-      // Handle Login Submit
-      document.getElementById('loginForm').addEventListener('submit', function(e) {
-        e.preventDefault();
+      loginUser: function() {
+        var id = document.getElementById('loginIdentifier').value.trim().toLowerCase();
+        var pass = document.getElementById('loginPassword').value;
 
-        const id = document.getElementById('loginIdentifier').value.trim().toLowerCase();
-        const pass = document.getElementById('loginPassword').value;
-
-        const foundUser = userDatabase.find(u => (u.phone.toLowerCase() === id || u.email.toLowerCase() === id) && u.password === pass);
-
-        if (foundUser) {
-          showAlert("Login successful!");
-          launchDashboard(foundUser);
-        } else {
-          showAlert("Invalid credentials! Please check your email/phone and password.", true);
+        if (!id || !pass) {
+          app.showAlert("Please enter your email/phone and password.", true);
+          return;
         }
-      });
 
-      // Sign Out
-      document.getElementById('logoutBtn').addEventListener('click', function() {
-        currentUser = null;
+        var user = app.users.find(function(u) {
+          return (u.phone.toLowerCase() === id || u.email.toLowerCase() === id) && u.password === pass;
+        });
+
+        if (user) {
+          app.currentUser = user;
+          app.openDashboard();
+          app.showAlert("Signed in successfully!");
+        } else {
+          app.showAlert("Invalid email/phone or password.", true);
+        }
+      },
+
+      openDashboard: function() {
+        document.getElementById('authView').classList.add('hidden');
+        document.getElementById('dashboardView').classList.remove('hidden');
+        document.getElementById('logoutBtn').classList.remove('hidden');
+
+        document.getElementById('profFullName').value = app.currentUser.fullName || '';
+        document.getElementById('profNationalId').value = app.currentUser.nationalId || '';
+        document.getElementById('profPayoutPhone').value = app.currentUser.payoutPhone || app.currentUser.phone;
+
+        app.renderUI();
+      },
+
+      renderUI: function() {
+        if (!app.currentUser) return;
+        document.getElementById('userBalance').innerText = "KES " + (app.currentUser.balance || 0).toLocaleString();
+        document.getElementById('userInvestments').innerText = "KES " + (app.currentUser.investments || 0).toLocaleString();
+        document.getElementById('userReferrals').innerText = (app.currentUser.referrals || 0) + " Users";
+      },
+
+      signOut: function() {
+        app.currentUser = null;
         document.getElementById('dashboardView').classList.add('hidden');
         document.getElementById('logoutBtn').classList.add('hidden');
         document.getElementById('authView').classList.remove('hidden');
-        document.getElementById('tabLoginBtn').click();
-        showAlert("You have signed out.");
-      });
+        app.showTab('login');
+        app.showAlert("Signed out.");
+      },
 
-      // Deposit Modal logic
-      document.getElementById('openDepositBtn').addEventListener('click', function() {
-        document.getElementById('depPhone').value = currentUser.payoutPhone || currentUser.phone;
+      openDepositModal: function() {
+        document.getElementById('depPhone').value = app.currentUser.payoutPhone || app.currentUser.phone;
         document.getElementById('depositModal').classList.remove('hidden');
-      });
+      },
 
-      document.getElementById('closeDepositBtn').addEventListener('click', function() {
+      closeDepositModal: function() {
         document.getElementById('depositModal').classList.add('hidden');
-      });
+      },
 
-      document.ge
+      processDeposit: function() {
+        var net = document.getElementById('depNetwork').value;
+        var phone = document.getElementById('depPhone').value.trim();
+        var amt = parseFloat(document.getElementById('depAmount').value);
+
+        if (!phone || !amt || amt <= 0) {
+          alert("Enter a valid phone number and deposit amount.");
+          return;
+        }
+
+        app.closeDepositModal();
+        alert("STK Push sent to " + phone + " via " + net + ".\nRouting to Merchant: " + app.merchantNumber + ".\n\nEnter PIN on your mobile phone.");
+
+        app.currentUser.balan
