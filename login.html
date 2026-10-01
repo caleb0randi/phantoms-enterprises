@@ -6,59 +6,82 @@
   <title>Access Portal | Phantoms Enterprises</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    .glass { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); }
+    .glass { background: rgba(15, 23, 42, 0.90); backdrop-filter: blur(16px); }
     .gold-gradient { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans flex items-center justify-center p-4">
 
-  <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl glass">
+  <!-- Centered Portal Box -->
+  <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl glass my-auto">
     
     <div class="text-center mb-8">
-      <h1 class="text-3xl font-black text-white tracking-wider">PHANTOMS</h1>
-      <p class="text-amber-400 text-xs font-semibold uppercase tracking-widest mt-1">Enterprises Access Portal</p>
+      <span class="text-4xl">⚡</span>
+      <h1 class="text-3xl font-black text-white tracking-wider mt-2">PHANTOMS</h1>
+      <p class="text-amber-400 text-xs font-bold uppercase tracking-widest mt-1">Enterprises Access Portal</p>
     </div>
 
-    <!-- Mode Selector Tabs -->
-    <div class="flex mb-6 bg-slate-950 p-1 rounded-xl border border-slate-800">
-      <button id="loginTabBtn" onclick="switchTab('login')" class="flex-1 py-2 text-sm font-bold rounded-lg bg-amber-500 text-slate-950">Sign In</button>
-      <button id="registerTabBtn" onclick="switchTab('register')" class="flex-1 py-2 text-sm font-bold rounded-lg text-slate-400">Register</button>
+    <!-- Navigation Tabs -->
+    <div class="flex mb-6 bg-slate-950 p-1.5 rounded-2xl border border-slate-800">
+      <button id="loginTabBtn" onclick="switchTab('login')" class="flex-1 py-2.5 text-xs font-bold rounded-xl bg-amber-500 text-slate-950 shadow-md">Sign In</button>
+      <button id="registerTabBtn" onclick="switchTab('register')" class="flex-1 py-2.5 text-xs font-bold rounded-xl text-slate-400">Register</button>
+      <button id="forgotTabBtn" onclick="switchTab('forgot')" class="flex-1 py-2.5 text-xs font-bold rounded-xl text-slate-400">Forgot PIN</button>
     </div>
 
-    <!-- Login Form -->
+    <!-- 1. Login Form -->
     <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
       <div>
-        <label class="block text-sm font-medium text-slate-300 mb-1">Username / Email</label>
-        <input type="text" id="loginUsername" required placeholder="phantomenterprises@gmail.com" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-amber-500">
+        <label class="block text-xs font-semibold text-slate-400 mb-1">Username / Email</label>
+        <input type="text" id="username" required placeholder="e.g. phantomsenterprises@gmail.com" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
       </div>
       <div>
-        <label class="block text-sm font-medium text-slate-300 mb-1">Password</label>
-        <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-amber-500">
+        <label class="block text-xs font-semibold text-slate-400 mb-1">Password</label>
+        <input type="password" id="password" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
       </div>
-      <button type="submit" class="w-full gold-gradient text-slate-950 font-bold py-3 rounded-xl hover:opacity-90 transition shadow-lg">Sign In</button>
+      <button type="submit" class="w-full gold-gradient text-slate-950 font-bold py-3.5 rounded-xl hover:opacity-90 transition text-xs shadow-lg">Sign In</button>
     </form>
 
-    <!-- Register Form -->
+    <!-- 2. Registration Form -->
     <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-4 hidden">
       <div>
-        <label class="block text-sm font-medium text-slate-300 mb-1">Email Address</label>
+        <label class="block text-xs font-semibold text-slate-400 mb-1">Email Address</label>
         <div class="flex gap-2">
-          <input type="email" id="regEmail" required placeholder="user@gmail.com" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-amber-500">
-          <button type="button" onclick="sendCode()" class="px-3 py-2 bg-slate-800 text-amber-400 text-xs font-bold rounded-xl hover:bg-slate-700 whitespace-nowrap">Send Code</button>
+          <input type="email" id="regEmail" required placeholder="user@gmail.com" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
+          <button type="button" onclick="sendRegisterCode()" class="px-3 py-2 bg-slate-800 text-amber-400 text-xs font-bold rounded-xl hover:bg-slate-700 whitespace-nowrap">Send Code</button>
         </div>
       </div>
       <div>
-        <label class="block text-sm font-medium text-slate-300 mb-1">Verification Code</label>
-        <input type="text" id="regCode" required placeholder="6-digit code" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-amber-500">
+        <label class="block text-xs font-semibold text-slate-400 mb-1">Verification Code</label>
+        <input type="text" id="regCode" required placeholder="6-digit email code" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
       </div>
       <div>
-        <label class="block text-sm font-medium text-slate-300 mb-1">Create Password</label>
-        <input type="password" id="regPassword" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-amber-500">
+        <label class="block text-xs font-semibold text-slate-400 mb-1">Create Password</label>
+        <input type="password" id="regPassword" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
       </div>
-      <button type="submit" class="w-full gold-gradient text-slate-950 font-bold py-3 rounded-xl hover:opacity-90 transition shadow-lg">Verify & Create Account</button>
+      <button type="submit" class="w-full gold-gradient text-slate-950 font-bold py-3.5 rounded-xl hover:opacity-90 transition text-xs shadow-lg">Verify & Create Account</button>
     </form>
 
-    <div id="statusMessage" class="mt-4 text-center text-sm font-semibold hidden"></div>
+    <!-- 3. Forgot Password Form -->
+    <form id="forgotForm" onsubmit="handleForgotPasswordReset(event)" class="space-y-4 hidden">
+      <div>
+        <label class="block text-xs font-semibold text-slate-400 mb-1">Registered Email Address</label>
+        <div class="flex gap-2">
+          <input type="email" id="forgotEmail" required placeholder="your-email@gmail.com" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
+          <button type="button" onclick="sendForgotCode()" class="px-3 py-2 bg-slate-800 text-amber-400 text-xs font-bold rounded-xl hover:bg-slate-700 whitespace-nowrap">Send Reset Code</button>
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-400 mb-1">Reset Code</label>
+        <input type="text" id="forgotCode" required placeholder="6-digit code" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-400 mb-1">New Password</label>
+        <input type="password" id="forgotNewPassword" required placeholder="Enter new password" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
+      </div>
+      <button type="submit" class="w-full bg-amber-500 text-slate-950 font-bold py-3.5 rounded-xl hover:bg-amber-400 transition text-xs shadow-lg">Reset Password</button>
+    </form>
+
+    <div id="statusMessage" class="mt-4 text-center text-xs font-semibold hidden"></div>
 
   </div>
 
@@ -66,57 +89,73 @@
     function switchTab(tab) {
       const loginForm = document.getElementById('loginForm');
       const registerForm = document.getElementById('registerForm');
+      const forgotForm = document.getElementById('forgotForm');
+      
       const loginBtn = document.getElementById('loginTabBtn');
       const regBtn = document.getElementById('registerTabBtn');
+      const forgotBtn = document.getElementById('forgotTabBtn');
+
+      loginForm.classList.add('hidden');
+      registerForm.classList.add('hidden');
+      forgotForm.classList.add('hidden');
+
+      loginBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl text-slate-400";
+      regBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl text-slate-400";
+      forgotBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl text-slate-400";
 
       if (tab === 'login') {
         loginForm.classList.remove('hidden');
-        registerForm.classList.add('hidden');
-        loginBtn.className = "flex-1 py-2 text-sm font-bold rounded-lg bg-amber-500 text-slate-950";
-        regBtn.className = "flex-1 py-2 text-sm font-bold rounded-lg text-slate-400";
-      } else {
-        loginForm.classList.add('hidden');
+        loginBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl bg-amber-500 text-slate-950 shadow-md";
+      } else if (tab === 'register') {
         registerForm.classList.remove('hidden');
-        regBtn.className = "flex-1 py-2 text-sm font-bold rounded-lg bg-amber-500 text-slate-950";
-        loginBtn.className = "flex-1 py-2 text-sm font-bold rounded-lg text-slate-400";
+        regBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl bg-amber-500 text-slate-950 shadow-md";
+      } else if (tab === 'forgot') {
+        forgotForm.classList.remove('hidden');
+        forgotBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl bg-amber-500 text-slate-950 shadow-md";
       }
     }
 
     async function handleLogin(e) {
       e.preventDefault();
-      const username = document.getElementById('loginUsername').value;
-      const password = document.getElementById('loginPassword').value;
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
       const status = document.getElementById('statusMessage');
 
-      status.className = "mt-4 text-center text-sm font-semibold text-blue-400";
-      status.innerText = "Authenticating...";
+      status.className = "mt-4 text-center text-xs font-semibold text-blue-400";
+      status.innerText = "Authenticating credentials...";
       status.classList.remove('hidden');
 
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      });
-      const data = await res.json();
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
 
-      if (data.success) {
-        localStorage.setItem('userRole', data.user.role);
-        localStorage.setItem('userEmail', data.user.email);
-        status.className = "mt-4 text-center text-sm font-semibold text-emerald-400";
-        status.innerText = `Login successful! Redirecting...`;
-        setTimeout(() => window.location.href = '/', 800);
-      } else {
-        status.className = "mt-4 text-center text-sm font-semibold text-red-400";
-        status.innerText = data.message || "Invalid credentials.";
+        if (data.success) {
+          localStorage.setItem('userRole', data.user.role);
+          localStorage.setItem('userEmail', data.user.email);
+          localStorage.setItem('username', data.user.username);
+          status.className = "mt-4 text-center text-xs font-semibold text-emerald-400";
+          status.innerText = `Login successful as ${data.user.role}! Redirecting...`;
+          setTimeout(() => window.location.href = '/', 600);
+        } else {
+          status.className = "mt-4 text-center text-xs font-semibold text-red-400";
+          status.innerText = data.message || "Invalid credentials.";
+        }
+      } catch (err) {
+        status.className = "mt-4 text-center text-xs font-semibold text-red-400";
+        status.innerText = "Server error. Please try again.";
       }
     }
 
-    async function sendCode() {
+    async function sendRegisterCode() {
       const email = document.getElementById('regEmail').value;
       const status = document.getElementById('statusMessage');
       if (!email) return alert('Enter email first');
 
-      status.className = "mt-4 text-center text-sm font-semibold text-blue-400";
+      status.className = "mt-4 text-center text-xs font-semibold text-blue-400";
       status.innerText = "Sending code via Brevo...";
       status.classList.remove('hidden');
 
@@ -126,7 +165,7 @@
         body: JSON.stringify({ email })
       });
       const data = await res.json();
-      status.className = "mt-4 text-center text-sm font-semibold text-emerald-400";
+      status.className = "mt-4 text-center text-xs font-semibold text-emerald-400";
       status.innerText = data.message;
     }
 
@@ -145,15 +184,65 @@
       const data = await res.json();
 
       if (data.success) {
-        status.className = "mt-4 text-center text-sm font-semibold text-emerald-400";
-        status.innerText = "Registration complete! You can now sign in.";
+        status.className = "mt-4 text-center text-xs font-semibold text-emerald-400";
+        status.innerText = "Account created! Redirecting to login...";
         setTimeout(() => switchTab('login'), 1200);
       } else {
-        status.className = "mt-4 text-center text-sm font-semibold text-red-400";
+        status.className = "mt-4 text-center text-xs font-semibold text-red-400";
+        status.innerText = data.message;
+      }
+    }
+
+    async function sendForgotCode() {
+      const email = document.getElementById('forgotEmail').value;
+      const status = document.getElementById('statusMessage');
+      if (!email) return alert('Enter registered email first');
+
+      status.className = "mt-4 text-center text-xs font-semibold text-blue-400";
+      status.innerText = "Sending reset code...";
+      status.classList.remove('hidden');
+
+      const res = await fetch('/api/forgot-password/send-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        status.className = "mt-4 text-center text-xs font-semibold text-emerald-400";
+        status.innerText = data.message;
+      } else {
+        status.className = "mt-4 text-center text-xs font-semibold text-red-400";
+        status.innerText = data.message;
+      }
+    }
+
+    async function handleForgotPasswordReset(e) {
+      e.preventDefault();
+      const email = document.getElementById('forgotEmail').value;
+      const code = document.getElementById('forgotCode').value;
+      const newPassword = document.getElementById('forgotNewPassword').value;
+      const status = document.getElementById('statusMessage');
+
+      const res = await fetch('/api/forgot-password/reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code, newPassword })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        status.className = "mt-4 text-center text-xs font-semibold text-emerald-400";
+        status.innerText = "Password reset successfully! Redirecting to login...";
+        setTimeout(() => switchTab('login'), 1200);
+      } else {
+        status.className = "mt-4 text-center text-xs font-semibold text-red-400";
         status.innerText = data.message;
       }
     }
   </script>
 
 </body>
-</html>
+  </html>
+  
