@@ -45,7 +45,7 @@
 
     <div id="statusAlert" class="status-alert"></div>
 
-    <!-- AUTHENTICATION VIEW (ALWAYS SHOWN FIRST) -->
+    <!-- AUTHENTICATION VIEW -->
     <div id="authView">
       <div class="tab-switcher">
         <button type="button" class="tab-btn active" id="tabRegisterBtn" onclick="app.showTab('register')">Register</button>
@@ -87,7 +87,7 @@
       </div>
     </div>
 
-    <!-- APPLICATION VIEWS (LOCKED & HIDDEN UNTIL VALID AUTHENTICATION) -->
+    <!-- APPLICATION VIEWS -->
     
     <!-- 1. DASHBOARD VIEW -->
     <div id="dashboardView" class="app-view hidden">
@@ -251,9 +251,8 @@
       },
 
       switchView: function(viewId) {
-        // SECURITY GUARD: If user is not authenticated, block navigation completely
         if (!app.currentUser) {
-          app.showAlert("Access denied. Please register or sign in first.", true);
+          app.showAlert("Please register or sign in to access this page.", true);
           return;
         }
 
@@ -286,27 +285,15 @@
         try {
           const credential = await auth.createUserWithEmailAndPassword(email, pass);
           
-          const newUser = {
+          await db.collection("users").doc(credential.user.uid).set({
             phone: phone,
             email: email,
             balance: 0,
             investments: 0,
             createdAt: new Date()
-          };
-
-          await db.collection("users").doc(credential.user.uid).set(newUser);
-
-          app.currentUser = credential.user;
-          app.userData = newUser;
+          });
 
           app.showAlert("Account registered successfully!");
-          
-          // Unlock dashboard ONLY after successful registration
-          document.getElementById('authView').classList.add('hidden');
-          document.getElementById('menuBtn').classList.remove('hidden');
-          app.switchView('dashboardView');
-          app.updateUI();
-
         } catch (error) {
           app.showAlert(error.message, true);
         }
@@ -322,23 +309,8 @@
         }
 
         try {
-          const credential = await auth.signInWithEmailAndPassword(email, pass);
-          const doc = await db.collection("users").doc(credential.user.uid).get();
-          
-          if (doc.exists) {
-            app.currentUser = credential.user;
-            app.userData = doc.data();
-
-            app.showAlert("Signed in successfully!");
-            
-            // Unlock dashboard ONLY after successful sign in
-            document.getElementById('authView').classList.add('hidden');
-            document.getElementById('menuBtn').classList.remove('hidden');
-            app.switchView('dashboardView');
-            app.updateUI();
-          } else {
-            app.showAlert("User record not found in Firestore.", true);
-          }
+          await auth.signInWithEmailAndPassword(email, pass);
+          app.showAlert("Signed in successfully!");
         } catch (error) {
           app.showAlert("Invalid email or password.", true);
         }
@@ -346,20 +318,8 @@
 
       signOut: function() {
         auth.signOut().then(() => {
-          app.currentUser = null;
-          app.userData = null;
-
-          // Lock down all dashboard views and return to Register page
           document.getElementById('navDrawer').classList.remove('open');
-          document.getElementById('menuBtn').classList.add('hidden');
-
-          const views = document.querySelectorAll('.app-view');
-          views.forEach(v => v.classList.add('hidden'));
-
-          document.getElementById('authView').classList.remove('hidden');
-          app.showTab('register');
-
-          app.showAlert("You have signed out.");
+          app.showAlert("Signed out.");
         });
       },
 
@@ -372,7 +332,6 @@
       },
 
       submitDepositRequest: async function() {
-        if (!app.currentUser) return;
         const code = document.getElementById('depMpesaCode').value.trim().toUpperCase();
         const amt = parseFloat(document.getElementById('depAmount').value);
 
@@ -401,7 +360,6 @@
       },
 
       processWithdrawal: async function() {
-        if (!app.currentUser) return;
         const phone = document.getElementById('wdPhone').value.trim();
         const amt = parseFloat(document.getElementById('wdAmount').value);
 
@@ -429,7 +387,6 @@
       },
 
       rentPlan: async function(name, cost) {
-        if (!app.currentUser) return;
         if ((app.userData.balance || 0) < cost) {
           app.showAlert("Insufficient balance to rent " + name + ". Deposit funds first.", true);
           return;
@@ -461,7 +418,6 @@
       },
 
       loadMyInvestments: async function() {
-        if (!app.currentUser) return;
         const container = document.getElementById('myInvestmentList');
         container.innerHTML = "Loading your active plans...";
 
@@ -493,5 +449,27 @@
       }
     };
 
-    // FORCE AUTHENTICATION LANDING ON INITIAL PAGE LOAD
-    auth.onAuthStateChan
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        app.currentUser = user;
+        const doc = await db.collection("users").doc(user.uid).get();
+        if (doc.exists) {
+          app.userData = doc.data();
+          document.getElementById('authView').classList.add('hidden');
+          document.getElementById('menuBtn').classList.remove('hidden');
+          app.switchView('dashboardView');
+          app.updateUI();
+        }
+      } else {
+        app.currentUser = null;
+        app.userData = null;
+        document.getElementById('authView').classList.remove('hidden');
+        document.getElementById('menuBtn').classList.add('hidden');
+        const views = document.querySelectorAll('.app-view');
+        views.forEach(v => v.classList.add('hidden'));
+        app.showTab('register');
+      }
+    });
+  </script>
+</body>
+</html>
