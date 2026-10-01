@@ -32,11 +32,11 @@
     <form id="login-form">
         <div class="input-group">
             <label>Username</label>
-            <input type="text" id="login-username" required>
+            <input type="text" id="login-username" autocomplete="username" required>
         </div>
         <div class="input-group">
             <label>Password</label>
-            <input type="password" id="login-password" required>
+            <input type="password" id="login-password" autocomplete="current-password" required>
         </div>
         <button type="submit">Log In</button>
         <div class="toggle-link">
@@ -53,7 +53,7 @@
         <div class="input-group">
             <label>Email or Phone Number</label>
             <div class="code-row">
-                <input type="text" id="signup-contact" required placeholder="user@example.com">
+                <input type="email" id="signup-contact" required placeholder="user@example.com">
                 <button type="button" onclick="sendCode()">Get Code</button>
             </div>
         </div>
@@ -73,11 +73,6 @@
 </div>
 
 <script>
-    // Auto-redirect if already logged in
-    if (localStorage.getItem('phantom_user')) {
-        window.location.href = '/dashboard';
-    }
-
     const msg = document.getElementById('msg');
 
     function showMsg(text, isError = true) {
@@ -102,19 +97,23 @@
 
     async function sendCode() {
         const contact = document.getElementById('signup-contact').value;
-        if (!contact) return showMsg('Please enter an email or phone number.');
+        if (!contact) return showMsg('Please enter an email address.');
 
-        const res = await fetch('/api/send-code', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contact })
-        });
-        const data = await res.json();
-        
-        if (data.success) {
-            showMsg(`Code sent! (Dev Code: ${data.devCode})`, false);
-        } else {
-            showMsg(data.message);
+        try {
+            const res = await fetch('/api/send-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contact })
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                showMsg('Verification code sent to your email!', false);
+            } else {
+                showMsg(data.message);
+            }
+        } catch (err) {
+            showMsg('Error sending verification code. Please try again.');
         }
     }
 
@@ -123,18 +122,22 @@
         const username = document.getElementById('login-username').value;
         const password = document.getElementById('login-password').value;
 
-        const res = await fetch('/api/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-        });
-        const data = await res.json();
+        try {
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await res.json();
 
-        if (data.success) {
-            localStorage.setItem('phantom_user', JSON.stringify(data.user));
-            window.location.href = '/dashboard';
-        } else {
-            showMsg(data.message);
+            if (data.success) {
+                localStorage.setItem('phantom_user', JSON.stringify(data.user));
+                window.location.href = '/dashboard';
+            } else {
+                showMsg(data.message || 'Invalid username or password.');
+            }
+        } catch (err) {
+            showMsg('Login request failed. Server error.');
         }
     });
 
@@ -145,18 +148,22 @@
         const code = document.getElementById('signup-code').value;
         const password = document.getElementById('signup-password').value;
 
-        const res = await fetch('/api/signup', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, contact, password, code })
-        });
-        const data = await res.json();
+        try {
+            const res = await fetch('/api/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, contact, password, code })
+            });
+            const data = await res.json();
 
-        if (data.success) {
-            showMsg('Account created! Please log in.', false);
-            setTimeout(showLogin, 1500);
-        } else {
-            showMsg(data.message);
+            if (data.success) {
+                showMsg('Account created! Please log in.', false);
+                setTimeout(showLogin, 1500);
+            } else {
+                showMsg(data.message);
+            }
+        } catch (err) {
+            showMsg('Signup request failed.');
         }
     });
 </script>
