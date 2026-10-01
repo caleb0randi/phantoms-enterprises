@@ -23,12 +23,23 @@
     <!-- Login Form -->
     <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-6">
       <div>
-        <label for="email" class="block text-sm font-medium text-slate-300 mb-2">Email Address</label>
+        <label for="username" class="block text-sm font-medium text-slate-300 mb-2">Username / Email</label>
         <input 
-          type="email" 
-          id="email" 
+          type="text" 
+          id="username" 
           required 
-          placeholder="phantomsenterprises@gmail.com"
+          placeholder="phantomenterprises@gmail.com"
+          class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-blue-500 transition"
+        >
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium text-slate-300 mb-2">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          required 
+          placeholder="••••••••"
           class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-blue-500 transition"
         >
       </div>
@@ -49,7 +60,8 @@
     async function handleLogin(event) {
       event.preventDefault();
       
-      const emailInput = document.getElementById('email').value;
+      const usernameInput = document.getElementById('username').value;
+      const passwordInput = document.getElementById('password').value;
       const statusMsg = document.getElementById('statusMessage');
 
       statusMsg.className = "mt-4 text-center text-sm font-semibold text-blue-400";
@@ -60,26 +72,30 @@
         const response = await fetch('/api/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: emailInput })
+          body: JSON.stringify({ 
+            username: usernameInput, 
+            password: passwordInput 
+          })
         });
 
         const data = await response.json();
 
         if (data.success) {
-          // Save role and email sent back from server whitelist
+          // Store user details and superadmin role in localStorage
           localStorage.setItem('userRole', data.user.role);
           localStorage.setItem('userEmail', data.user.email);
+          localStorage.setItem('username', data.user.username);
 
           statusMsg.className = "mt-4 text-center text-sm font-semibold text-emerald-400";
-          statusMsg.innerText = `Login successful! Redirecting as ${data.user.role}...`;
+          statusMsg.innerText = `Login successful! Access granted as ${data.user.role}. Redirecting...`;
 
-          // Redirect to main platform dashboard
+          // Redirect directly to dashboard
           setTimeout(() => {
-            window.location.href = '/index.html';
-          }, 1000);
+            window.location.href = '/';
+          }, 800);
         } else {
           statusMsg.className = "mt-4 text-center text-sm font-semibold text-red-400";
-          statusMsg.innerText = data.message || "Login failed.";
+          statusMsg.innerText = data.message || "Invalid credentials.";
         }
       } catch (err) {
         console.error("Login error:", err);
